@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:jaldiio/LoginPage.dart';
 import './Animation/FadeAnimation.dart';
@@ -8,6 +9,11 @@ class ForgotPassword extends StatefulWidget {
 }
 
 class _ForgotPasswordState extends State<ForgotPassword> {
+
+  final _formKey = GlobalKey<FormState>();
+  String error = '';
+  String email_id = " ";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -87,28 +93,35 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                         borderRadius: BorderRadius.circular(10.0),
                         color: Colors.transparent,
                       ),
-                      child: Column(
-                        children: <Widget>[
-                          Container(
-                            padding: EdgeInsets.all(10.0),
-                            decoration: BoxDecoration(
-                              border: Border(
-                                bottom: BorderSide(
-                                    color: Colors.grey[100]
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          children: <Widget>[
+                            Container(
+                              padding: EdgeInsets.all(10.0),
+                              decoration: BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(
+                                      color: Colors.grey[100]
+                                  ),
                                 ),
                               ),
-                            ),
-                            child: TextField(
-                              decoration: InputDecoration(
-                                border: InputBorder.none,
-                                hintText: "E-mail",
-                                hintStyle: TextStyle(
-                                    color: Colors.grey
+                              child: TextFormField(
+                                decoration: InputDecoration(
+                                  border: InputBorder.none,
+                                  hintText: "E-mail",
+                                  hintStyle: TextStyle(
+                                      color: Colors.grey
+                                  ),
                                 ),
+                                validator: (val) => val.isEmpty ? 'Enter an Email ID' : null,
+                                onChanged: (val){
+                                  setState(() => email_id = val);
+                                },
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),),
                     SizedBox(
@@ -131,18 +144,25 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                           ),
                           ),
                         ),),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => LoginPage()),
-                        );
+                      onPressed: () async {
+                          if(_formKey.currentState.validate()){
+                              FirebaseAuth.instance.sendPasswordResetEmail(email: email_id).then((value) => print("Password link has been sent to the registered Email-ID."));
+                          }
+                          
+                      
                       },
                     ),
                     SizedBox(
                       height: 20.0,
                     ),
+                    Center(
+                        child: Text(
+                        error,
+                        style: TextStyle(color: Colors.orange[300], fontSize: 14.0),
+                      ),
+                    ),
                   ],
-                )
+                ),
 
             )
           ],
