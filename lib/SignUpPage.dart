@@ -191,7 +191,13 @@ class _SignUpPageState extends State<SignUpPage> {
 
                             if(result == null){
                               setState(() => error = 'Please supply a valid email');
+                            }else{
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => WelcomePage()),
+                                );
                             }
+
 
                           }
                       },
