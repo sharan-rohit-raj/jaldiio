@@ -9,9 +9,6 @@ import 'SignUpPage.dart';
 import 'WelcomePage.dart';
 import 'ForgotPassword.dart';
 import 'Wrapper.dart';
-import 'package:appcenter/appcenter.dart';
-import 'package:appcenter_analytics/appcenter_analytics.dart';
-import 'package:appcenter_crashes/appcenter_crashes.dart';
 
 
 void main() => runApp(MyApp());
