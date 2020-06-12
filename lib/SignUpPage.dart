@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:jaldiio/LoginPage.dart';
 import 'package:jaldiio/Services/auth.dart';
+import 'package:jaldiio/Shared/Loading.dart';
 import 'package:jaldiio/WelcomePage.dart';
 import './Animation/FadeAnimation.dart';
+import 'dart:developer';
 
 class SignUpPage extends StatefulWidget {
 
@@ -21,9 +23,11 @@ class _SignUpPageState extends State<SignUpPage> {
   String email_id = " ";
   String password = " ";
   String error = '';
+  bool load = false;
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return load == true? Loading() : Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Color(0xff24146d),
       body: Container(
@@ -55,19 +59,37 @@ class _SignUpPageState extends State<SignUpPage> {
                         ),
                       ),
                     ),
-                    BackButton(
-                      color: Colors.white,
-                      onPressed: (){
-                          widget.toggleView();
-                      },
-                    ),
+
+//                    BackButton(
+//                      color: Colors.white,
+//                      onPressed: (){
+////                          widget.toggleView();
+//                      print("stop clicking me!");
+//                      },
+
                 ],
 
               ),
             ),
 
+
+            Padding(
+              padding: EdgeInsets.fromLTRB(20, 0, 0, 0),
+              child: FadeAnimation(
+                1,
+                RaisedButton.icon(
+                  onPressed: () {widget.toggleView();},
+                  icon: Icon(Icons.arrow_back, color: Colors.white,),
+                  label: Text("Back", style: TextStyle(color: Colors.white)),
+                  color: Colors.deepPurpleAccent[200],
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18.0),
+                  ),
+                ),
+              ),
+            ),
             SizedBox(
-              height:20,
+              height: 40,
             ),
 
             Padding(
@@ -75,6 +97,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
+
                     FadeAnimation(
                       1,
                       Text(
@@ -113,6 +136,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                     border:InputBorder.none,
                                     hintText: "Email ID",
                                     hintStyle: TextStyle(color: Colors.grey)
+
                                 ),
                                 validator: (val) => val.isEmpty ? 'Enter an Email ID' : null,
                                 onChanged: (val){
@@ -187,15 +211,17 @@ class _SignUpPageState extends State<SignUpPage> {
                         ),),
                       onPressed: () async {
                           if(_formKey.currentState.validate()){
+                            setState(() {
+                              load = true;
+                            });
                             dynamic result = await _auth.registerWithEmailAndPassword(email_id, password);
 
                             if(result == null){
-                              setState(() => error = 'Please supply a valid email');
-                            }else{
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => WelcomePage()),
-                                );
+                              setState(() {
+                                load = false;
+                                error = 'Please supply a valid email';
+                              });
+
                             }
 
 
@@ -211,6 +237,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         style: TextStyle(color: Colors.red, fontSize: 14.0),
                       ),
                     ),
+
                   ],
                 )
 

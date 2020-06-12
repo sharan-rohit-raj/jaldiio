@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:jaldiio/Animation/FadeAnimation.dart';
 
 class ToDoList extends StatefulWidget {
   @override
@@ -16,8 +18,31 @@ class _ToDoListState extends State<ToDoList> {
         children: <Widget>[
           Container(
         ),
+          SizedBox(
+            height: 40,
+          ),
           Positioned(
-            child: Text("To-dos", style: TextStyle(color: Colors.white, fontSize: 40), ),
+            child: Row(
+
+              children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
+                  child: FadeAnimation(
+                    1,
+                    FlatButton.icon(
+                      onPressed: () {Navigator.pop(context);},
+                      icon: Icon(Icons.arrow_back, color: Colors.white,),
+                      label: Text("", style: TextStyle(color: Colors.white)),
+                      color: Colors.transparent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18.0),
+                      ),
+                    ),
+                  ),
+                ),
+                Text("To-dos", style: TextStyle(color: Colors.white, fontSize: 40), ),
+              ],
+            ),
             top:40,
             left:20,
           ),

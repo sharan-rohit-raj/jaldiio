@@ -2,8 +2,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:jaldiio/LoginPage.dart';
 import './Animation/FadeAnimation.dart';
+import 'package:jaldiio/LoginPage.dart';
 
 class ForgotPassword extends StatefulWidget {
+
+
   @override
   _ForgotPasswordState createState() => _ForgotPasswordState();
 }
@@ -51,8 +54,25 @@ class _ForgotPasswordState extends State<ForgotPassword> {
               ),
             ),
 
+            Padding(
+              padding: EdgeInsets.fromLTRB(20, 0, 0, 0),
+              child: FadeAnimation(
+                1,
+                RaisedButton.icon(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  icon: Icon(Icons.arrow_back, color: Colors.white,),
+                  label: Text("Back", style: TextStyle(color: Colors.white)),
+                  color: Colors.deepPurpleAccent[200],
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18.0),
+                  ),
+                ),
+              ),
+            ),
             SizedBox(
-              height:20,
+              height: 30,
             ),
 
             Padding(

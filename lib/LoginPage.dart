@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jaldiio/ForgotPassword.dart';
 import 'package:jaldiio/Services/auth.dart';
+import 'package:jaldiio/Shared/Loading.dart';
 import 'package:jaldiio/SignUpPage.dart';
 import './Animation/FadeAnimation.dart';
 
@@ -20,10 +21,11 @@ class _LoginPageState extends State<LoginPage> {
   String email_id = " ";
   String password = " ";
   String error = '';
+  bool load = false;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return load == true ? Loading() : Scaffold(
       resizeToAvoidBottomInset: false,
 
       body: Container(
@@ -181,11 +183,17 @@ class _LoginPageState extends State<LoginPage> {
                         ),),
                       onPressed: () async{
                           if(_formKey.currentState.validate()){
-                            
+                            setState(() {
+                              load = true;
+                            });
                             dynamic result = await _auth.signinWithEmailAndPassword(email_id, password);
 
                             if(result == null){
-                              setState(() => error = 'Oh..Oh that seems to be incorrect. Please try again.');
+                              setState(() {
+                                error = 'Oh..Oh that seems to be incorrect. Please try again.';
+                                load = false;
+                              });
+
                             }
                           }
                       },
