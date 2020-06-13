@@ -1,8 +1,11 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:jaldiio/Services/auth.dart';
+import 'package:jaldiio/Shared/GridDashboard.dart';
 import 'package:jaldiio/ToDoList.dart';
+
 import './Animation/FadeAnimation.dart';
 class Home extends StatefulWidget {
 
@@ -30,108 +33,203 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: Text("Jaldi.io", style: TextStyle(color: Colors.white),),
-        backgroundColor: Colors.orange,
-      elevation: 0.0,
-      actions: <Widget>[
-        FlatButton.icon(
-          onPressed: () async{
-              await _auth.signOut();
-          },
-          icon: Icon(Icons.person),
-          label: Text(
-            'Sign Out',
-            style: TextStyle(color: Colors.white),
-          ),
-          color: Colors.orange,
-        ),
-      ],
-      ),
+      backgroundColor: Color(0xff392850),
+//      appBar: AppBar(
+//        backgroundColor: Colors.transparent,
+//      elevation: 0.0,
+//      actions: <Widget>[
+////        Padding(
+////          padding: const EdgeInsets.fromLTRB(0,0,16,0),
+////          child: IconButton(
+////            onPressed: () async{
+////                await _auth.signOut();
+////            },
+////            icon: Icon(Icons.power_settings_new, color: Colors.white,),
+////            color: Colors.transparent,
+////          ),
+////        ),
+//      ],
+//      ),
       body: Container(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            CarouselSlider(
-              height: 400.0,
-              initialPage: 0,
-              enlargeCenterPage: true,
-              autoPlay: true,
-              reverse: false,
-              enableInfiniteScroll: true,
-              autoPlayInterval: Duration(seconds: 2),
-              autoPlayAnimationDuration: Duration(milliseconds: 2000),
-              pauseAutoPlayOnTouch: Duration(seconds: 10),
-              scrollDirection: Axis.horizontal,
-              onPageChanged: (index) {
-                setState(() {
-                  _current = index;
-                });
-              },
-              items: images.map((imgUrl) {
-                  return Builder(
-                    builder: (BuildContext context){
-                      return Container(
-                        width: MediaQuery.of(context).size.width,
-                        margin: EdgeInsets.symmetric(horizontal: 10.0),
-                        decoration: BoxDecoration(
-                          color: Colors.green,
-                        ),
-                          child: Image.network(
-                            imgUrl, 
-                            fit: BoxFit.fill,
-                            ),
-                        );
-                    },
-                  );
-              }).toList(),
-            ),
-            SizedBox(height: 20,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: map<Widget>(
-                images, (index, url){
-                  return Container(
-                    width: 10.0,
-                    height: 10.0,
-                    margin: EdgeInsets.symmetric(vertical: 10.0, horizontal:20),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: _current == index ? Colors.redAccent : Colors.green,
-                    ),
-                  );
-                }
-              ),
-
-              
-            ),
-
-            SizedBox(
-              height: 20,
-              ),
-
-              RaisedButton(
-                color: Colors.purple[100],
-                child: Text(
-                  "To-Do List"
-                  
-                  ),
-                onPressed: (){
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => ToDoList()),
-                    );
-              },)
-
-          ],
-          
+        decoration: BoxDecoration(
+            gradient: LinearGradient(
+                begin: Alignment.bottomCenter,
+                end: Alignment.topCenter,
+                colors: [Color.fromRGBO(26, 6, 62, 1.0), Color.fromRGBO(51, 0, 111, 1.0), Color.fromRGBO(83, 0, 181, 1.0)]
+            )
         ),
+        child: Column(
+            children: <Widget>[
+
+//            CarouselSlider(
+//              height: 400.0,
+//              initialPage: 0,
+//              enlargeCenterPage: true,
+//              autoPlay: true,
+//              reverse: false,
+//              enableInfiniteScroll: true,
+//              autoPlayInterval: Duration(seconds: 2),
+//              autoPlayAnimationDuration: Duration(milliseconds: 2000),
+//              pauseAutoPlayOnTouch: Duration(seconds: 10),
+//              scrollDirection: Axis.horizontal,
+//              onPageChanged: (index) {
+//                setState(() {
+//                  _current = index;
+//                });
+//              },
+//              items: images.map((imgUrl) {
+//                  return Builder(
+//                    builder: (BuildContext context){
+//                      return Container(
+//                        width: MediaQuery.of(context).size.width,
+//                        margin: EdgeInsets.symmetric(horizontal: 10.0),
+//                        decoration: BoxDecoration(
+//                          color: Colors.green,
+//                        ),
+//                          child: Image.network(
+//                            imgUrl,
+//                            fit: BoxFit.fill,
+//                            ),
+//                        );
+//                    },
+//                  );
+//              }).toList(),
+//            ),
+
+              Padding(
+                padding: const EdgeInsets.only(left: 16, right: 16, top: 40),
+                child: FadeAnimation(
+                  1,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 170),
+                        child: IconButton(
+                          icon: Icon(Icons.account_circle, color: Colors.white, size: 30,),
+                          onPressed: () {
+                            print("Profile");
+                          },
+                        ),
+                      ),
+                      SizedBox(
+                        width: 0,
+                      ),
+                      Container(
+                          height: 230,
+                          width: 240,
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                                fit: BoxFit.fitHeight,
+                                image: AssetImage("assets/images/logo.png")
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 170),
+                          child: IconButton(
+                          onPressed: () async{
+                            await _auth.signOut();
+                          },
+                          icon: Icon(Icons.power_settings_new, color: Colors.white,size: 30,),
+                          color: Colors.transparent,
+                      ),
+                        ),
+
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 50,
+              ),
+
+              //Setting the padding for the word "Jhony's Family"
+              Padding(
+                padding: EdgeInsets.only(left: 16, right: 16),
+                child: FadeAnimation(
+                  1,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text("Jaldi.io's Family", style: GoogleFonts.openSans(
+                            textStyle: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold
+                            )
+                          )),
+                          SizedBox(
+                            height: 4
+                          ),
+                          Text("Home", style: GoogleFonts.openSans(
+                              textStyle: TextStyle(
+                                  color: Color(0xffa29aac),
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600
+                              )
+                          )),
+                        ],
+                      ),
+                      IconButton(
+                        alignment: Alignment.topCenter,
+                        icon: Icon(Icons.message, color: Colors.white, size: 30,)
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 40,
+              ),
+              GridDashboard(),
+//            Row(
+//              mainAxisAlignment: MainAxisAlignment.center,
+//              children: map<Widget>(
+//                images, (index, url){
+//                  return Container(
+//                    width: 10.0,
+//                    height: 10.0,
+//                    margin: EdgeInsets.symmetric(vertical: 10.0, horizontal:20),
+//                    decoration: BoxDecoration(
+//                      shape: BoxShape.circle,
+//                      color: _current == index ? Colors.redAccent : Colors.green,
+//                    ),
+//                  );
+//                }
+//              ),
+//
+//
+//            ),
+
+//            SizedBox(
+//              height: 20,
+//              ),
+//
+//              RaisedButton(
+//                color: Colors.purple[100],
+//                child: Text(
+//                  "To-Do List"
+//
+//                  ),
+//                onPressed: (){
+//                    Navigator.push(
+//                      context,
+//                      MaterialPageRoute(builder: (context) => ToDoList()),
+//                    );
+//              },)
+
+            ],
+
+          ),
       ),
+
     );
   }
 }

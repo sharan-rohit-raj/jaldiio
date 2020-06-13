@@ -9,6 +9,7 @@ import 'SignUpPage.dart';
 import 'WelcomePage.dart';
 import 'ForgotPassword.dart';
 import 'Wrapper.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 
 void main() => runApp(MyApp());

@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:jaldiio/LoginPage.dart';
 import './Animation/FadeAnimation.dart';
 import 'package:jaldiio/LoginPage.dart';
@@ -106,6 +107,9 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                         ),
                       ),
                     ),
+                    SizedBox(
+                      height: 50,
+                    ),
                     FadeAnimation(
                       1, Container(
                       padding: EdgeInsets.all(8.0),
@@ -132,6 +136,14 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                   hintText: "E-mail",
                                   hintStyle: TextStyle(
                                       color: Colors.grey
+                                  ),
+
+                                ),
+                                style: GoogleFonts.openSans(
+                                  textStyle: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w400
                                   ),
                                 ),
                                 validator: (val) => val.isEmpty ? 'Enter an Email ID' : null,

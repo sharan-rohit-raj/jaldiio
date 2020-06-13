@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:jaldiio/ForgotPassword.dart';
 import 'package:jaldiio/Services/auth.dart';
 import 'package:jaldiio/Shared/Loading.dart';
@@ -111,6 +112,13 @@ class _LoginPageState extends State<LoginPage> {
                                       color: Colors.grey
                                   ),
                                 ),
+                                style: GoogleFonts.openSans(
+                                  textStyle: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w400
+                                  ),
+                                ),
                                 validator: (val) => val.isEmpty ? 'Enter an Email ID' : null,
                                 onChanged: (val) {
                                     setState(() => email_id = val);
@@ -131,7 +139,9 @@ class _LoginPageState extends State<LoginPage> {
                                     hintText: "Password",
                                     hintStyle: TextStyle(color: Colors.grey),
                                 ),
+                                style: TextStyle(color: Colors.white, fontSize: 18),
                                 obscureText: true,
+
                                 validator: (val) => val.length < 6 ? 'Enter a Password 6+ characters long' : null,
                                 onChanged: (val) {
                                      setState(() => password = val);
