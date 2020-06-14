@@ -63,6 +63,8 @@ flutter:
     - assets/images/recipe.png
     - assets/images/todo_list.png
     - assets/images/logo.png
+    - assets/images/avatar.png
+    - assets/images/avatar_prof.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

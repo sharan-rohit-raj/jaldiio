@@ -2,30 +2,33 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:jaldiio/EditProfile.dart';
 import 'package:jaldiio/Services/auth.dart';
 import 'package:jaldiio/Shared/GridDashboard.dart';
 import 'package:jaldiio/ToDoList.dart';
 
 import './Animation/FadeAnimation.dart';
-class Home extends StatefulWidget {
 
+class Home extends StatefulWidget {
   @override
   _HomeState createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> {
   final AuthService _auth = AuthService();
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
-  int _current =0;
+  int _current = 0;
 
-  List images = ["https://images.unsplash.com/photo-1522426266214-ec2d2abb9ce0?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1353&q=80",
-  "https://images.unsplash.com/photo-1591238008815-d9a603f0db4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=717&q=80",
-  "https://images.unsplash.com/photo-1591227532336-85280d0cf355?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80"
+  List images = [
+    "https://images.unsplash.com/photo-1522426266214-ec2d2abb9ce0?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1353&q=80",
+    "https://images.unsplash.com/photo-1591238008815-d9a603f0db4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=717&q=80",
+    "https://images.unsplash.com/photo-1591227532336-85280d0cf355?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80"
   ];
 
-  List<T>map<T>(List list, Function handler){
+  List<T> map<T>(List list, Function handler) {
     List<T> result = [];
-    for(var i = 0; i< list.length ;i++){
+    for (var i = 0; i < list.length; i++) {
       result.add(handler(i, list[i]));
     }
     return result;
@@ -33,37 +36,161 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+//      resizeToAvoidBottomInset: false,
+      key: _scaffoldKey,
+      appBar: AppBar(
+        backgroundColor: Color.fromRGBO(83, 0, 181, 1.0),
+        elevation: 0.0,
+        leading: new IconButton(
+          icon: new Icon(
+            Icons.account_circle,
+            color: Colors.white,
+            size: 30,
+          ),
+          onPressed: () => _scaffoldKey.currentState.openDrawer(),
+        ),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(
+              Icons.power_settings_new,
+              color: Colors.white,
+              size: 30,
+            ),
+            onPressed: () async {
+              await _auth.signOut();
+            },
+          )
+        ],
+      ),
+      drawer: new Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            DrawerHeader(
+                decoration: BoxDecoration(
+                  color: Colors.deepPurpleAccent,
+                ),
+                child: Stack(
+                  children: <Widget>[
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: CircleAvatar(
+                        backgroundImage: AssetImage("assets/images/avatar.png"),
+                        radius: 50,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 16),
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: Text(
+                            "Jaldi.io User",
+                          style: GoogleFonts.openSans(
+                            fontSize: 23,
+                            color: Colors.white,
+
+                          ),
+                        ),
+
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 16.0),
+                      child: Align(
+                        alignment: Alignment.centerRight + Alignment(0,0.4),
+                        child: Text(
+                          "Family Member",
+                          style: GoogleFonts.openSans(
+                            fontSize: 14,
+                            color: Colors.white
+                          )
+                        )
+                      ),
+                    )
+                  ],
+                )),
+            ListTile(
+              leading: Icon(Icons.phone, size: 30, color: Colors.deepPurpleAccent,),
+              title: Text(
+                  "Phone Number",
+                style: GoogleFonts.openSans(
+                    fontSize: 14,
+                    color: Colors.black
+                ),
+              ),
+            ),
+            Divider(
+              color: Colors.deepPurpleAccent,
+              thickness: 0.50,
+            ),
+            ListTile(
+              leading: Icon(Icons.cake, size: 30, color: Colors.deepPurpleAccent,),
+              title: Text(
+                "My Big Day",
+                style: GoogleFonts.openSans(
+                    fontSize: 14,
+                    color: Colors.black
+                ),
+              ),
+            ),
+            Divider(
+              color: Colors.deepPurpleAccent,
+              thickness: 0.50,
+            ),
+            ListTile(
+              leading: Icon(Icons.edit, size: 30, color: Colors.deepPurpleAccent,),
+              title: Text(
+                "Edit Profile",
+                style: GoogleFonts.openSans(
+                    fontSize: 14,
+                    color: Colors.black
+                ),
+              ),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => EditProfile()),
+                );
+              },
+            ),
+            Divider(
+              color: Colors.deepPurpleAccent,
+              thickness: 0.50,
+            ),
+            ListTile(
+              leading: Icon(Icons.feedback, size: 30, color: Colors.deepPurpleAccent,),
+              title: Text(
+                "Contact Us",
+                style: GoogleFonts.openSans(
+                    fontSize: 14,
+                    color: Colors.black
+                ),
+              ),
+              onTap: () {
+                print("Contact Us");
+              },
+            ),
+            Divider(
+              color: Colors.deepPurple,
+              thickness: 0.50,
+            ),
+          ],
+        ),
+      ),
       backgroundColor: Color(0xff392850),
-//      appBar: AppBar(
-//        backgroundColor: Colors.transparent,
-//      elevation: 0.0,
-//      actions: <Widget>[
-////        Padding(
-////          padding: const EdgeInsets.fromLTRB(0,0,16,0),
-////          child: IconButton(
-////            onPressed: () async{
-////                await _auth.signOut();
-////            },
-////            icon: Icon(Icons.power_settings_new, color: Colors.white,),
-////            color: Colors.transparent,
-////          ),
-////        ),
-//      ],
-//      ),
       body: Container(
         decoration: BoxDecoration(
             gradient: LinearGradient(
                 begin: Alignment.bottomCenter,
                 end: Alignment.topCenter,
-                colors: [Color.fromRGBO(26, 6, 62, 1.0), Color.fromRGBO(51, 0, 111, 1.0), Color.fromRGBO(83, 0, 181, 1.0)]
-            )
-        ),
+                colors: [
+              Color.fromRGBO(26, 6, 62, 1.0),
+              Color.fromRGBO(51, 0, 111, 1.0),
+              Color.fromRGBO(83, 0, 181, 1.0)
+            ])),
         child: Column(
-            children: <Widget>[
-
+          children: <Widget>[
 //            CarouselSlider(
 //              height: 400.0,
 //              initialPage: 0,
@@ -99,96 +226,77 @@ class _HomeState extends State<Home> {
 //              }).toList(),
 //            ),
 
-              Padding(
-                padding: const EdgeInsets.only(left: 16, right: 16, top: 40),
-                child: FadeAnimation(
-                  1,
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 170),
-                        child: IconButton(
-                          icon: Icon(Icons.account_circle, color: Colors.white, size: 30,),
-                          onPressed: () {
-                            print("Profile");
-                          },
-                        ),
+            Padding(
+              padding: const EdgeInsets.only(left: 16, right: 16, top: 40),
+              child: FadeAnimation(
+                1,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Container(
+                      height: 230,
+                      width: 250,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                            fit: BoxFit.fitHeight,
+                            image: AssetImage("assets/images/logo.png")),
                       ),
-                      SizedBox(
-                        width: 0,
-                      ),
-                      Container(
-                          height: 230,
-                          width: 240,
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                                fit: BoxFit.fitHeight,
-                                image: AssetImage("assets/images/logo.png")
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 170),
-                          child: IconButton(
-                          onPressed: () async{
-                            await _auth.signOut();
-                          },
-                          icon: Icon(Icons.power_settings_new, color: Colors.white,size: 30,),
-                          color: Colors.transparent,
-                      ),
-                        ),
-
-                    ],
-                  ),
+                    ),
+                    SizedBox(
+                      width: 10,
+                    ),
+                  ],
                 ),
               ),
-              SizedBox(
-                height: 50,
-              ),
+            ),
+            SizedBox(
+              height: 50,
+            ),
 
-              //Setting the padding for the word "Jhony's Family"
-              Padding(
-                padding: EdgeInsets.only(left: 16, right: 16),
-                child: FadeAnimation(
-                  1,
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text("Jaldi.io's Family", style: GoogleFonts.openSans(
-                            textStyle: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold
-                            )
-                          )),
-                          SizedBox(
-                            height: 4
-                          ),
-                          Text("Home", style: GoogleFonts.openSans(
-                              textStyle: TextStyle(
-                                  color: Color(0xffa29aac),
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600
-                              )
-                          )),
-                        ],
-                      ),
-                      IconButton(
+            //Setting the padding for the word "Jhony's Family"
+            Padding(
+              padding: EdgeInsets.only(left: 16, right: 16),
+              child: FadeAnimation(
+                1,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text("Jaldi.io's Family",
+                            style: GoogleFonts.openSans(
+                                textStyle: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold))),
+                        SizedBox(height: 4),
+                        Text("Home",
+                            style: GoogleFonts.openSans(
+                                textStyle: TextStyle(
+                                    color: Color(0xffa29aac),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600))),
+                      ],
+                    ),
+                    IconButton(
                         alignment: Alignment.topCenter,
-                        icon: Icon(Icons.message, color: Colors.white, size: 30,)
-                      ),
-                    ],
-                  ),
+                        icon: Icon(
+                          Icons.message,
+                          color: Colors.white,
+                          size: 30,
+                        )),
+                  ],
                 ),
               ),
-              SizedBox(
-                height: 40,
-              ),
-              GridDashboard(),
+            ),
+            SizedBox(
+              height: 40,
+            ),
+            GridDashboard(),
 //            Row(
 //              mainAxisAlignment: MainAxisAlignment.center,
 //              children: map<Widget>(
@@ -224,13 +332,9 @@ class _HomeState extends State<Home> {
 //                      MaterialPageRoute(builder: (context) => ToDoList()),
 //                    );
 //              },)
-
-            ],
-
-          ),
+          ],
+        ),
       ),
-
     );
   }
 }
-
