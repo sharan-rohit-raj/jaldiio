@@ -222,6 +222,7 @@ class _EditProfileState extends State<EditProfile> {
                                     fontSize: 18,
                                     color: Colors.black
                                 ),
+                                keyboardType: TextInputType.number,
                                 validator: (val) => (int.parse(val) >= 0 && int.parse(val) <=100)
                                     ? null
                                     : "Please type a valid age",
@@ -276,6 +277,7 @@ class _EditProfileState extends State<EditProfile> {
                                   fontSize: 18,
                                   color: Colors.black
                                 ),
+                                keyboardType: TextInputType.phone,
                                 validator: (val) => val.length < 7
                                     ? 'Enter a valid phone number'
                                     : null,

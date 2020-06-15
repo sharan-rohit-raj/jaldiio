@@ -2,6 +2,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:jaldiio/ContactUs.dart';
 import 'package:jaldiio/EditProfile.dart';
 import 'package:jaldiio/Services/auth.dart';
 import 'package:jaldiio/Shared/GridDashboard.dart';
@@ -168,7 +169,10 @@ class _HomeState extends State<Home> {
                 ),
               ),
               onTap: () {
-                print("Contact Us");
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ContactUs()),
+                );
               },
             ),
             Divider(
