@@ -4,11 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:jaldiio/ContactUs.dart';
 import 'package:jaldiio/EditProfile.dart';
+import 'package:jaldiio/Models/UserValue.dart';
+import 'package:jaldiio/Services/DataBaseService.dart';
 import 'package:jaldiio/Services/auth.dart';
 import 'package:jaldiio/Shared/GridDashboard.dart';
 import 'package:jaldiio/ToDoList.dart';
+import 'package:provider/provider.dart';
 
 import './Animation/FadeAnimation.dart';
+import 'Models/user.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -37,6 +41,7 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    final user_val = Provider.of<User>(context);
     return Scaffold(
 //      resizeToAvoidBottomInset: false,
       key: _scaffoldKey,
@@ -64,123 +69,252 @@ class _HomeState extends State<Home> {
           )
         ],
       ),
-      drawer: new Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            DrawerHeader(
-                decoration: BoxDecoration(
-                  color: Colors.deepPurpleAccent,
-                ),
-                child: Stack(
-                  children: <Widget>[
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: CircleAvatar(
-                        backgroundImage: AssetImage("assets/images/avatar.png"),
-                        radius: 50,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 16),
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: Text(
-                            "Jaldi.io User",
-                          style: GoogleFonts.openSans(
-                            fontSize: 23,
-                            color: Colors.white,
+      drawer: StreamBuilder<UserValue>(
+        stream: DataBaseService(uid: user_val.uid).userData,
+        builder: (context, snapshot) {
 
+          if(snapshot.hasData){
+            UserValue userValue = snapshot.data;
+            return new Drawer(
+              child: ListView(
+                padding: EdgeInsets.zero,
+                children: <Widget>[
+                  DrawerHeader(
+                      decoration: BoxDecoration(
+                        color: Colors.deepPurpleAccent,
+                      ),
+                      child: Stack(
+                        children: <Widget>[
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: CircleAvatar(
+                              backgroundImage: AssetImage("assets/images/avatar.png"),
+                              radius: 50,
+                            ),
                           ),
-                        ),
+                          Padding(
+                            padding: const EdgeInsets.only(right: 16),
+                            child: Align(
+                              alignment: Alignment.centerRight,
+                              child: Text(
+                                userValue.name,
+                                style: GoogleFonts.openSans(
+                                  fontSize: 23,
+                                  color: Colors.white,
 
+                                ),
+                              ),
+
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(right: 16.0),
+                            child: Align(
+                                alignment: Alignment.centerRight + Alignment(0,0.4),
+                                child: Text(
+                                    "Family Member",
+                                    style: GoogleFonts.openSans(
+                                        fontSize: 14,
+                                        color: Colors.white
+                                    )
+                                )
+                            ),
+                          )
+                        ],
+                      )),
+                  ListTile(
+                    leading: Icon(Icons.phone, size: 30, color: Colors.deepPurpleAccent,),
+                    title: Text(
+                      userValue.phoneNum.toString(),
+                      style: GoogleFonts.openSans(
+                          fontSize: 14,
+                          color: Colors.black
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 16.0),
-                      child: Align(
-                        alignment: Alignment.centerRight + Alignment(0,0.4),
-                        child: Text(
-                          "Family Member",
-                          style: GoogleFonts.openSans(
-                            fontSize: 14,
-                            color: Colors.white
-                          )
-                        )
+                  ),
+                  Divider(
+                    color: Colors.deepPurpleAccent,
+                    thickness: 0.50,
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.cake, size: 30, color: Colors.deepPurpleAccent,),
+                    title: Text(
+                      userValue.date,
+                      style: GoogleFonts.openSans(
+                          fontSize: 14,
+                          color: Colors.black
                       ),
-                    )
-                  ],
-                )),
-            ListTile(
-              leading: Icon(Icons.phone, size: 30, color: Colors.deepPurpleAccent,),
-              title: Text(
-                  "Phone Number",
-                style: GoogleFonts.openSans(
-                    fontSize: 14,
-                    color: Colors.black
-                ),
+                    ),
+                  ),
+                  Divider(
+                    color: Colors.deepPurpleAccent,
+                    thickness: 0.50,
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.edit, size: 30, color: Colors.deepPurpleAccent,),
+                    title: Text(
+                      "Edit Profile",
+                      style: GoogleFonts.openSans(
+                          fontSize: 14,
+                          color: Colors.black
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => EditProfile()),
+                      );
+                    },
+                  ),
+                  Divider(
+                    color: Colors.deepPurpleAccent,
+                    thickness: 0.50,
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.feedback, size: 30, color: Colors.deepPurpleAccent,),
+                    title: Text(
+                      "Contact Us",
+                      style: GoogleFonts.openSans(
+                          fontSize: 14,
+                          color: Colors.black
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => ContactUs()),
+                      );
+                    },
+                  ),
+                  Divider(
+                    color: Colors.deepPurple,
+                    thickness: 0.50,
+                  ),
+                ],
               ),
-            ),
-            Divider(
-              color: Colors.deepPurpleAccent,
-              thickness: 0.50,
-            ),
-            ListTile(
-              leading: Icon(Icons.cake, size: 30, color: Colors.deepPurpleAccent,),
-              title: Text(
-                "My Big Day",
-                style: GoogleFonts.openSans(
-                    fontSize: 14,
-                    color: Colors.black
-                ),
+            );
+          }else{
+            return new Drawer(
+              child: ListView(
+                padding: EdgeInsets.zero,
+                children: <Widget>[
+                  DrawerHeader(
+                      decoration: BoxDecoration(
+                        color: Colors.deepPurpleAccent,
+                      ),
+                      child: Stack(
+                        children: <Widget>[
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: CircleAvatar(
+                              backgroundImage: AssetImage("assets/images/avatar.png"),
+                              radius: 50,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(right: 16),
+                            child: Align(
+                              alignment: Alignment.centerRight,
+                              child: Text(
+                                "Jaldi.io User",
+                                style: GoogleFonts.openSans(
+                                  fontSize: 23,
+                                  color: Colors.white,
+
+                                ),
+                              ),
+
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(right: 16.0),
+                            child: Align(
+                                alignment: Alignment.centerRight + Alignment(0,0.4),
+                                child: Text(
+                                    "Family Member",
+                                    style: GoogleFonts.openSans(
+                                        fontSize: 14,
+                                        color: Colors.white
+                                    )
+                                )
+                            ),
+                          )
+                        ],
+                      )),
+                  ListTile(
+                    leading: Icon(Icons.phone, size: 30, color: Colors.deepPurpleAccent,),
+                    title: Text(
+                      "Phone Number",
+                      style: GoogleFonts.openSans(
+                          fontSize: 14,
+                          color: Colors.black
+                      ),
+                    ),
+                  ),
+                  Divider(
+                    color: Colors.deepPurpleAccent,
+                    thickness: 0.50,
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.cake, size: 30, color: Colors.deepPurpleAccent,),
+                    title: Text(
+                      "My Big Day",
+                      style: GoogleFonts.openSans(
+                          fontSize: 14,
+                          color: Colors.black
+                      ),
+                    ),
+                  ),
+                  Divider(
+                    color: Colors.deepPurpleAccent,
+                    thickness: 0.50,
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.edit, size: 30, color: Colors.deepPurpleAccent,),
+                    title: Text(
+                      "Edit Profile",
+                      style: GoogleFonts.openSans(
+                          fontSize: 14,
+                          color: Colors.black
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => EditProfile()),
+                      );
+                    },
+                  ),
+                  Divider(
+                    color: Colors.deepPurpleAccent,
+                    thickness: 0.50,
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.feedback, size: 30, color: Colors.deepPurpleAccent,),
+                    title: Text(
+                      "Contact Us",
+                      style: GoogleFonts.openSans(
+                          fontSize: 14,
+                          color: Colors.black
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => ContactUs()),
+                      );
+                    },
+                  ),
+                  Divider(
+                    color: Colors.deepPurple,
+                    thickness: 0.50,
+                  ),
+                ],
               ),
-            ),
-            Divider(
-              color: Colors.deepPurpleAccent,
-              thickness: 0.50,
-            ),
-            ListTile(
-              leading: Icon(Icons.edit, size: 30, color: Colors.deepPurpleAccent,),
-              title: Text(
-                "Edit Profile",
-                style: GoogleFonts.openSans(
-                    fontSize: 14,
-                    color: Colors.black
-                ),
-              ),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => EditProfile()),
-                );
-              },
-            ),
-            Divider(
-              color: Colors.deepPurpleAccent,
-              thickness: 0.50,
-            ),
-            ListTile(
-              leading: Icon(Icons.feedback, size: 30, color: Colors.deepPurpleAccent,),
-              title: Text(
-                "Contact Us",
-                style: GoogleFonts.openSans(
-                    fontSize: 14,
-                    color: Colors.black
-                ),
-              ),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => ContactUs()),
-                );
-              },
-            ),
-            Divider(
-              color: Colors.deepPurple,
-              thickness: 0.50,
-            ),
-          ],
-        ),
+            );
+          }
+
+        }
       ),
       backgroundColor: Color(0xff392850),
       body: Container(
@@ -271,12 +405,29 @@ class _HomeState extends State<Home> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        Text("Jaldi.io's Family",
-                            style: GoogleFonts.openSans(
-                                textStyle: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold))),
+                        StreamBuilder<UserValue>(
+                          stream: DataBaseService(uid: user_val.uid).userData,
+                          builder: (context, snapshot) {
+                            if(snapshot.hasData){
+                              UserValue userValue = snapshot.data;
+                              return Text(userValue.name+"'s Family",
+                                  style: GoogleFonts.openSans(
+                                      textStyle: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold)));
+                            }
+                            else{
+                              return Text("Jaldi.io's Family",
+                                  style: GoogleFonts.openSans(
+                                      textStyle: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold)));
+                            }
+
+                          }
+                        ),
                         SizedBox(height: 4),
                         Text("Home",
                             style: GoogleFonts.openSans(

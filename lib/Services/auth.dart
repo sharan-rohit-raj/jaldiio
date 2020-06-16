@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:jaldiio/Models/user.dart';
+import 'package:jaldiio/Services/DataBaseService.dart';
 
 class AuthService{
 
@@ -41,7 +42,10 @@ class AuthService{
   Future registerWithEmailAndPassword(String email, String password) async{
     try{
         AuthResult result = await _auth.createUserWithEmailAndPassword(email: email, password: password);
-        FirebaseUser  fireuser = result.user;   
+        FirebaseUser  fireuser = result.user;
+
+        //create new doc for user
+//        await DataBaseService(uid: fireuser.uid).updateUserInfo("Sharan", "Hey yo", 22, 3657774973);
         return _userFromFirebaseUser(fireuser);
     }catch(e){
        print(e.toString());
