@@ -81,8 +81,8 @@ class _EditProfileState extends State<EditProfile> {
 
 
                           return Container(
-                            padding: EdgeInsets.all(20),
-                            margin: EdgeInsets.all(10),
+                            padding: EdgeInsets.all(1),
+                            margin: EdgeInsets.all(5),
                             decoration: BoxDecoration(
                               color: Colors.white,
                               border: Border.all(
@@ -198,8 +198,8 @@ class _EditProfileState extends State<EditProfile> {
                         }
                         else{
                           return Container(
-                            padding: EdgeInsets.all(20),
-                            margin: EdgeInsets.all(10),
+                            padding: EdgeInsets.all(1),
+                            margin: EdgeInsets.all(5),
                             decoration: BoxDecoration(
                               color: Colors.white,
                               border: Border.all(
@@ -276,7 +276,7 @@ class _EditProfileState extends State<EditProfile> {
                                         Padding(
                                           padding: const EdgeInsets.only(
                                               top: 0, bottom: 1),
-                                          child: Text("Email-ID",
+                                          child: Text(email,
                                               style: GoogleFonts.openSans(fontSize: 15)),
                                         ),
                                         Padding(
@@ -480,6 +480,7 @@ class _EditProfileState extends State<EditProfile> {
                             height: 25,
                           ),
                           FlatButton(
+                            padding: EdgeInsets.only(left: 100, right: 100),
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(15),
                                 side: BorderSide(color: Colors.deepPurpleAccent)),

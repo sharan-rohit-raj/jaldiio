@@ -185,7 +185,7 @@ class _ContactUsState extends State<ContactUs> {
                                   side: BorderSide(
                                       color: Colors.deepPurpleAccent)),
                               child: Text(
-                                "Send Message",
+                                "Send",
                                 style: GoogleFonts.openSans(
                                     fontSize: 18,
                                     color: Colors.deepPurpleAccent),
