@@ -3,18 +3,24 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:jaldiio/ContactUs.dart';
+import 'package:jaldiio/ManageFamily/CreateFamily.dart';
+import 'package:jaldiio/ManageFamily/DeleteFamily.dart';
 import 'package:jaldiio/EditProfile.dart';
+import 'package:jaldiio/ManageFamily/JoinFamily.dart';
+import 'package:jaldiio/Models/FamilyCodeValue.dart';
 import 'package:jaldiio/Models/UserValue.dart';
 import 'package:jaldiio/Services/DataBaseService.dart';
 import 'package:jaldiio/Services/auth.dart';
 import 'package:jaldiio/Shared/GridDashboard.dart';
-import 'package:jaldiio/ToDoList.dart';
+import 'package:jaldiio/ToDos/ToDoList.dart';
 import 'package:provider/provider.dart';
 
 import './Animation/FadeAnimation.dart';
+import 'ManageFamily/LeaveFamily.dart';
 import 'Models/user.dart';
 
 class Home extends StatefulWidget {
+
   @override
   _HomeState createState() => _HomeState();
 }
@@ -38,10 +44,15 @@ class _HomeState extends State<Home> {
     }
     return result;
   }
+  
+  void showCodeAlreadyCreated(String value){
+    _scaffoldKey.currentState.showSnackBar(new SnackBar(content: new Text(value)));
+  }
 
   @override
   Widget build(BuildContext context) {
     final user_val = Provider.of<User>(context);
+    String name;
     return Scaffold(
 //      resizeToAvoidBottomInset: false,
       key: _scaffoldKey,
@@ -190,6 +201,117 @@ class _HomeState extends State<Home> {
                     color: Colors.deepPurple,
                     thickness: 0.50,
                   ),
+                  StreamBuilder<FamilyCodeValue>(
+                    stream: DataBaseService(uid: user_val.uid).codeData,
+                    builder: (context, snapshot) {
+
+                      if(snapshot.hasData && snapshot.data.familyID.isNotEmpty){
+                        return ListTile(
+                          leading: Icon(Icons.people, size: 30, color: Colors.deepPurpleAccent,),
+                          title: Text(
+                            "Joined a Family",
+                            style: GoogleFonts.openSans(
+                                fontSize: 14,
+                                color: Colors.black
+                            ),
+                          ),
+                          trailing: Icon(Icons.check_circle, color: Colors.green,),
+                        );
+                      }
+                      else{
+                        return ListTile(
+                          leading: Icon(Icons.people, size: 30, color: Colors.deepPurpleAccent,),
+                          title: Text(
+                            "Join Family",
+                            style: GoogleFonts.openSans(
+                                fontSize: 14,
+                                color: Colors.black
+                            ),
+                          ),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => JoinFamily()),
+                            );
+//                    print("join family");
+                          },
+                        );
+                      }
+
+                    }
+                  ),
+                  Divider(
+                    color: Colors.deepPurpleAccent,
+                    thickness: 0.50,
+                  ),
+                  StreamBuilder<FamilyCodeValue>(
+                    stream: DataBaseService(uid: user_val.uid).codeData,
+                    builder: (context, snapshot) {
+
+                      if(snapshot.hasData && snapshot.data.familyID.isNotEmpty){
+                        FamilyCodeValue codeValue = snapshot.data;
+//                        print(codeValue.familyID);
+                        if(codeValue.admin){
+                          return ListTile(
+                            leading: Icon(Icons.delete, size: 30, color: Colors.deepPurpleAccent,),
+                            title: Text(
+                              "Delete Family",
+                              style: GoogleFonts.openSans(
+                                  fontSize: 14,
+                                  color: Colors.black
+                              ),
+                            ),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => DeleteFamily(familyCode: codeValue.familyID,)),
+                              );
+                            },
+                          );
+                        }
+                        else{
+                          return ListTile(
+                            leading: Icon(Icons.exit_to_app, size: 30, color: Colors.deepPurpleAccent,),
+                            title: Text(
+                              "Leave Family",
+                              style: GoogleFonts.openSans(
+                                  fontSize: 14,
+                                  color: Colors.black
+                              ),
+                            ),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => LeaveFamily(familyCode: codeValue.familyID,)),
+                              );
+                            },
+                          );
+                        }
+
+                      }
+                      else{
+                        return ListTile(
+                          leading: Icon(Icons.group_add, size: 30, color: Colors.deepPurpleAccent,),
+                          title: Text(
+                            "Create Family",
+                            style: GoogleFonts.openSans(
+                                fontSize: 14,
+                                color: Colors.black
+                            ),
+                          ),
+                          onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => CreateFamily()),
+                              );
+
+//                    print("join family");
+                          },
+                        );
+                      }
+
+                    }
+                  ),
                 ],
               ),
             );
@@ -329,40 +451,7 @@ class _HomeState extends State<Home> {
             ])),
         child: Column(
           children: <Widget>[
-//            CarouselSlider(
-//              height: 400.0,
-//              initialPage: 0,
-//              enlargeCenterPage: true,
-//              autoPlay: true,
-//              reverse: false,
-//              enableInfiniteScroll: true,
-//              autoPlayInterval: Duration(seconds: 2),
-//              autoPlayAnimationDuration: Duration(milliseconds: 2000),
-//              pauseAutoPlayOnTouch: Duration(seconds: 10),
-//              scrollDirection: Axis.horizontal,
-//              onPageChanged: (index) {
-//                setState(() {
-//                  _current = index;
-//                });
-//              },
-//              items: images.map((imgUrl) {
-//                  return Builder(
-//                    builder: (BuildContext context){
-//                      return Container(
-//                        width: MediaQuery.of(context).size.width,
-//                        margin: EdgeInsets.symmetric(horizontal: 10.0),
-//                        decoration: BoxDecoration(
-//                          color: Colors.green,
-//                        ),
-//                          child: Image.network(
-//                            imgUrl,
-//                            fit: BoxFit.fill,
-//                            ),
-//                        );
-//                    },
-//                  );
-//              }).toList(),
-//            ),
+
 
             Padding(
               padding: const EdgeInsets.only(left: 16, right: 16, top: 40),
@@ -410,6 +499,7 @@ class _HomeState extends State<Home> {
                           builder: (context, snapshot) {
                             if(snapshot.hasData){
                               UserValue userValue = snapshot.data;
+                              name = userValue.name;
                               return Text(userValue.name+"'s Family",
                                   style: GoogleFonts.openSans(
                                       textStyle: TextStyle(
@@ -418,6 +508,7 @@ class _HomeState extends State<Home> {
                                           fontWeight: FontWeight.bold)));
                             }
                             else{
+                              name = "";
                               return Text("Jaldi.io's Family",
                                   style: GoogleFonts.openSans(
                                       textStyle: TextStyle(
@@ -451,42 +542,9 @@ class _HomeState extends State<Home> {
             SizedBox(
               height: 40,
             ),
-            GridDashboard(),
-//            Row(
-//              mainAxisAlignment: MainAxisAlignment.center,
-//              children: map<Widget>(
-//                images, (index, url){
-//                  return Container(
-//                    width: 10.0,
-//                    height: 10.0,
-//                    margin: EdgeInsets.symmetric(vertical: 10.0, horizontal:20),
-//                    decoration: BoxDecoration(
-//                      shape: BoxShape.circle,
-//                      color: _current == index ? Colors.redAccent : Colors.green,
-//                    ),
-//                  );
-//                }
-//              ),
-//
-//
-//            ),
 
-//            SizedBox(
-//              height: 20,
-//              ),
-//
-//              RaisedButton(
-//                color: Colors.purple[100],
-//                child: Text(
-//                  "To-Do List"
-//
-//                  ),
-//                onPressed: (){
-//                    Navigator.push(
-//                      context,
-//                      MaterialPageRoute(builder: (context) => ToDoList()),
-//                    );
-//              },)
+            GridDashboard(name: name,scaffoldKey: _scaffoldKey,),
+
           ],
         ),
       ),

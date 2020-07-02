@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:jaldiio/Models/user.dart';
 import 'package:jaldiio/Services/auth.dart';
-import 'package:jaldiio/ToDoList.dart';
+import 'package:jaldiio/ToDos/ToDoList.dart';
 import 'package:provider/provider.dart';
 import 'LoginPage.dart';
 import 'SignUpPage.dart';

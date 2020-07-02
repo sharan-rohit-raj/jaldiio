@@ -37,6 +37,9 @@ dependencies:
   flutter_spinkit: ^4.1.2
   url_launcher: ^5.4.10
   flutter_email_sender: ^3.0.1
+  image_picker: ^0.6.7+2
+  firebase_storage: ^3.1.6
+  carousel_pro: ^1.0.0
 
 dev_dependencies:
   flutter_test:
@@ -69,6 +72,16 @@ flutter:
     - assets/images/avatar_prof.png
     - assets/images/pattern.png
     - assets/images/patter_darker.png
+    - assets/images/todolist.png
+    - assets/images/todoshort.png
+    - assets/images/teamtodo.png
+    - assets/images/contactList.png
+    - assets/images/contactus.png
+    - assets/images/editprofile.png
+    - assets/images/deleteFamily.png
+    - assets/images/leaveFamily.png
+    - assets/images/createFamily.png
+    - assets/images/joinFamily.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

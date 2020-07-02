@@ -31,8 +31,8 @@ class _EditProfileState extends State<EditProfile> {
   @override
   Widget build(BuildContext context) {
 
-    String email;
-    FirebaseAuth.instance.currentUser().then((value) => email = value.email);
+
+
     final user_val = Provider.of<User>(context);
         return Scaffold(
           resizeToAvoidBottomInset: false,
@@ -51,13 +51,14 @@ class _EditProfileState extends State<EditProfile> {
               ),
               onPressed: () {
                 Navigator.pop(context);
+
               },
             ),
           ),
           body: SingleChildScrollView(
                 child: Column(
                   children: <Widget>[
-                    StreamBuilder<Object>(
+                    StreamBuilder<UserValue>(
                       stream: DataBaseService(uid: user_val.uid).userData,
                       builder: (context, snapshot) {
                         if(snapshot.hasData){
@@ -85,6 +86,7 @@ class _EditProfileState extends State<EditProfile> {
                             margin: EdgeInsets.all(5),
                             decoration: BoxDecoration(
                               color: Colors.white,
+
                               border: Border.all(
                                 width: 0.2,
                               ),
@@ -105,7 +107,7 @@ class _EditProfileState extends State<EditProfile> {
                             child: Column(
                               children: <Widget>[
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                   children: <Widget>[
                                     Column(
                                       children: <Widget>[
@@ -159,7 +161,7 @@ class _EditProfileState extends State<EditProfile> {
                                         Padding(
                                           padding: const EdgeInsets.only(
                                               top: 0, bottom: 1),
-                                          child: Text(email,
+                                          child: Text(user_val.email,
                                               style: GoogleFonts.openSans(fontSize: 15)),
                                         ),
                                         Padding(
@@ -222,7 +224,7 @@ class _EditProfileState extends State<EditProfile> {
                             child: Column(
                               children: <Widget>[
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                   children: <Widget>[
                                     Column(
                                       children: <Widget>[
@@ -276,7 +278,7 @@ class _EditProfileState extends State<EditProfile> {
                                         Padding(
                                           padding: const EdgeInsets.only(
                                               top: 0, bottom: 1),
-                                          child: Text(email,
+                                          child: Text(user_val.email,
                                               style: GoogleFonts.openSans(fontSize: 15)),
                                         ),
                                         Padding(
@@ -321,6 +323,11 @@ class _EditProfileState extends State<EditProfile> {
                       padding: EdgeInsets.all(20),
                       margin: EdgeInsets.all(10),
                       decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: AssetImage("assets/images/editprofile.png"),
+                          fit: BoxFit.fill,
+                          colorFilter: new ColorFilter.mode(Colors.white.withOpacity(0.1), BlendMode.dstATop),
+                        ),
                         color: Colors.white,
                         border: Border.all(
                           width: 0.2,
@@ -498,7 +505,7 @@ class _EditProfileState extends State<EditProfile> {
                                     _customerNameController.text,
                                     _customerStatusController.text,
                                     _customerDateController.text,
-                                    int.parse(_customerPhoneController.text));
+                                    int.parse(_customerPhoneController.text),);
                               }
                             },
                           )
