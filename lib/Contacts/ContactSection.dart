@@ -27,6 +27,7 @@ class _ContactSectionState extends State<ContactSection> {
   }
   @override
   Widget build(BuildContext context) {
+//    print("code: "+widget.code);
     final user_val = Provider.of<User>(context);
     return StreamProvider<List<Contact>>.value(
       value: DataBaseService(famCode: widget.code).contacts,
@@ -89,6 +90,7 @@ class _ContactSectionState extends State<ContactSection> {
             DraggableScrollableSheet(
                 maxChildSize: 0.85,
                 builder: (BuildContext context, ScrollController scrollController){
+//                  print(widget.code);
                   return Container(
                     decoration: BoxDecoration(
                       color: Color.fromRGBO(193, 190, 235, 0.9),

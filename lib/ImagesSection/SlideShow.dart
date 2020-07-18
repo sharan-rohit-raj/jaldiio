@@ -1,7 +1,16 @@
+import 'dart:async';
+
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:jaldiio/ImagesSection/ImageView.dart';
+import 'package:jaldiio/Models/ImageTags.dart';
 import 'package:jaldiio/Services/DataBaseService.dart';
 import 'package:jaldiio/Shared/Loading.dart';
+import 'package:queries/collections.dart';
+import 'package:queries/queries.dart';
 
 class SlideShow extends StatefulWidget {
 
@@ -12,8 +21,9 @@ class SlideShow extends StatefulWidget {
   _SlideShowState createState() => _SlideShowState();
 }
 
-class _SlideShowState extends State<SlideShow> {
-
+class _SlideShowState extends State<SlideShow> with SingleTickerProviderStateMixin{
+  AnimationController _animationController ;
+//  AnimationController _subHeadingAnimationController;
   final PageController ctrl = PageController(viewportFraction: 0.8);
 
   int currentPage =0;
@@ -24,6 +34,13 @@ class _SlideShowState extends State<SlideShow> {
   void initState(){
     print(widget.famCode);
     queryDb();
+
+    _animationController = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: 1),
+    );
+    Timer(Duration(milliseconds: 200), () => _animationController.forward());
+
 
 
     ctrl.addListener(() {
@@ -36,6 +53,13 @@ class _SlideShowState extends State<SlideShow> {
       }
 
     });
+    super.initState();
+  }
+
+  @override
+  void dispose(){
+    _animationController.dispose();
+    super.dispose();
   }
 
   @override
@@ -83,8 +107,9 @@ class _SlideShowState extends State<SlideShow> {
     Firestore.instance.collection('family_info');
 
   print(tag);
+  print(widget.famCode);
     Query query = familyCollection
-        .document("sharancancodewithflutter")
+        .document(widget.famCode)
         .collection("images").where("tag", arrayContains: tag);
 
 
@@ -131,10 +156,21 @@ class _SlideShowState extends State<SlideShow> {
           )),
         ),
         onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => ImageView(
+                  url: data['url'] ,
+                  id: data['id'],
+                  famCode: widget.famCode,
+                )),);
           print(data['name']);
         },
       );
   }
+
+
+
 
    _buildTagPage(){
     return Container(
@@ -143,18 +179,132 @@ class _SlideShowState extends State<SlideShow> {
         crossAxisAlignment: CrossAxisAlignment.start,
 
         children: [
-          Text('Your Stories' , style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),),
-          Text('FILTER', style : TextStyle(color: Colors.black26)),
-          _buildButton('Favorites'),
-          _buildButton('Happy'),
-          _buildButton('Sad'),
+          SlideTransition(
+            position: Tween<Offset>(
+              begin: Offset(-1,0),
+              end: Offset.zero,
+            ).animate(_animationController),
+            child: FadeTransition(
+              opacity: _animationController,
+                child: Text('Your Stories' , style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),)),
+          ),
+          SizedBox(
+            height: 50,
+          ),
+
+          SlideTransition(
+            position: Tween<Offset>(
+              begin: Offset(-1,0),
+              end: Offset.zero,
+            ).animate(_animationController),
+            child: FadeTransition(
+              opacity: _animationController,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8),
+                child: Text('Filter images with \nthe tags below.' , style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400),),
+              ),
+            ),
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          FadeTransition(
+            opacity: _animationController,
+            child: Container(
+              height: 200,
+              width: 180,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(15),
+                border: Border.all(
+                  color: Colors.white
+                ),
+                boxShadow: [BoxShadow(color:Colors.black87, blurRadius: 5, offset: Offset(5, 5))],
+              ),
+              child: StreamBuilder<ImageTags>(
+                stream: DataBaseService(famCode: widget.famCode).imgTagData,
+                builder: (context, snapshot) {
+//                print("family: "+widget.famCode);
+                  if(snapshot.hasData){
+                    ImageTags tagsData = snapshot.data;
+
+                    void reorder(int oldIndex, int newIndex){
+                      if(newIndex > oldIndex)
+                        newIndex-=1;
+
+                      final String x = tagsData.tags.removeAt(oldIndex);
+                      tagsData.tags.insert(newIndex, x);
+
+                    }
+                    return ReorderableListView(
+                      padding: EdgeInsets.all(15),
+                      onReorder:  (oldIndex, newIndex){
+                        setState(() {
+                          reorder(oldIndex, newIndex);
+                        });
+
+                      },
+                      children: tagsData.tags.map((index) {
+
+                        return ListTile(
+                          key: ObjectKey(index),
+                          title: Text("$index",
+                          style: GoogleFonts.openSans(
+                            color: Colors.black87
+                          ),),
+                        onLongPress: () async{
+//                          print("loooong");
+                            AwesomeDialog(
+                              context: context,
+                              dialogType: DialogType.WARNING,
+                              animType: AnimType.BOTTOMSLIDE,
+                              title: "Delete Tag",
+                              desc: 'Do you wish to delete this tag?',
+                              btnOkOnPress: () async {
+                                await DataBaseService(famCode: widget.famCode).deleteImgTag("$index");
+                              },
+                              btnCancelOnPress: () {},
+                              btnOkText: "Delete",
+                              btnOkColor: Colors.red,
+                              btnCancelColor: Colors.deepPurpleAccent,
+                            )..show();
+                        },
+                        onTap: () {
+                          queryDb(tag: '$index');
+                        },);
+                      }).toList(),
+                    );
+                  }
+                  else if(snapshot.hasError){
+                    return ListTile(
+                      title: Text("Emtpy"),
+                    );
+                  }
+                  else{
+                    return Container(
+                      height: 10,
+                        width: 30,
+                        child: LinearProgressIndicator(backgroundColor: Colors.deepPurpleAccent,)
+                    );
+                  }
+
+                }
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 
-  _buildButton(tag){
-    Color color = tag == activeTag ? Colors.purple : Colors.white;
-    return FlatButton(color: color,child: Text('$tag'),onPressed: () => queryDb(tag: tag),);
-  }
+//  _buildList(tag){
+//    Color color = tag == activeTag ? Colors.purple : Colors.white;
+//    return ListTile
+//      (
+//      key: ObjectKey(tag),
+//      title: Text('$tag',style: GoogleFonts.openSans(
+//        color: Colors.black87
+//      ),),
+//      onTap: () => queryDb(tag: tag),);
+//  }
 }

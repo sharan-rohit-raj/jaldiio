@@ -36,7 +36,7 @@ class DeleteFamilMembers extends StatelessWidget {
 
         if(formKey.currentState.validate()) {
 //                                  send();.
-        print(codeController);
+//        print(codeController);
           if(familyCode.compareTo(codeController) == 0 ){
                 final FirebaseUser fireuser =
                 await FirebaseAuth.instance.currentUser();

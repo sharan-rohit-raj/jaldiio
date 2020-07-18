@@ -5,8 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:jaldiio/Animation/FadeAnimation.dart';
 import 'package:jaldiio/Models/Contact.dart';
+import 'package:jaldiio/Models/user.dart';
 import 'package:provider/provider.dart';
 
+import '../Home.dart';
 import '../Services/DataBaseService.dart';
 
 class CreateFamily extends StatefulWidget {
@@ -26,6 +28,8 @@ class _CreateFamilyState extends State<CreateFamily> {
 
   @override
   Widget build(BuildContext context) {
+    final user_val = Provider.of<User>(context);
+
     return Scaffold(
       backgroundColor: Colors.white,
       key: _scaffoldKey,
@@ -183,6 +187,7 @@ class _CreateFamilyState extends State<CreateFamily> {
 
                                       if(found == false){
                                         await DataBaseService(famCode: _codeController.text).initializeDocField();
+                                        await DataBaseService(famCode: _codeController.text).initializeImageTagField();
                                         final FirebaseUser fireuser =
                                         await FirebaseAuth.instance.currentUser();
                                         await DataBaseService(uid: fireuser.uid)

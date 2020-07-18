@@ -3,6 +3,7 @@ import 'package:jaldiio/Authentication/Authenticate.dart';
 import 'package:provider/provider.dart';
 import 'Home.dart';
 import 'Models/user.dart';
+import 'package:jaldiio/HomeSection/HomePage.dart';
 
 class Wrapper extends StatelessWidget {
   @override
@@ -13,7 +14,7 @@ class Wrapper extends StatelessWidget {
       return Authenticate();
     }
     else{
-      return Home();
+      return HomePage();
     }
 
   }

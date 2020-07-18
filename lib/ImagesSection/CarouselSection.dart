@@ -31,7 +31,7 @@ class CarouselSection extends StatelessWidget {
 
 
       ),
-      body: SlideShow(),
+      body: SlideShow(famCode: famCode,),
     );
   }
 }

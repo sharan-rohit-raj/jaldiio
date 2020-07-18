@@ -60,6 +60,18 @@ class _SignUpPageState extends State<SignUpPage> {
                         ),
                       ),
                     ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 30),
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.arrow_back_ios,
+                        color: Colors.deepPurpleAccent,
+                      ),
+                      onPressed: () {
+                        widget.toggleView();
+                      },
+                    ),
+                  ),
 
 //                    BackButton(
 //                      color: Colors.white,
@@ -74,21 +86,7 @@ class _SignUpPageState extends State<SignUpPage> {
             ),
 
 
-            Padding(
-              padding: EdgeInsets.fromLTRB(20, 0, 0, 0),
-              child: FadeAnimation(
-                1,
-                RaisedButton.icon(
-                  onPressed: () {widget.toggleView();},
-                  icon: Icon(Icons.arrow_back, color: Colors.white,),
-                  label: Text("Back", style: TextStyle(color: Colors.white)),
-                  color: Colors.deepPurpleAccent[200],
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18.0),
-                  ),
-                ),
-              ),
-            ),
+
             SizedBox(
               height: 40,
             ),

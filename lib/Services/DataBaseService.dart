@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:jaldiio/Models/Contact.dart';
 import 'package:jaldiio/Models/FamilyCodeValue.dart';
+import 'package:jaldiio/Models/ImageTags.dart';
 import 'package:jaldiio/Models/ImageUrls.dart';
 import 'package:jaldiio/Models/Task.dart';
 import 'package:jaldiio/Models/UserInformation.dart';
@@ -38,6 +39,13 @@ class DataBaseService {
       'phone_num': phone_num,
       'admin': false,
       'joined': false,
+    });
+  }
+
+  Future updateTags(List<String> tags) async{
+    return await familyCollection.document(famCode).collection("images")
+        .document("tagList").updateData({
+      'tagValues': FieldValue.arrayUnion(tags)
     });
   }
 
@@ -101,6 +109,19 @@ class DataBaseService {
     return await familyCollection.document(famCode).collection("members").document(name_id).delete();
   }
 
+  Future deleteImgTag(String tag) async{
+    List<String> tags = new List<String>();
+    tags.add(tag);
+    return await familyCollection.document(famCode).collection("images")
+        .document("tagList").updateData({
+      'tagValues': FieldValue.arrayRemove(tags)
+    });
+  }
+
+  Future deleteImg(String id) async{
+    return await familyCollection.document(famCode).collection("images").document(id).delete();
+  }
+
   Future deleteContactDoc(String name_id) async{
     return await familyCollection
         .document(famCode)
@@ -161,6 +182,24 @@ class DataBaseService {
       'code': famCode,
     });
   }
+  Future initializeImageTagField() async{
+    List<String> initialList = new List<String>();
+    initialList.add("#Happy");
+    return await familyCollection.document(famCode).collection("images").
+    document("tagList").setData({
+      'tagValues': FieldValue.arrayUnion(initialList),
+    });
+  }
+
+  // Might need if recipe has tags
+//  Future initializeRecipeTagField() async{
+//    List<String> initialList = new List<String>();
+//    initialList.add("");
+//    return await familyCollection.document(famCode).collection("recipes").
+//    document("tagList").setData({
+//      'tagValues': FieldValue.arrayUnion(initialList),
+//    });
+//  }
 
   Future updateContactsInfo(String emailId, String name, int phNo) async {
     String small_name = name.toLowerCase();
@@ -201,11 +240,7 @@ class DataBaseService {
     });
   }
 
-  Future addImageURL(String name, String url) async{
-    var random = Random.secure();
-    var value = random.nextInt(1000000000);
-    String code = value.toString();
-    String id = name.toLowerCase()+"_"+code;
+  Future addImageURL(String name, String id, String url, List<String> tags) async{
     return await familyCollection
         .document(famCode)
         .collection("images")
@@ -213,6 +248,7 @@ class DataBaseService {
       'url' : url,
       'name': capitalize(name),
       'id': id,
+      'tag': tags,
 
     });
   }
@@ -291,6 +327,14 @@ class DataBaseService {
     );
   }
 
+  ImageTags _imageTags(DocumentSnapshot snapshot){
+    List<String> emptyList = new List<String>();
+    emptyList.add("");
+    return ImageTags(
+      tags: List.from(snapshot.data['tagValues']) ?? emptyList,
+    );
+  }
+
   FamilyCodeValue _familyCodeValue(DocumentSnapshot snapshot) {
     return FamilyCodeValue(
       familyID: snapshot.data['familyID'] ?? '',
@@ -313,6 +357,12 @@ class DataBaseService {
 
   Stream<List<UserInformation>> get infos {
     return userCollection.snapshots().map(_userLisFromSnapShot);
+  }
+
+  Stream<ImageTags> get imgTagData{
+    return familyCollection.document(famCode).collection("images")
+        .document("tagList").snapshots()
+        .map(_imageTags);
   }
 
   Stream<UserValue> get userData {

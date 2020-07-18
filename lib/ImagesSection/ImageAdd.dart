@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -7,6 +8,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:jaldiio/Animation/FadeAnimation.dart';
 import 'package:jaldiio/Services/CloudStorageService.dart';
 import 'package:jaldiio/Services/DataBaseService.dart';
+import 'package:string_validator/string_validator.dart';
 import 'package:jaldiio/Shared/Loading.dart';
 
 class ImageAdd extends StatefulWidget {
@@ -31,12 +33,6 @@ class _ImageAddState extends State<ImageAdd> {
   void showInSnackBar(String value) {
     _scaffoldKey.currentState.showSnackBar(new SnackBar(content: new Text(value)));
   }
-
-  final _nameController = TextEditingController(text: "");
-  String imgName;
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  final _formKey = GlobalKey<FormState>();
-
   String capitalize(String string) {
     if (string == null) {
       throw ArgumentError("string: $string");
@@ -48,6 +44,35 @@ class _ImageAddState extends State<ImageAdd> {
 
     return string[0].toUpperCase() + string.substring(1).toLowerCase();
   }
+  String imageIDgenerator(String name){
+    var random = Random.secure();
+    var value = random.nextInt(1000000000);
+    String code = value.toString();
+    String id = capitalize(name.toLowerCase().trim().replaceAll(' ', ''))+"_"+code;
+    return id;
+  }
+
+  final _nameController = TextEditingController(text: "");
+  final _tag1 = TextEditingController(text: "");
+  final _tag2 = TextEditingController(text: "");
+  final _tag3 = TextEditingController(text: "");
+  String imgName;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final _formKey = GlobalKey<FormState>();
+  List<String> tags;
+
+
+  List<String> populateList(String tag1, String tag2, String tag3){
+    List<String> tags = new List<String>();
+    tags.add('#'+capitalize(tag1));
+    if(tag2.isNotEmpty)
+      tags.add('#'+capitalize(tag2));
+    if(tag3.isNotEmpty)
+      tags.add('#'+capitalize(tag3));
+
+    return tags;
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -56,9 +81,11 @@ class _ImageAddState extends State<ImageAdd> {
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
+        onPressed: () async{
           showPicker();
           print("image file: " + _image.toString());
+//          tags = populateList(_tag1.text, _tag2.text, _tag3.text);
+//          await DataBaseService(famCode: widget.famCode).updateTags(tags);
         },
         child: Icon(
           Icons.add,
@@ -189,9 +216,93 @@ class _ImageAddState extends State<ImageAdd> {
                                   fontSize: 18,
                                   fontWeight: FontWeight.w400),
                             ),
-                            validator: (val) => val.length > 0
+                            validator: (val) => (val.length > 0) && isAlpha(val)
                                 ? null
                                 : "Please enter an valid name",
+                            onChanged: (val) {
+
+                            },
+                          ),
+                        ),
+                        Container(
+                          padding: EdgeInsets.all(10.0),
+                          decoration: BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(color: Colors.grey[100]),
+                            ),
+                          ),
+                          child: TextFormField(
+                            controller: _tag1,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              hintText: "Set Tag 1",
+                              hintStyle: TextStyle(color: Colors.grey),
+                            ),
+                            style: GoogleFonts.openSans(
+                              textStyle: TextStyle(
+                                  color: Colors.deepPurpleAccent,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w400),
+                            ),
+                            validator: (val) => (val.length > 0) && isAlpha(val)
+                                ? null
+                                : "Please enter a valid tag",
+                            onChanged: (val) {
+
+                            },
+                          ),
+                        ),
+                        Container(
+                          padding: EdgeInsets.all(10.0),
+                          decoration: BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(color: Colors.grey[100]),
+                            ),
+                          ),
+                          child: TextFormField(
+                            controller: _tag2,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              hintText: "Set Tag 2 (Optional)",
+                              hintStyle: TextStyle(color: Colors.grey),
+                            ),
+                            style: GoogleFonts.openSans(
+                              textStyle: TextStyle(
+                                  color: Colors.deepPurpleAccent,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w400),
+                            ),
+                            validator: (val) => (isAlpha(val) && val.length >0) || val.length==0
+                                ? null
+                                : "Please enter a valid tag",
+                            onChanged: (val) {
+
+                            },
+                          ),
+                        ),
+                        Container(
+                          padding: EdgeInsets.all(10.0),
+                          decoration: BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(color: Colors.grey[100]),
+                            ),
+                          ),
+                          child: TextFormField(
+                            controller: _tag3,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              hintText: "Set Tag 3 (Optional)",
+                              hintStyle: TextStyle(color: Colors.grey),
+                            ),
+                            style: GoogleFonts.openSans(
+                              textStyle: TextStyle(
+                                  color: Colors.deepPurpleAccent,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w400),
+                            ),
+                            validator: (val) => (isAlpha(val) && val.length >0) || val.length==0
+                                ? null
+                                : "Please enter a valid tag",
                             onChanged: (val) {
 
                             },
@@ -222,8 +333,10 @@ class _ImageAddState extends State<ImageAdd> {
                 //              final StorageUploadTask task = firebaseRef.putFile(_image);
                 if(_formKey.currentState.validate()){
                   String url = "";
+                  List<String> tags = populateList(_tag1.text, _tag2.text, _tag3.text);
+                  String id = imageIDgenerator(_nameController.text);
                   StorageReference ref = CloudStorageService(famCode: widget.famCode).
-                  Imagesref(capitalize(_nameController.text));
+                  Imagesref(id);
                   showInSnackBar("Please wait while we upload your image...");
                   StorageUploadTask upload =  ref.putFile(_image);
 
@@ -231,30 +344,10 @@ class _ImageAddState extends State<ImageAdd> {
 
                   url = await storageTaskSnapshot.ref.getDownloadURL();
 //                  print(url);
-                  await DataBaseService(famCode: widget.famCode).addImageURL(capitalize(_nameController.text), url);
+                  await DataBaseService(famCode: widget.famCode).addImageURL(capitalize(_nameController.text).trim(),id, url, tags);
+                  await DataBaseService(famCode: widget.famCode).updateTags(tags);
                   showInSnackBar("Image uploaded successfully!");
 
-                }
-
-              },
-            ),
-            FlatButton(
-              child: Text("Delete",
-                style: GoogleFonts.openSans(
-                    fontSize: 18,
-                    color: Colors.white),),
-              padding: EdgeInsets.only(left: 100, right: 100),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                  side: BorderSide(
-                      color: Colors.deepPurpleAccent)),
-              color: Colors.deepPurpleAccent,
-              onPressed: () async {
-
-                if(_formKey.currentState.validate()){
-                  await CloudStorageService(famCode: widget.famCode)
-                      .deleteImage(_nameController.text);
-                  showInSnackBar("Image deleted succesfully!");
                 }
 
               },

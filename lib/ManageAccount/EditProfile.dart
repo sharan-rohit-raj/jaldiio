@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:jaldiio/Animation/FadeAnimation.dart';
+import 'package:jaldiio/Home.dart';
 import 'package:jaldiio/LoginPage.dart';
 import 'package:jaldiio/Models/UserInformation.dart';
 import 'package:jaldiio/Models/UserValue.dart';
@@ -10,10 +11,11 @@ import 'package:jaldiio/Services/DataBaseService.dart';
 import 'package:jaldiio/Services/auth.dart';
 import 'package:provider/provider.dart';
 
-import 'Models/user.dart';
+import '../Models/user.dart';
 
 class EditProfile extends StatefulWidget {
-
+  BuildContext contexty;
+  EditProfile({Key key, @required this.contexty}) : super(key: key);
   @override
   _EditProfileState createState() => _EditProfileState();
 }
@@ -51,7 +53,6 @@ class _EditProfileState extends State<EditProfile> {
               ),
               onPressed: () {
                 Navigator.pop(context);
-
               },
             ),
           ),

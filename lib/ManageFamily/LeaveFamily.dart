@@ -8,6 +8,7 @@ import 'package:jaldiio/Models/user.dart';
 import 'package:jaldiio/Shared/Loading.dart';
 import 'package:provider/provider.dart';
 
+import '../Home.dart';
 import '../Services/DataBaseService.dart';
 
 class LeaveFamily extends StatefulWidget {
@@ -62,6 +63,7 @@ class _LeaveFamilyState extends State<LeaveFamily> {
                           color: Colors.deepPurpleAccent,
                         ),
                         onPressed: () {
+
                           Navigator.pop(context);
                         },
                       ),
@@ -132,8 +134,6 @@ class _LeaveFamilyState extends State<LeaveFamily> {
                                       .deleteContactDoc(name_id);
                                   await DataBaseService(uid: fireuser.uid).leaveFamily();
                                   showInSnackBar("Left family successfully.");
-                                  Navigator.pop(context);
-
                                 },
                               );
                             }

@@ -29,8 +29,9 @@ class CloudStorageService{
     return imageRef.child(famCode).child("Recipes").child(capitalize(recipeCode));
   }
 
-  Future deleteImage(String name) async{
-    return imageRef.child(famCode).child("Images").child(capitalize(name)).delete();
+  Future deleteImage(String id) async{
+
+    return imageRef.child(famCode).child("Images").child(id).delete();
   }
 
 }
