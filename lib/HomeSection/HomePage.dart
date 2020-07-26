@@ -15,6 +15,7 @@ import 'package:jaldiio/ManageFamily/LeaveFamily.dart';
 import 'package:jaldiio/Models/FamilyCodeValue.dart';
 import 'package:jaldiio/Models/UserValue.dart';
 import 'package:jaldiio/Models/user.dart';
+import 'package:jaldiio/RecipesZone/RecipeZone.dart';
 import 'package:jaldiio/Services/DataBaseService.dart';
 import 'package:jaldiio/Services/auth.dart';
 import 'package:jaldiio/Shared/Loading.dart';
@@ -35,11 +36,12 @@ class HomePage extends StatefulWidget {
 var cardAspectRatio = 12.0 / 16.0;
 var widgetAspectRatio = cardAspectRatio * 1.2;
 
-class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin{
-  AnimationController _animationController ;
+class _HomePageState extends State<HomePage>
+    with SingleTickerProviderStateMixin {
+  AnimationController _animationController;
 
   @override
-  void dispose(){
+  void dispose() {
     _animationController.dispose();
     super.dispose();
   }
@@ -69,24 +71,25 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     }
   }
 
-  void nightMode(){
+  void nightMode() {
     bgcolor = 0xFF240E45;
     interiorColor = 0xFFFFFFFF;
     offsetColor = Colors.amber;
   }
-  void dayMode(){
+
+  void dayMode() {
     bgcolor = 0xFFCCBEDE;
     interiorColor = 0xFF5B3298;
     offsetColor = Colors.black87;
   }
-  void setMode(bool switchMode){
-    if(switchMode){
+
+  void setMode(bool switchMode) {
+    if (switchMode) {
       nightMode();
-    }else{
+    } else {
       dayMode();
     }
   }
-
 
   String salutations() {
     var now = DateTime.now();
@@ -119,8 +122,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
   @override
   void initState() {
-    _animationController = AnimationController(vsync: this,
-        duration: Duration(milliseconds: 1000));
+    _animationController = AnimationController(
+        vsync: this, duration: Duration(milliseconds: 1000));
     Timer(Duration(milliseconds: 200), () => _animationController.forward());
     controller.addListener(() {
       int next = controller.page.round();
@@ -176,237 +179,247 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               userValue = snapshot.data;
 
               return StreamBuilder<FamilyCodeValue>(
-                stream: DataBaseService(uid: user_val.uid).codeData,
-                builder: (context, snapshotCode) {
-                  FamilyCodeValue familyCodeValue = null;
-                  if(snapshotCode.hasData){
-                    familyCodeValue = snapshotCode.data;
-                  }else{
-                    return Loading();
-                  }
-                  return new MultiLevelDrawer(
-                      backgroundColor: Color.fromRGBO(109, 49, 185, 0.9),
-                      rippleColor: Colors.white,
-                      subMenuBackgroundColor: Color.fromRGBO(253, 160, 41, 1),
-                      header: Container(
-                        // Header for Drawer
-                        child: Center(
-                            child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            SizedBox(
-                              height: 70,
-                            ),
-                            Image.asset(
-                              "assets/images/avatar.png",
-                              width: 100,
-                              height: 100,
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Text(
-                              userValue.name,
-                              style: GoogleFonts.openSans(
-                                color: Colors.white,
-                                fontSize: 25,
+                  stream: DataBaseService(uid: user_val.uid).codeData,
+                  builder: (context, snapshotCode) {
+                    FamilyCodeValue familyCodeValue = null;
+                    if (snapshotCode.hasData) {
+                      familyCodeValue = snapshotCode.data;
+                    } else {
+                      return Loading();
+                    }
+                    return new MultiLevelDrawer(
+                        backgroundColor: Color.fromRGBO(109, 49, 185, 0.9),
+                        rippleColor: Colors.white,
+                        subMenuBackgroundColor: Color.fromRGBO(253, 160, 41, 1),
+                        header: Container(
+                          // Header for Drawer
+                          child: Center(
+                              child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              SizedBox(
+                                height: 70,
                               ),
-                            ),
-                            Text(
-                              typeOfMember(
-                                  adminValidator(), partOfFamilyValidator()),
-                              style: GoogleFonts.openSans(
-                                color: Colors.white,
+                              Image.asset(
+                                "assets/images/avatar.png",
+                                width: 100,
+                                height: 100,
                               ),
-                            ),
-                          ],
-                        )),
-                      ),
-                      children: [
-                        // Child Elements for Each Drawer Item
-                        MLMenuItem(
-                            leading: Icon(
-                              Icons.person,
-                              color: Colors.white,
-                            ),
-                            trailing: Icon(Icons.arrow_right, color: Colors.white),
-                            content: Text(
-                              "Account",
-                              style: GoogleFonts.openSans(
-                                color: Colors.white,
+                              SizedBox(
+                                height: 10,
                               ),
-                            ),
-                            subMenuItems: [
-                              MLSubmenu(
-                                onClick: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => new EditProfile()),
-                                  );
-                                },
-                                submenuContent: Text(
-                                  "Edit Profile",
-                                  style: GoogleFonts.openSans(
-                                    color: Colors.white,
-                                  ),
+                              Text(
+                                userValue.name,
+                                style: GoogleFonts.openSans(
+                                  color: Colors.white,
+                                  fontSize: 25,
                                 ),
                               ),
-                              MLSubmenu(
-                                  onClick: () {},
+                              Text(
+                                typeOfMember(
+                                    adminValidator(), partOfFamilyValidator()),
+                                style: GoogleFonts.openSans(
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          )),
+                        ),
+                        children: [
+                          // Child Elements for Each Drawer Item
+                          MLMenuItem(
+                              leading: Icon(
+                                Icons.person,
+                                color: Colors.white,
+                              ),
+                              trailing:
+                                  Icon(Icons.arrow_right, color: Colors.white),
+                              content: Text(
+                                "Account",
+                                style: GoogleFonts.openSans(
+                                  color: Colors.white,
+                                ),
+                              ),
+                              subMenuItems: [
+                                MLSubmenu(
+                                  onClick: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              new EditProfile()),
+                                    );
+                                  },
                                   submenuContent: Text(
-                                    "Delete Account",
+                                    "Edit Profile",
                                     style: GoogleFonts.openSans(
                                       color: Colors.white,
                                     ),
-                                  )),
-                            ],
-                            onClick: () {}),
+                                  ),
+                                ),
+                                MLSubmenu(
+                                    onClick: () {},
+                                    submenuContent: Text(
+                                      "Delete Account",
+                                      style: GoogleFonts.openSans(
+                                        color: Colors.white,
+                                      ),
+                                    )),
+                              ],
+                              onClick: () {}),
 
-                        MLMenuItem(
-                            leading: Icon(Icons.people, color: Colors.white),
-                            trailing: Icon(Icons.arrow_right, color: Colors.white),
+                          MLMenuItem(
+                              leading: Icon(Icons.people, color: Colors.white),
+                              trailing:
+                                  Icon(Icons.arrow_right, color: Colors.white),
+                              content: Text(
+                                "Family",
+                                style: GoogleFonts.openSans(
+                                  color: Colors.white,
+                                ),
+                              ),
+                              onClick: () {},
+                              subMenuItems: [
+                                if (partOfFamilyValidator() &&
+                                    familyCodeValue != null) ...[
+                                  MLSubmenu(
+                                      onClick: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  ContactSection(
+                                                    code: familyCodeValue
+                                                        .familyID,
+                                                  )),
+                                        );
+                                      },
+                                      submenuContent: Text(
+                                        "Add/View Family",
+                                        style: GoogleFonts.openSans(
+                                          color: Colors.white,
+                                        ),
+                                      )),
+                                ],
+                                if (partOfFamilyValidator() &&
+                                    adminValidator()) ...[
+                                  MLSubmenu(
+                                      onClick: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  DeleteFamily(
+                                                    familyCode:
+                                                        userValue.familyID,
+                                                  )),
+                                        );
+                                      },
+                                      submenuContent: Text(
+                                        "Delete Family",
+                                        style: GoogleFonts.openSans(
+                                          color: Colors.white,
+                                        ),
+                                      )),
+                                ],
+                                if (partOfFamilyValidator() &&
+                                    !adminValidator()) ...[
+                                  MLSubmenu(
+                                      onClick: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) => LeaveFamily(
+                                                    familyCode:
+                                                        userValue.familyID,
+                                                  )),
+                                        );
+                                      },
+                                      submenuContent: Text(
+                                        "Leave Family",
+                                        style: GoogleFonts.openSans(
+                                          color: Colors.white,
+                                        ),
+                                      )),
+                                ],
+                                if (!partOfFamilyValidator()) ...[
+                                  MLSubmenu(
+                                      onClick: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  CreateFamily()),
+                                        );
+                                      },
+                                      submenuContent: Text(
+                                        "Create Family",
+                                        style: GoogleFonts.openSans(
+                                          color: Colors.white,
+                                        ),
+                                      )),
+                                  MLSubmenu(
+                                      onClick: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  JoinFamily()),
+                                        );
+                                      },
+                                      submenuContent: Text(
+                                        "Join Family",
+                                        style: GoogleFonts.openSans(
+                                          color: Colors.white,
+                                        ),
+                                      )),
+                                ],
+                              ]),
+
+                          MLMenuItem(
+                            leading: Icon(Icons.feedback, color: Colors.white),
                             content: Text(
-                              "Family",
+                              "Contact Us",
                               style: GoogleFonts.openSans(
                                 color: Colors.white,
                               ),
                             ),
-                            onClick: () {},
-                            subMenuItems: [
-
-                              if(partOfFamilyValidator() && familyCodeValue != null) ...[
-                                MLSubmenu(
-                                    onClick: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => ContactSection(
-                                        code: familyCodeValue.familyID,
-                                      )),
-                                );
-                                    },
-                                    submenuContent: Text(
-                                      "Add/View Family",
-                                      style: GoogleFonts.openSans(
-                                        color: Colors.white,
-                                      ),
-                                    )),
-                              ],
-
-
-                              if (partOfFamilyValidator() && adminValidator()) ...[
-                                MLSubmenu(
-                                    onClick: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => DeleteFamily(
-                                                  familyCode: userValue.familyID,
-                                                )),
-                                      );
-                                    },
-                                    submenuContent: Text(
-                                      "Delete Family",
-                                      style: GoogleFonts.openSans(
-                                        color: Colors.white,
-                                      ),
-                                    )),
-                              ],
-                              if (partOfFamilyValidator() && !adminValidator()) ...[
-                                MLSubmenu(
-                                    onClick: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => LeaveFamily(
-                                                  familyCode: userValue.familyID,
-                                                )),
-                                      );
-                                    },
-                                    submenuContent: Text(
-                                      "Leave Family",
-                                      style: GoogleFonts.openSans(
-                                        color: Colors.white,
-                                      ),
-                                    )),
-                              ],
-                              if (!partOfFamilyValidator()) ...[
-                                MLSubmenu(
-                                    onClick: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => CreateFamily()),
-                                      );
-                                    },
-                                    submenuContent: Text(
-                                      "Create Family",
-                                      style: GoogleFonts.openSans(
-                                        color: Colors.white,
-                                      ),
-                                    )),
-                                MLSubmenu(
-                                    onClick: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => JoinFamily()),
-                                      );
-                                    },
-                                    submenuContent: Text(
-                                      "Join Family",
-                                      style: GoogleFonts.openSans(
-                                        color: Colors.white,
-                                      ),
-                                    )),
-                              ],
-                            ]),
-
-                        MLMenuItem(
-                          leading: Icon(Icons.feedback, color: Colors.white),
-                          content: Text(
-                            "Contact Us",
-                            style: GoogleFonts.openSans(
-                              color: Colors.white,
-                            ),
+                            onClick: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => ContactUs()),
+                              );
+                            },
                           ),
-                          onClick: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => ContactUs()),
-                            );
-                          },
-                        ),
-                        MLMenuItem(
-                          leading: partOfFamilyValidator()
-                              ? Icon(
-                                  Icons.mood,
-                                  color: Colors.green,
-                                )
-                              : Icon(
-                                  Icons.mood_bad,
-                                  color: Colors.white,
-                                ),
-                          content: Text(
-                            "Family Status",
-                            style: GoogleFonts.openSans(
-                              color: Colors.white,
+                          MLMenuItem(
+                            leading: partOfFamilyValidator()
+                                ? Icon(
+                                    Icons.mood,
+                                    color: Colors.green,
+                                  )
+                                : Icon(
+                                    Icons.mood_bad,
+                                    color: Colors.white,
+                                  ),
+                            content: Text(
+                              "Family Status",
+                              style: GoogleFonts.openSans(
+                                color: Colors.white,
+                              ),
                             ),
+                            onClick: () {
+                              showDialog(
+                                  context: context,
+                                  builder: (_) => partOfFamilyValidator()
+                                      ? OkalertDialog("Family Joined",
+                                          "You belong to Rohit Family.")
+                                      : OkalertDialog("Family not Joined",
+                                          "You don't belong to any Family."));
+                            },
                           ),
-                          onClick: () {
-                            showDialog(
-                                context: context,
-                                builder: (_) => partOfFamilyValidator()
-                                    ? OkalertDialog("Family Joined",
-                                        "You belong to Rohit Family.")
-                                    : OkalertDialog("Family not Joined",
-                                        "You don't belong to any Family."));
-                          },
-                        ),
-                      ]);
-                }
-              );
+                        ]);
+                  });
             } else if (snapshot.hasError) {
               return new MultiLevelDrawer(
                   backgroundColor: Color.fromRGBO(109, 49, 185, 0.9),
@@ -531,7 +544,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             padding: const EdgeInsets.only(left: 12, top: 30, bottom: 8.0),
             child: SlideTransition(
               position: Tween<Offset>(
-                begin: Offset(0,-1),
+                begin: Offset(0, -1),
                 end: Offset.zero,
               ).animate(_animationController),
               child: FadeTransition(
@@ -550,11 +563,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                     Padding(
                       padding: const EdgeInsets.only(top: 10),
                       child: InkWell(
-                          child: Image.asset("assets/images/HomeLogo.png"),
+                        child: Image.asset("assets/images/HomeLogo.png"),
                         onTap: () {
-                            setState(() {
-                              reassemble();
-                            });
+                          setState(() {
+                            reassemble();
+                          });
                         },
                       ),
                     ),
@@ -701,10 +714,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           )),
         ),
         onTap: () {
-          if(famCode == null){
-            showSnackBar("Please be a part of family to access this feature...", _scaffoldKey);
-          }
-          else{
+          if (famCode == null) {
+            showSnackBar("Please be a part of family to access this feature...",
+                _scaffoldKey);
+          } else {
 //          print("famcode: "+famCode);
             switch (title) {
               case "To-Do List":
@@ -712,8 +725,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   context,
                   MaterialPageRoute(
                       builder: (context) => ToDoList(
-                        code: famCode,
-                      )),);
+                            code: famCode,
+                          )),
+                );
                 break;
 
               case "Images":
@@ -721,8 +735,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   context,
                   MaterialPageRoute(
                       builder: (context) => CarouselSection(
-                        famCode: famCode,
-                      )),);
+                            famCode: famCode,
+                          )),
+                );
                 break;
 
               case "Family Events":
@@ -737,14 +752,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 break;
 
               case "Recipe Zone":
-                AwesomeDialog(
-                  context: context,
-                  dialogType: DialogType.INFO,
-                  animType: AnimType.BOTTOMSLIDE,
-                  title: title,
-                  desc: 'Under Construction...',
-                  btnOkOnPress: () {},
-                )..show();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => RecipeZone(
+                            famCode: famCode,
+                          )),
+                );
                 break;
 
               default:
@@ -752,7 +766,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 break;
             }
           }
-
         },
       ),
     );
@@ -792,5 +805,4 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       ),
     );
   }
-
 }
