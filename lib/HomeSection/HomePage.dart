@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -22,6 +23,7 @@ import 'package:jaldiio/Shared/MLDrawer.dart';
 import 'package:jaldiio/ToDos/ToDoList.dart';
 import 'package:provider/provider.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:string_validator/string_validator.dart';
 import 'CardScroll.dart';
 import 'Data.dart';
 import '../ContactUs.dart';
@@ -45,6 +47,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   }
 
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  final _formKey = GlobalKey<FormState>();
+  String email;
+  String password;
   final AuthService _auth = AuthService();
   final PageController controller = PageController(viewportFraction: 0.8);
 //  var currentIndex = images.length - 1.0;
@@ -253,7 +258,28 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                 ),
                               ),
                               MLSubmenu(
-                                  onClick: () {},
+                                  onClick: () {
+                                    String id = user_val.email;
+                                    if(partOfFamilyValidator() && familyCodeValue != null){
+
+                                      if(userValue.admin){
+                                        //String familyCode, String uid, String contactId,
+                                        reAuthenticateDialog(true, familyCodeValue.familyID, user_val.uid, id,
+                                            _auth, "Delete Family Member Admin Account", 'As you are the admin, first you must delete your existing family to delete your account.',
+                                            Colors.deepPurpleAccent, Colors.red, Colors.transparent, Colors.grey[100], Colors.grey, Colors.black);
+                                      }
+                                      else{
+                                        reAuthenticateDialog(false, familyCodeValue.familyID, user_val.uid, id,
+                                            _auth, "Delete Family Member Account", 'Are you sure you wish to delete this account? You will not have access to this family anymore.',
+                                            Colors.deepPurpleAccent, Colors.red, Colors.transparent, Colors.grey[100], Colors.grey, Colors.black);
+                                      }
+                                    }
+                                    else{
+                                      reAuthenticateDialog(false, null, user_val.uid, id,
+                                          _auth, "Delete user Account", 'Are you sure you wish to delete this account?',
+                                          Colors.deepPurpleAccent, Colors.red, Colors.transparent, Colors.grey[100], Colors.grey, Colors.black);
+                                    }
+                                  },
                                   submenuContent: Text(
                                     "Delete Account",
                                     style: GoogleFonts.openSans(
@@ -298,11 +324,12 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                               if (partOfFamilyValidator() && adminValidator()) ...[
                                 MLSubmenu(
                                     onClick: () {
+                                      print(familyCodeValue.familyID);
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) => DeleteFamily(
-                                                  familyCode: userValue.familyID,
+                                                  familyCode: familyCodeValue.familyID,
                                                 )),
                                       );
                                     },
@@ -476,7 +503,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                             ),
                           ),
                           MLSubmenu(
-                              onClick: () {},
+                              onClick: () {
+                                reAuthenticateDialog(false, null, null, null,
+                                    _auth, "Delete user Account", 'Are you sure you wish to delete this account?',
+                                    Colors.deepPurpleAccent, Colors.red, Colors.transparent, Colors.grey[100], Colors.grey, Colors.black);
+                              },
                               submenuContent: Text(
                                 "Delete Account",
                                 style: GoogleFonts.openSans(
@@ -522,7 +553,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                     ),
                   ]);
             } else {
-              return LinearProgressIndicator();
+              return Loading();
             }
           }),
       body: Column(
@@ -605,7 +636,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                       children: <Widget>[
                         Text("Welcome",
                             style: GoogleFonts.dancingScript(
-                                color: Colors.white,
+                                color: Color(interiorColor),
                                 fontSize: 35.0,
                                 letterSpacing: 1.0)),
                       ],
@@ -661,7 +692,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                         }),
                   );
                 } else {
-                  return LinearProgressIndicator();
+                  return Loading();
                 }
               })
         ],
@@ -701,11 +732,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           )),
         ),
         onTap: () {
-          if(famCode == null){
+          if(famCode == null || famCode.isEmpty){
             showSnackBar("Please be a part of family to access this feature...", _scaffoldKey);
           }
           else{
-//          print("famcode: "+famCode);
+          print("famcode: "+famCode);
             switch (title) {
               case "To-Do List":
                 Navigator.push(
@@ -792,5 +823,203 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       ),
     );
   }
+
+ AwesomeDialog reAuthenticateDialog(bool adminCheck, String familyCode, String uid, String contactId, AuthService _auth, String title,
+     String desc, Color cancelBtnColor, Color okBtnColor, Color formColor, Color borderColor, Color hintColor, Color textColor){
+  return AwesomeDialog(
+  context: context,
+  dialogType: DialogType.WARNING,
+  animType: AnimType.BOTTOMSLIDE,
+  title: title,
+  desc: desc,
+  btnOkOnPress: () {
+    if(!adminCheck){
+      reLogin(_auth, familyCode, contactId, uid, formColor, borderColor, hintColor, textColor, cancelBtnColor);
+    }
+    else{
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => new DeleteFamily(familyCode: familyCode)),
+      );
+    }
+
+  },
+  btnCancelOnPress: () {},
+  btnCancelColor: cancelBtnColor,
+    btnOkColor: okBtnColor,
+  )..show();}
+
+ AwesomeDialog reLogin(AuthService _auth,String familyCode, String contactId,
+     String uid, Color formColor, Color borderColor, Color hintColor, Color textColor, Color okBtnColor){
+    return   AwesomeDialog(
+      context: context,
+      dialogType: DialogType.INFO,
+      animType: AnimType.BOTTOMSLIDE,
+      body: Column(
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Center(
+              child: Text("Please re-enter your credentials for security purposes.",
+                style: GoogleFonts.openSans(
+                  fontSize: 15,
+                ),),
+            ),
+          ),
+          Form(
+            key: _formKey,
+            child: FadeAnimation(
+              1, Container(
+              padding: EdgeInsets.all(8.0),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10.0),
+                color: formColor,
+              ),
+              child: Column(
+                children: <Widget>[
+                  Container(
+                    padding: EdgeInsets.all(10.0),
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                            color: borderColor
+                        ),
+                      ),
+                    ),
+                    child: TextFormField(
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        hintText: "Email ID",
+                        hintStyle: TextStyle(
+                            color: hintColor
+                        ),
+                      ),
+                      style: GoogleFonts.openSans(
+                        textStyle: TextStyle(
+                            color: textColor,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w400
+                        ),
+                      ),
+                      validator: (val) => val.isEmpty || !(isEmail(val)) ? 'Enter a valid Email ID' : null,
+                      onChanged: (val) {
+                        setState(() {
+                          email = val;
+                        });
+                      },
+                    ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.all(10.0),
+                    decoration: BoxDecoration(
+                      border: Border(bottom: BorderSide(
+                        color: borderColor,
+                      ),
+                      ),
+                    ),
+                    child: TextFormField(
+                      decoration: InputDecoration(
+                        border:InputBorder.none,
+                        hintText: "Password",
+                        hintStyle: TextStyle(color: hintColor),
+                      ),
+                      style: TextStyle(color: textColor, fontSize: 18),
+                      obscureText: true,
+
+                      validator: (val) => val.length < 6 ? 'Enter a Password 6+ characters long' : null,
+                      onChanged: (val) {
+                        setState(() {
+                          password = val;
+                        });
+                      },
+                    ),
+                  )
+                ],
+              ),
+            ),),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Container(
+            width: 100,
+            decoration: BoxDecoration(
+              color: Colors.transparent,
+              border: Border.all(color: Colors.deepPurpleAccent),
+              borderRadius: BorderRadius.circular(100),
+            ),
+            child: IconButton(
+              icon: Icon(Icons.check,size: 30,color: Colors.deepPurpleAccent,),
+              onPressed: () async{
+                if(_formKey.currentState.validate()){
+                  if(await _auth.reAuth(email, password) == null){
+                    reAuthenticateError(okBtnColor);
+                  }
+                  else{
+                  //Delete Contact Doc
+                    if(familyCode != null && familyCode.isNotEmpty){
+                      await DataBaseService(famCode: familyCode).deleteContactDoc(contactId);
+                    }
+                    //Delete User
+                    if(uid != null && uid.isNotEmpty){
+                      await DataBaseService(uid: uid).deleteUserProfile();
+                    }
+
+                    //Delete Account
+                    await _auth.deleteAccount();
+
+                      Navigator.of(context, rootNavigator: false).pop();
+                  }
+                }
+              },
+            ),
+          )
+        ],
+      ),
+
+
+//      btnOkOnPress: () async{
+//      if(_formKey.currentState.validate()){
+//        if(await _auth.reAuth(email, password) == null){
+//          reAuthenticateError(okBtnColor);
+//        }
+//        else{
+//          print("Success");
+//        }
+//      }
+////
+//    },
+//      btnOkColor: okBtnColor,
+    )..show();
+  }
+
+ AwesomeDialog reAuthenticateError(Color okBtnColor){
+    return   AwesomeDialog(
+      context: context,
+      dialogType: DialogType.ERROR,
+      animType: AnimType.BOTTOMSLIDE,
+      title: "Invalid Credentials",
+      desc: "The credentials you have entered seems to be invalid",
+      btnOkOnPress: () {
+
+      },
+      btnOkText: "Try Again",
+      btnOkColor: okBtnColor,
+    )..show();
+
+  }
+
+
+    //Delete user from contact list
+//                                            print(familyCodeValue.familyID);
+//                                            await DataBaseService(famCode: familyCodeValue.familyID).deleteContactDoc(id);
+
+    //Make the user leave from family
+//                                            print(user_val.uid);
+//                                          await DataBaseService(uid: user_val.uid).leaveFamily();
+
+    //Delete user account
+//                                          await _auth.deleteAccount();
 
 }

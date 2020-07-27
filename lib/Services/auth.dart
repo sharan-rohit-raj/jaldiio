@@ -1,3 +1,4 @@
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:jaldiio/Models/user.dart';
 import 'package:jaldiio/Services/DataBaseService.dart';
@@ -13,17 +14,6 @@ class AuthService{
   //auth change user stream
   Stream<User> get user_stream {
     return _auth.onAuthStateChanged.map((FirebaseUser user) => _userFromFirebaseUser(user));
-  }
-  //Sign in anon
-  Future signInAnonymous() async{
-    try{
-      AuthResult result = await _auth.signInAnonymously();
-      FirebaseUser user = result.user;
-      return _userFromFirebaseUser(user);
-    }catch(e){
-      print(e.toString());
-      return null;
-    }
   }
 
   //Sign in with email and password
@@ -43,9 +33,6 @@ class AuthService{
     try{
         AuthResult result = await _auth.createUserWithEmailAndPassword(email: email, password: password);
         FirebaseUser  fireuser = result.user;
-
-        //create new doc for user
-//        await DataBaseService(uid: fireuser.uid).updateUserInfo("Sharan", "Hey yo", 22, 3657774973);
         return _userFromFirebaseUser(fireuser);
     }catch(e){
        print(e.toString());
@@ -53,13 +40,41 @@ class AuthService{
     }
   }
 
-  //register
+  //ReAuthenticate User
+  Future reAuth(String email, String password) async{
+    try{
+      FirebaseUser user = await _auth.currentUser();
+      AuthCredential credential = EmailAuthProvider.getCredential(
+        email: email,
+        password: password,
+      );
+      AuthResult result = await user.reauthenticateWithCredential(credential);
+      return result;
+    }catch(e){
+      print("Error in login.");
+      return null;
+    }
+  }
+
+
+  //Delete Account
+  Future deleteAccount() async{
+    try{
+      FirebaseUser user = await _auth.currentUser();
+      return await user.delete();
+    }catch(e){
+      print(e.toString());
+      print("Cannot perform delete account action.");
+      return null;
+    }
+  }
 
   //Sign out
   Future signOut() async{
     try{
       return await _auth.signOut();
     }catch(e){
+        print("Unable to Sign Out.");
        print(e.toString());
        return null;
     }

@@ -24,6 +24,7 @@ class _ContactTileState extends State<ContactTile> {
   bool isdelete = false;
 
 
+
   @override
   Widget build(BuildContext context) {
     String name_id = widget.contact.name.toLowerCase() + "_" + widget.contact.phNo.toString();
@@ -38,7 +39,14 @@ class _ContactTileState extends State<ContactTile> {
         margin: EdgeInsets.fromLTRB(20, 6, 20, 0),
         child: ListTile(
               leading: widget.contact.joined?
-              Icon(Icons.check_circle, color: Colors.green,) : Icon(Icons.check_circle_outline, color: Colors.grey),
+              Padding(
+                padding: const EdgeInsets.only(top: 13),
+                child: Icon(Icons.check_circle, color: Colors.green,),
+              ) :
+              Padding(
+                padding: const EdgeInsets.only(top: 13),
+                child: Icon(Icons.check_circle_outline, color: Colors.grey),
+              ),
               title: Text(widget.contact.name, style: GoogleFonts.openSans(
                 fontSize: 25,
 
@@ -52,13 +60,14 @@ class _ContactTileState extends State<ContactTile> {
                   icon: Icon(Icons.remove_circle, color: Colors.red,),
                 onPressed: () async{
                     print(widget.code);
+                    await DataBaseService(famCode: widget.code)
+                        .deleteContactDoc(widget.contact.emaild);
+                    //if user is joined update user's familyCode value in user_collection
+                  if(widget.contact.joined){
+                    await DataBaseService(uid: widget.contact.uid).updateJoined(false);
+                    await DataBaseService(uid: widget.contact.uid).leaveFamily();
+                  }
 
-                  final FirebaseUser fireuser = await FirebaseAuth
-                      .instance.currentUser();
-                  await DataBaseService(famCode: widget.code)
-                      .deleteContactDoc(name_id);
-                  await DataBaseService(uid: widget.contact.uid).updateJoined(false);
-                  await DataBaseService(uid: widget.contact.uid).leaveFamily();
               } ,
               ),
             )

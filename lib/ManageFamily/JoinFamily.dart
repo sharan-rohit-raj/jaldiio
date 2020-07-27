@@ -191,17 +191,26 @@ class _JoinFamilyState extends State<JoinFamily> {
                                             if(found){
                                               final FirebaseUser fireuser =
                                               await FirebaseAuth.instance.currentUser();
-                                              await DataBaseService(uid: fireuser.uid)
-                                                  .updateFamilyCode(
-                                                  _codeController.text
-                                              );
-                                              await DataBaseService(uid: fireuser.uid, famCode: _codeController.text)
-                                                  .updateMembers(snapshot.data.name, snapshot.data.phoneNum);
-                                              await DataBaseService(uid: fireuser.uid).updateJoined(true);
-                                              await DataBaseService(famCode: _codeController.text).updateContactjoined(snapshot.data.name, snapshot.data.phoneNum, true);
-                                              await DataBaseService(famCode: _codeController.text).updateContactUID(snapshot.data.name, snapshot.data.phoneNum, fireuser.uid);
+                                              try{
+                                                await DataBaseService(famCode: _codeController.text).updateContactjoined(fireuser.email, true);
+                                                await DataBaseService(famCode: _codeController.text).updateContactUID(fireuser.email, fireuser.uid);
+                                                await DataBaseService(uid: fireuser.uid)
+                                                    .updateFamilyCode(
+                                                    _codeController.text
+                                                );
+//                                                await DataBaseService(uid: fireuser.uid, famCode: _codeController.text)
+//                                                    .updateMembers(snapshot.data.name, snapshot.data.phoneNum);
+                                                await DataBaseService(uid: fireuser.uid).updateJoined(true);
+                                                showInSnackBar("Yay! you joined a family!");
 
-                                              showInSnackBar("Yay! you joined a family!");
+
+                                              }
+                                              catch(e){
+                                                print(e.toString());
+                                                showInSnackBar("Oh..Oh seems like you weren't invited. Please make sure the admin invites you.");
+                                              }
+
+
                                             }
                                             else{
                                               showInSnackBar("hmm.. we were not expecting that code. Please try again.");

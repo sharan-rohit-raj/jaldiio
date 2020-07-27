@@ -29,7 +29,7 @@ class _CreateFamilyState extends State<CreateFamily> {
   @override
   Widget build(BuildContext context) {
     final user_val = Provider.of<User>(context);
-
+    bool isAlreadyPressed = false;
     return Scaffold(
       backgroundColor: Colors.white,
       key: _scaffoldKey,
@@ -169,7 +169,10 @@ class _CreateFamilyState extends State<CreateFamily> {
                                         fontSize: 18,
                                         color: Colors.deepPurpleAccent),
                                   ),
-                                  onPressed: () async {
+                                  onPressed: !isAlreadyPressed ? () async {
+                                    setState(() {
+                                      isAlreadyPressed = true;
+                                    });
                                     if (_formKey.currentState.validate()) {
                                       final QuerySnapshot result =
                                       await Firestore.instance.collection('family_info').getDocuments();
@@ -197,13 +200,15 @@ class _CreateFamilyState extends State<CreateFamily> {
                                         await DataBaseService(uid: fireuser.uid).updateAdmin(true);
                                         await DataBaseService(uid: fireuser.uid).updateJoined(true);
                                         showInSnackBar("Yay! your family name was stored successfully!");
+
+
                                       }
                                       else{
                                         showInSnackBar("We are sorry, that code was already taken by another family. Please try again.");
                                       }
 
                                     }
-                                  },
+                                  }: null,
                                 ),
                               ],
                             ),

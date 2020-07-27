@@ -42,6 +42,7 @@ class _DeleteFamilyState extends State<DeleteFamily> {
 
   @override
   Widget build(BuildContext context) {
+    print("family code: "+widget.familyCode);
     return Scaffold(
       key: _scaffoldKey,
       resizeToAvoidBottomInset: false,

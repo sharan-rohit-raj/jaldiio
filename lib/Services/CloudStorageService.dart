@@ -30,8 +30,22 @@ class CloudStorageService{
   }
 
   Future deleteImage(String id) async{
+    return await imageRef.child(famCode).child("Images").child(id).delete();
+  }
 
-    return imageRef.child(famCode).child("Images").child(id).delete();
+  Future deleteAllFamilyImages() async{
+
+    if(await imageRef.child(famCode).child("Images").getName() != null){
+      print(await imageRef.child(famCode).child("Images").getPath());
+      await imageRef.child(famCode).child("Images").delete();
+    }
+
+    if (await imageRef.child(famCode).child("Recipes").getName() != null) {
+      print(await imageRef.child(famCode).child("Recipes").getName());
+      await imageRef.child(famCode).child("Recipes").delete();
+    }
+
+
   }
 
 }

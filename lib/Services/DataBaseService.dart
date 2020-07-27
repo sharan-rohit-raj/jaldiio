@@ -8,6 +8,8 @@ import 'package:jaldiio/Models/UserInformation.dart';
 import 'package:jaldiio/Models/UserValue.dart';
 import 'dart:math';
 
+import 'package:jaldiio/Services/CloudStorageService.dart';
+
 class DataBaseService {
   final String uid;
   final String famCode;
@@ -90,6 +92,10 @@ class DataBaseService {
     });
   }
 
+  Future deleteUserProfile() async{
+    return await userCollection.document(uid).delete();
+  }
+
   Future deleteTask(String id) async {
     return await familyCollection
         .document(famCode)
@@ -123,10 +129,17 @@ class DataBaseService {
   }
 
   Future deleteContactDoc(String name_id) async{
-    return await familyCollection
-        .document(famCode)
-        .collection("contacts")
-        .document(name_id).delete();
+    try{
+      return await familyCollection
+          .document(famCode)
+          .collection("contacts")
+          .document(name_id).delete();
+    }
+    catch(e){
+      print("Unable to delete contact.");
+      return null;
+    }
+
   }
 
   Future deleteTodoList() async{
@@ -158,15 +171,6 @@ class DataBaseService {
     });
   }
 
-  Future deleteRecipesList() async{
-    return await familyCollection
-        .document(famCode)
-        .collection("recipes").getDocuments().then((snapshot) {
-      for(DocumentSnapshot ds in snapshot.documents){
-        ds.reference.delete();
-      }
-    });
-  }
 
   Future deleteFamilyEventsList() async{
     return await familyCollection
@@ -174,6 +178,52 @@ class DataBaseService {
         .collection("familyEvents").getDocuments().then((snapshot) {
       for(DocumentSnapshot ds in snapshot.documents){
         ds.reference.delete();
+      }
+    });
+  }
+
+  Future deleteImagesList() async{
+    return await familyCollection
+        .document(famCode)
+        .collection("images").getDocuments().then((snapshot) {
+      for(DocumentSnapshot ds in snapshot.documents){
+        
+        if(ds.reference.documentID.compareTo("tagList") != 0){
+          try{
+            CloudStorageService(famCode: famCode).deleteImage(ds.reference.documentID).then((value) {
+              ds.reference.delete();
+            });
+          }catch(e){
+            print(e.toString());
+          }
+        }else{
+          ds.reference.delete();
+        }
+
+
+      }
+    });
+  }
+
+  Future deleteRecipesList() async{
+    return await familyCollection
+        .document(famCode)
+        .collection("recipes").getDocuments().then((snapshot) {
+      for(DocumentSnapshot ds in snapshot.documents){
+
+        if(ds.reference.documentID.compareTo("tagList") != 0){
+          try{
+            CloudStorageService(famCode: famCode).deleteImage(ds.reference.documentID).then((value) {
+              ds.reference.delete();
+            });
+          }catch(e){
+            print(e.toString());
+          }
+        }else{
+          ds.reference.delete();
+        }
+
+
       }
     });
   }
@@ -202,8 +252,7 @@ class DataBaseService {
 //  }
 
   Future updateContactsInfo(String emailId, String name, int phNo) async {
-    String small_name = name.toLowerCase();
-    String name_id = small_name + "_" + phNo.toString();
+    String name_id = emailId;
 
     return await familyCollection
         .document(famCode)
@@ -218,8 +267,8 @@ class DataBaseService {
     });
   }
 
-  Future updateContactjoined(String name, int phno, bool joined) async{
-    String name_id = name.toLowerCase()+"_"+phno.toString();
+  Future updateContactjoined(String id, bool joined) async{
+    String name_id = id;
     return await familyCollection
         .document(famCode)
         .collection("contacts")
@@ -229,8 +278,8 @@ class DataBaseService {
     });
   }
 
-  Future updateContactUID(String name, int phno, String uid) async{
-    String name_id = name.toLowerCase()+"_"+phno.toString();
+  Future updateContactUID(String id, String uid) async{
+    String name_id = id;
     return await familyCollection
         .document(famCode)
         .collection("contacts")
