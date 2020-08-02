@@ -6,6 +6,7 @@ import 'package:jaldiio/Models/ImageUrls.dart';
 import 'package:jaldiio/Models/Task.dart';
 import 'package:jaldiio/Models/UserInformation.dart';
 import 'package:jaldiio/Models/UserValue.dart';
+import 'package:jaldiio/Models/FamEvent.dart';
 import 'dart:math';
 
 import 'package:jaldiio/Services/CloudStorageService.dart';
@@ -100,6 +101,13 @@ class DataBaseService {
     return await familyCollection
         .document(famCode)
         .collection("todos")
+        .document(id).delete();
+  }
+
+  Future deleteEvent(String id) async {
+    return await familyCollection
+        .document(famCode)
+        .collection("familyEvent")
         .document(id).delete();
   }
 
@@ -267,6 +275,24 @@ class DataBaseService {
     });
   }
 
+  Future updateEvents(String title, String description, DateTime eventDate) async{
+    var random = Random.secure();
+
+    var value = random.nextInt(1000000000);
+    String event_id = value.toString();
+    return await familyCollection
+        .document(famCode)
+        .collection("familyEvents")
+        .document(event_id)
+        .setData({
+      'title': capitalize(title),
+      'description': description,
+      'id': event_id,
+      'eventDate' : eventDate,
+
+    });
+  }
+
   Future updateContactjoined(String id, bool joined) async{
     String name_id = id;
     return await familyCollection
@@ -329,6 +355,7 @@ class DataBaseService {
     });
   }
 
+
   List<Contact> _contactListFromSnapShot(QuerySnapshot snapshot) {
     return snapshot.documents.map((doc) {
       return Contact(
@@ -357,6 +384,17 @@ class DataBaseService {
       return Task(
         task: doc.data['task'] ?? '',
         check: doc.data['check'] ?? false,
+        id: doc.data['id'] ?? '',
+      );
+    }).toList();
+  }
+
+  List<EventModel> _eventListFromSnapShot(QuerySnapshot snapshot) {
+    return snapshot.documents.map((doc) {
+      return EventModel(
+        title: doc.data['title'] ?? '',
+        description: doc.data['description'] ?? '',
+        eventDate: doc.data['eventDate'] ?? '',
         id: doc.data['id'] ?? '',
       );
     }).toList();
@@ -434,6 +472,15 @@ class DataBaseService {
         .collection("todos")
         .snapshots()
         .map(_taskListFromSnapShot);
+  }
+
+  //get events stream
+  Stream<List<EventModel>> get events{
+    return familyCollection
+        .document(famCode)
+        .collection("familyEvent")
+        .snapshots()
+        .map(_eventListFromSnapShot);
   }
 
   //get urls stream
