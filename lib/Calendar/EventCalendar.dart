@@ -87,7 +87,7 @@ class _EventCalendarState extends State<EventCalendar> {
                     margin: const EdgeInsets.all(4.0),
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                        color: Color(0xffEA3914),
+                        color: Color(0xffE4664B),
                         borderRadius: BorderRadius.circular(10.0)),
                     child: Text(
                       date.day.toString(),
