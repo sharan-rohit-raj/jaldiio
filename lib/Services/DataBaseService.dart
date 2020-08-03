@@ -275,20 +275,20 @@ class DataBaseService {
     });
   }
 
-  Future updateEvents(String title, String description, DateTime eventDate) async{
+  Future updateEvents(String title, String description, String date) async{
     var random = Random.secure();
 
     var value = random.nextInt(1000000000);
     String event_id = value.toString();
     return await familyCollection
         .document(famCode)
-        .collection("familyEvents")
+        .collection("familyEvent")
         .document(event_id)
         .setData({
       'title': capitalize(title),
       'description': description,
       'id': event_id,
-      'eventDate' : eventDate,
+      'eventDate' : date,
 
     });
   }
@@ -392,10 +392,10 @@ class DataBaseService {
   List<EventModel> _eventListFromSnapShot(QuerySnapshot snapshot) {
     return snapshot.documents.map((doc) {
       return EventModel(
-        title: doc.data['title'] ?? '',
         description: doc.data['description'] ?? '',
         eventDate: doc.data['eventDate'] ?? '',
         id: doc.data['id'] ?? '',
+        title: doc.data['title'] ?? '',
       );
     }).toList();
   }

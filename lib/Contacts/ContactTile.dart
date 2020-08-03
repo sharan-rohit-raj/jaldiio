@@ -27,8 +27,6 @@ class _ContactTileState extends State<ContactTile> {
 
   @override
   Widget build(BuildContext context) {
-    String name_id = widget.contact.name.toLowerCase() + "_" + widget.contact.phNo.toString();
-    final user_val = Provider.of<User>(context);
     return Padding(
       padding: EdgeInsets.only(top: 8),
       child: Card(

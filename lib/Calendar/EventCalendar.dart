@@ -2,6 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:jaldiio/Models/FamEvent.dart';
 import 'package:jaldiio/Calendar/Event_Add.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
+import 'package:jaldiio/Calendar/Events.dart';
+import 'package:jaldiio/Services/DataBaseService.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:jaldiio/Animation/FadeAnimation.dart';
+
 
 class EventCalendar extends StatefulWidget {
   String code;
@@ -14,19 +21,19 @@ class EventCalendar extends StatefulWidget {
 class _EventCalendarState extends State<EventCalendar> {
   CalendarController _calcontrol;
   Map<DateTime, List<dynamic>> _famevent;
-  List<dynamic> _eventselected;
 
   @override
   void initState() {
     super.initState();
     _calcontrol = CalendarController();
     _famevent = {};
-    _eventselected = [];
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return StreamProvider<List<EventModel>>.value(
+        value: DataBaseService(famCode: widget.code).events,
+    child: Scaffold(
       appBar: PreferredSize(preferredSize: Size.fromHeight(80.0),
     child: AppBar(
         backgroundColor: Color(0xff211175),
@@ -39,9 +46,7 @@ class _EventCalendarState extends State<EventCalendar> {
         ),
       centerTitle: true,
       )),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      body: Stack(
           children: <Widget>[
             TableCalendar(
               events: _famevent,
@@ -50,7 +55,6 @@ class _EventCalendarState extends State<EventCalendar> {
                 renderDaysOfWeek: true,
                   canEventMarkersOverflow: true,
                   todayColor: Color(0xffEA3914),
-                  selectedColor: Color(0xffE4664B),
                   todayStyle: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 18.0,
@@ -68,11 +72,6 @@ class _EventCalendarState extends State<EventCalendar> {
                 formatButtonShowsNext: false,
               ),
               startingDayOfWeek: StartingDayOfWeek.monday,
-              onDaySelected: (date, events) {
-                setState(() {
-                  _eventselected = events;
-                });
-              },
               builders: CalendarBuilders(
                 selectedDayBuilder: (context, date, events) => Container(
                     margin: const EdgeInsets.all(4.0),
@@ -97,10 +96,24 @@ class _EventCalendarState extends State<EventCalendar> {
               ),
               calendarController: _calcontrol,
             ),
+            DraggableScrollableSheet(
+                initialChildSize: 0.3,
+                maxChildSize: 0.6,
+                builder: (BuildContext context, ScrollController scrollController){
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: Color.fromRGBO(193, 190, 235, 1),
+                      borderRadius: BorderRadius.only(topRight: Radius.circular(40), topLeft: Radius.circular(40)),
+                    ),
+                    child: Events(scrollController: scrollController, code: widget.code),
+                  );
+                }
+            ),
 
           ],
+
         ),
-      ),
+
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
@@ -113,6 +126,7 @@ class _EventCalendarState extends State<EventCalendar> {
 
 
       ),
+    ),
     );
   }
 }
