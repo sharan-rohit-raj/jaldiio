@@ -4,10 +4,12 @@ import 'package:firebase_storage/firebase_storage.dart';
 
 class CloudStorageService{
   final String famCode;
+  final String uid;
 
-  CloudStorageService({this.famCode});
+  CloudStorageService({this.famCode, this.uid});
 
   StorageReference imageRef = FirebaseStorage.instance.ref().child("Families");
+  StorageReference userRef = FirebaseStorage.instance.ref().child("Users");
 
   String capitalize(String string) {
     if (string == null) {
@@ -21,7 +23,6 @@ class CloudStorageService{
     return string[0].toUpperCase() + string.substring(1).toLowerCase();
   }
   StorageReference Imagesref(String name){
-    print(famCode);
     return imageRef.child(famCode).child("Images").child(capitalize(name));
 
   }
@@ -31,6 +32,18 @@ class CloudStorageService{
 
   Future deleteImage(String id) async{
     return await imageRef.child(famCode).child("Images").child(id).delete();
+  }
+
+  Future deleteProfileImg() async{
+    try{
+      return await userRef.child(uid).delete();
+    }
+    catch(e){
+      print("Unable to delete.\nReason:  "+e.toString());
+      return null;
+    }
+
+
   }
 
   Future deleteAllFamilyImages() async{
@@ -46,6 +59,10 @@ class CloudStorageService{
     }
 
 
+  }
+
+  StorageReference uploadProfileImgRef() {
+    return userRef.child(uid);
   }
 
 }

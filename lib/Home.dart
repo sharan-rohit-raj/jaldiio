@@ -12,7 +12,7 @@ import 'package:jaldiio/ManageFamily/JoinFamily.dart';
 import 'package:jaldiio/Models/FamilyCodeValue.dart';
 import 'package:jaldiio/Models/UserValue.dart';
 import 'package:jaldiio/Services/DataBaseService.dart';
-import 'package:jaldiio/Services/auth.dart';
+import 'package:jaldiio/Services/FireBaseUser.dart';
 import 'package:jaldiio/Shared/GridDashboard.dart';
 import 'package:jaldiio/Shared/Loading.dart';
 import 'package:jaldiio/ToDos/ToDoList.dart';

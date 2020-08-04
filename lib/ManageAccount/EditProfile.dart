@@ -1,14 +1,20 @@
+import 'dart:io';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:jaldiio/Animation/FadeAnimation.dart';
 import 'package:jaldiio/Home.dart';
 import 'package:jaldiio/LoginPage.dart';
 import 'package:jaldiio/Models/UserInformation.dart';
 import 'package:jaldiio/Models/UserValue.dart';
+import 'package:jaldiio/Services/CloudStorageService.dart';
 import 'package:jaldiio/Services/DataBaseService.dart';
-import 'package:jaldiio/Services/auth.dart';
+import 'package:jaldiio/Services/FireBaseUser.dart';
 import 'package:provider/provider.dart';
 
 import '../Models/user.dart';
@@ -26,17 +32,60 @@ class _EditProfileState extends State<EditProfile> {
   final _customerStatusController = TextEditingController(text: "");
   final _customerDateController = TextEditingController(text: "");
   final _customerPhoneController = TextEditingController(text: "");
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+
+  final AuthService _auth = AuthService();
+
 
   final _formKey = GlobalKey<FormState>();
+
+  //Image picker
+  File _image;
+  final picker = ImagePicker();
+  Future showPicker() async {
+    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+
+    setState(() {
+      if(pickedFile != null)
+          _image = File(pickedFile.path);
+    });
+
+    return pickedFile;
+
+  }
+
+  //SnackBar
+  void showSnackBar(String value, GlobalKey<ScaffoldState> key) {
+    key.currentState.showSnackBar(new SnackBar(content: new Text(value)));
+  }
+
+  //Displays the date picker
+  DateTime selectedDate = DateTime.now(); //Current date
+  Future<Null> _selectDate(BuildContext context) async {
+    final DateTime picked = await showDatePicker(
+        context: context,
+        initialDate: selectedDate,
+        firstDate: DateTime(1900, 8),
+        lastDate: DateTime(2101),
+        confirmText: 'Set Date',
+        cancelText: 'Cancel');
+    if (picked != null && picked != selectedDate)
+      setState(() {
+        selectedDate = picked;
+        _customerDateController.text = selectedDate.day.toString()+"/"+ selectedDate.month.toString() +"/"+ selectedDate.year.toString();
+      });
+  }
+
 
 
   @override
   Widget build(BuildContext context) {
 
 
-
     final user_val = Provider.of<User>(context);
+    bool profilePhotoChange = false;
         return Scaffold(
+          key: _scaffoldKey,
           resizeToAvoidBottomInset: false,
           appBar: AppBar(
             title: Text(
@@ -112,19 +161,49 @@ class _EditProfileState extends State<EditProfile> {
                                   children: <Widget>[
                                     Column(
                                       children: <Widget>[
-                                        Container(
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.rectangle,
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(10)),
+                                        _image != null ? Padding(
+                                          padding: const EdgeInsets.only(top: 15),
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(30),
+                                            child: Image.file(
+                                              _image,
+                                              height: 200,
+                                              width: 150,
+                                              fit: BoxFit.cover,
+                                            ),
                                           ),
-                                          padding: EdgeInsets.all(10),
-                                          child: Image.asset(
-                                            "assets/images/avatar_prof.png",
-                                            width: 150,
-                                            height: 200,
-                                            fit: BoxFit.cover,
-                                          ),
+                                        ):StreamBuilder<FirebaseUser>(
+                                            stream: FirebaseAuth.instance.currentUser().asStream(),
+                                            builder: (context, snapshot) {
+                                              if(snapshot.hasData){
+                                                FirebaseUser user = snapshot.data;
+                                                return
+                                                Padding(
+                                                  padding: const EdgeInsets.only(top: 15),
+                                                  child: ClipRRect(
+                                                    borderRadius: BorderRadius.circular(30),
+                                                    child: user.photoUrl != null ?
+                                                    CachedNetworkImage(
+                                                      placeholder: (context, url) => CircularProgressIndicator(),
+                                                      imageUrl: user.photoUrl,
+                                                      fit: BoxFit.cover,
+                                                      height: 200,
+                                                      width: 150,
+                                                    ):
+                                                    Image.asset(
+                                                      "assets/images/avatar_prof.png",
+                                                      width: 150,
+                                                      height: 200,
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                  ),
+                                                );
+                                              }
+                                              else {
+                                                return CircularProgressIndicator();
+                                              }
+
+                                            }
                                         ),
                                         FlatButton(
                                           shape: RoundedRectangleBorder(
@@ -137,6 +216,28 @@ class _EditProfileState extends State<EditProfile> {
                                                 fontSize: 15,
                                                 color: Colors.deepPurpleAccent),
                                           ),
+                                          onPressed: () async{
+
+                                            //Show image picker
+                                             showPicker().then((value) async{
+                                              //Debug Statement
+                                              _image != null ?
+                                              print("image file: " + _image.toString()):
+                                              print("Did not choose yet.");
+
+                                              if(_image != null){
+                                                String imgURL="";
+                                                StorageReference strgimgrfrnc = CloudStorageService(uid: user_val.uid).uploadProfileImgRef();
+                                                showSnackBar("Please wait while we upload your profile image...", _scaffoldKey);
+                                                StorageUploadTask profileUpload = strgimgrfrnc.putFile(_image);
+                                                StorageTaskSnapshot storageTaskSnapShot = await profileUpload.onComplete;
+                                                imgURL = await storageTaskSnapShot.ref.getDownloadURL();
+                                                print("The image url is :"+ imgURL);
+                                                await _auth.uploadProfileImage(imgURL).then((value) => showSnackBar("Profile Image Updated", _scaffoldKey));
+                                              }
+                                            });
+
+                                          },
                                         )
                                       ],
                                     ),
@@ -229,18 +330,27 @@ class _EditProfileState extends State<EditProfile> {
                                   children: <Widget>[
                                     Column(
                                       children: <Widget>[
-                                        Container(
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.rectangle,
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(10)),
+                                        _image != null ?
+                                        Padding(
+                                          padding: const EdgeInsets.only(top: 15),
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(30),
+                                            child: Image.file(
+                                              _image,
+                                              width: 150,
+                                              height: 200,
+                                            ),
                                           ),
-                                          padding: EdgeInsets.all(10),
-                                          child: Image.asset(
-                                            "assets/images/avatar_prof.png",
-                                            width: 150,
-                                            height: 200,
-                                            fit: BoxFit.cover,
+                                        ):Padding(
+                                          padding: const EdgeInsets.only(top: 15.0),
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(30),
+                                            child: Image.asset(
+                                              "assets/images/avatar_prof.png",
+                                              width: 150,
+                                              height: 200,
+                                              fit: BoxFit.cover,
+                                            ),
                                           ),
                                         ),
                                         FlatButton(
@@ -400,6 +510,7 @@ class _EditProfileState extends State<EditProfile> {
                                           ),
                                           child: TextFormField(
                                             controller: _customerDateController,
+//                                            initialValue: selectedDate.toIso8601String(),
                                             decoration: InputDecoration(
                                               border: InputBorder.none,
                                               hintText: "DD/MM/YYYY",
@@ -416,6 +527,11 @@ class _EditProfileState extends State<EditProfile> {
                                             onChanged: (val) {
 //                              setState(() => password = val);
                                             },
+                                            onTap: () {
+                                              //Show date picker
+                                              _selectDate(context);
+                                            },
+
                                           ),
                                         ),
                                         Container(
@@ -451,7 +567,7 @@ class _EditProfileState extends State<EditProfile> {
                                           padding: EdgeInsets.all(10.0),
                                           decoration: BoxDecoration(
                                             border: Border(
-                                              bottom: BorderSide(
+                                           bottom: BorderSide(
                                                 color: Colors.grey[100],
                                               ),
                                             ),

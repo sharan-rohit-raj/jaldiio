@@ -8,7 +8,7 @@ class AuthService{
   final FirebaseAuth _auth = FirebaseAuth.instance;
   //Create user obj based on FirebaseUser
   User _userFromFirebaseUser(FirebaseUser user){
-    return user != null ? User(uid: user.uid, email: user.email) : null;
+    return user != null ? User(uid: user.uid, email: user.email, imgURL: user.photoUrl) : null;
   }
 
   //auth change user stream
@@ -77,6 +77,19 @@ class AuthService{
         print("Unable to Sign Out.");
        print(e.toString());
        return null;
+    }
+  }
+
+  //User Image upload
+  Future uploadProfileImage(String photoURL) async{
+    try{
+      FirebaseUser user = await _auth.currentUser();
+      UserUpdateInfo updateInfo = new UserUpdateInfo();
+      updateInfo.photoUrl = photoURL;
+      return await user.updateProfile(updateInfo);
+    }catch(e){
+      print("Unable to upload.\n Reason: " + e.toString());
+      return null;
     }
   }
 

@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -16,16 +18,15 @@ import 'package:jaldiio/ManageFamily/LeaveFamily.dart';
 import 'package:jaldiio/Models/FamilyCodeValue.dart';
 import 'package:jaldiio/Models/UserValue.dart';
 import 'package:jaldiio/Models/user.dart';
+import 'package:jaldiio/Services/CloudStorageService.dart';
 import 'package:jaldiio/Services/DataBaseService.dart';
-import 'package:jaldiio/Services/auth.dart';
+import 'package:jaldiio/Services/FireBaseUser.dart';
 import 'package:jaldiio/Shared/Loading.dart';
 import 'package:jaldiio/Shared/MLDrawer.dart';
 import 'package:jaldiio/ToDos/ToDoList.dart';
-import 'package:jaldiio/Calendar/EventCalendar.dart';
 import 'package:provider/provider.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:string_validator/string_validator.dart';
-import 'package:jaldiio/RecipesZone/RecipeZone.dart';
 import 'CardScroll.dart';
 import 'Data.dart';
 import '../ContactUs.dart';
@@ -60,6 +61,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   int interiorColor;
   Color offsetColor;
   bool toggleDayNight;
+  bool load = false;
 
   void showSnackBar(String value, GlobalKey<ScaffoldState> key) {
     key.currentState.showSnackBar(new SnackBar(content: new Text(value)));
@@ -124,6 +126,19 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     return salutation;
   }
 
+  Future _checkForInternetConnection() async{
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        return true;
+      }
+    } on SocketException catch (_) {
+      return false;
+    }
+
+  }
+
+
   @override
   void initState() {
     _animationController = AnimationController(vsync: this,
@@ -142,18 +157,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
   @override
   Widget build(BuildContext context) {
-//    controller.addListener(() {
-//      setState(() {
-//        currentIndex = controller.page;
-//      });
-//    });
-
     setState(() {
       salutations();
     });
     final user_val = Provider.of<User>(context);
 
-    return Scaffold(
+
+    return load == true ? Loading() :Scaffold(
       backgroundColor: Color(bgcolor),
       key: _scaffoldKey,
       drawer: StreamBuilder<UserValue>(
@@ -204,10 +214,34 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                             SizedBox(
                               height: 70,
                             ),
-                            Image.asset(
-                              "assets/images/avatar.png",
-                              width: 100,
-                              height: 100,
+                            StreamBuilder<FirebaseUser>(
+                              stream: FirebaseAuth.instance.currentUser().asStream(),
+                              builder: (context, snapshot) {
+                                if(snapshot.hasData){
+                                  FirebaseUser user = snapshot.data;
+                                  return ClipRRect(
+                                    borderRadius: BorderRadius.circular(30),
+                                    child: user.photoUrl != null ?
+                                    CachedNetworkImage(
+                                      placeholder: (context, url) => CircularProgressIndicator(),
+                                      imageUrl: user.photoUrl,
+                                      fit: BoxFit.cover,
+                                      height: 100,
+                                      width: 100,
+                                    ):
+                                    Image.asset(
+                                      "assets/images/avatar_prof.png",
+                                      width: 100,
+                                      height: 100,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  );
+                                }
+                                else {
+                                  return CircularProgressIndicator();
+                                }
+
+                              }
                             ),
                             SizedBox(
                               height: 10,
@@ -578,7 +612,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                         color: Color(interiorColor),
                         size: 30.0,
                       ),
-                      onPressed: () => _scaffoldKey.currentState.openDrawer(),
+                      onPressed: () async => await _checkForInternetConnection() ?
+                      _scaffoldKey.currentState.openDrawer() :
+                      connectivityDialogBox(),
                     ),
                     Padding(
                       padding: const EdgeInsets.only(top: 10),
@@ -598,7 +634,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                         color: Color(interiorColor),
                       ),
                       onPressed: () async {
-                        await _auth.signOut();
+                        if(await _checkForInternetConnection()){
+                          await _auth.signOut();
+                        }else{
+                          connectivityDialogBox();
+                        }
                       },
                     )
                   ],
@@ -645,25 +685,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                     ),
                   );
                 } else {
-                  return LinearProgressIndicator();
+                  return SizedBox();
                 }
               }),
 
-//            Stack(
-//              children: <Widget>[
-//                CardScroll(currPage: currentIndex,),
-//                Positioned.fill(
-//                    child: PageView.builder(
-//                        itemCount: images.length,
-//                        controller: controller,
-//                        reverse: true,
-//                        itemBuilder: (context, index){
-//                          return Container();
-//                        }
-//                    )
-//                ),
-//              ],
-//            ),
           StreamBuilder<FamilyCodeValue>(
               stream: DataBaseService(uid: user_val.uid).codeData,
               builder: (context, snapshot) {
@@ -694,7 +719,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                         }),
                   );
                 } else {
-                  return Loading();
+                  return SizedBox();
                 }
               })
         ],
@@ -733,54 +758,63 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             style: TextStyle(fontSize: 40, color: Colors.white),
           )),
         ),
-        onTap: () {
-          if(famCode == null || famCode.isEmpty){
-            showSnackBar("Please be a part of family to access this feature...", _scaffoldKey);
-          }
-          else{
-          print("famcode: "+famCode);
-            switch (title) {
-              case "To-Do List":
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => ToDoList(
-                        code: famCode,
-                      )),);
-                break;
+        onTap: () async{
+          //Check for internet connection
+          if(await _checkForInternetConnection()){
 
-              case "Images":
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => CarouselSection(
-                        famCode: famCode,
-                      )),);
-                break;
-
-              case "Family Events":
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => EventCalendar(
-                        code: famCode,
-                      )),);
-                break;
-
-              case "Recipe Zone":
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => RecipeZone(
-                            famCode: famCode,
-                          )),
-                );
-                break;
-
-              default:
-                print(title);
-                break;
+            if(famCode == null || famCode.isEmpty){
+              showSnackBar("Please be a part of family to access this feature...", _scaffoldKey);
             }
+            else{
+              print("famcode: "+famCode);
+              switch (title) {
+                case "To-Do List":
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ToDoList(
+                          code: famCode,
+                        )),);
+                  break;
+
+                case "Images":
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => CarouselSection(
+                          famCode: famCode,
+                        )),);
+                  break;
+
+                case "Family Events":
+                  AwesomeDialog(
+                    context: context,
+                    dialogType: DialogType.INFO,
+                    animType: AnimType.BOTTOMSLIDE,
+                    title: title,
+                    desc: 'Under Construction...',
+                    btnOkOnPress: () {},
+                  )..show();
+                  break;
+
+                case "Recipe Zone":
+                  AwesomeDialog(
+                    context: context,
+                    dialogType: DialogType.INFO,
+                    animType: AnimType.BOTTOMSLIDE,
+                    title: title,
+                    desc: 'Under Construction...',
+                    btnOkOnPress: () {},
+                  )..show();
+                  break;
+
+                default:
+                  print(title);
+                  break;
+              }
+            }
+          }else{
+            connectivityDialogBox();
           }
 
         },
@@ -965,6 +999,12 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                       await DataBaseService(uid: uid).deleteUserProfile();
                     }
 
+                    //Delete User Profile Image
+                    if(uid != null){
+                      await CloudStorageService(uid: uid).deleteProfileImg();
+
+                    }
+
                     //Delete Account
                     await _auth.deleteAccount();
 
@@ -1009,16 +1049,16 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
   }
 
-
-    //Delete user from contact list
-//                                            print(familyCodeValue.familyID);
-//                                            await DataBaseService(famCode: familyCodeValue.familyID).deleteContactDoc(id);
-
-    //Make the user leave from family
-//                                            print(user_val.uid);
-//                                          await DataBaseService(uid: user_val.uid).leaveFamily();
-
-    //Delete user account
-//                                          await _auth.deleteAccount();
+  //Connectivity Error Dialog Box
+  AwesomeDialog connectivityDialogBox(){
+    return AwesomeDialog(
+      context: context,
+      dialogType: DialogType.WARNING,
+      animType: AnimType.BOTTOMSLIDE,
+      title: 'Connectivity Error',
+      desc: 'Hmm..looks like there is no connectivity...',
+      btnOkOnPress: () {},
+    )..show();
+  }
 
 }
