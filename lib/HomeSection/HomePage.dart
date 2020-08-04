@@ -25,6 +25,7 @@ import 'package:jaldiio/Calendar/EventCalendar.dart';
 import 'package:provider/provider.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:string_validator/string_validator.dart';
+import 'package:jaldiio/RecipesZone/RecipeZone.dart';
 import 'CardScroll.dart';
 import 'Data.dart';
 import '../ContactUs.dart';
@@ -767,14 +768,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 break;
 
               case "Recipe Zone":
-                AwesomeDialog(
-                  context: context,
-                  dialogType: DialogType.INFO,
-                  animType: AnimType.BOTTOMSLIDE,
-                  title: title,
-                  desc: 'Under Construction...',
-                  btnOkOnPress: () {},
-                )..show();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => RecipeZone(
+                            famCode: famCode,
+                          )),
+                );
                 break;
 
               default:
