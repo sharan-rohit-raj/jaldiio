@@ -1,11 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:io';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_email_sender/flutter_email_sender.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:jaldiio/Animation/FadeAnimation.dart';
 import 'package:jaldiio/Models/FamilyCodeValue.dart';
-import 'package:jaldiio/Models/UserValue.dart';
 import 'package:jaldiio/Models/user.dart';
 import 'package:jaldiio/Services/DataBaseService.dart';
 import 'package:provider/provider.dart';
@@ -19,6 +16,7 @@ class EventAdd extends StatefulWidget {
 
   @override
   _EventAddState createState() => _EventAddState();
+
 }
 
 class _EventAddState extends State<EventAdd> {
@@ -29,6 +27,18 @@ class _EventAddState extends State<EventAdd> {
   final _Keyform = GlobalKey<FormState>();
   final _key = GlobalKey<ScaffoldState>();
   bool processing;
+
+  //Check for Internet connectivity
+  Future _checkForInternetConnection() async {
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        return true;
+      }
+    } on SocketException catch (_) {
+      return false;
+    }
+  }
 
   @override
   void initState() {
@@ -138,17 +148,20 @@ class _EventAddState extends State<EventAdd> {
                             fontWeight: FontWeight.bold), ),
 
                     onPressed: () async {
-                      if(_Keyform.currentState.validate()) {
-                        code = snapshotCode.data.familyID;
+                      if(await _checkForInternetConnection()){
+                        if(_Keyform.currentState.validate()) {
+                          code = snapshotCode.data.familyID;
 
-                        String date = _Dateofevent.day.toString() + "/" + _Dateofevent.month.toString() + "/" + _Dateofevent.year.toString();
+                          String date = _Dateofevent.day.toString() + "/" + _Dateofevent.month.toString() + "/" + _Dateofevent.year.toString();
 
-                            await DataBaseService(famCode: code)
-                            .updateEvents(_head.text, _details.text, date);
+                          await DataBaseService(famCode: code)
+                              .updateEvents(_head.text, _details.text, date);
 
-                        Navigator.pop(context);
+                          Navigator.pop(context);
 
+                        }
                       }
+                      else {connectivityDialogBox(context);}
                     },
                     ); }
                   ),
@@ -165,4 +178,16 @@ class _EventAddState extends State<EventAdd> {
     _details.dispose();
     super.dispose();
   }
+}
+
+//Connectivity Error Dialog Box
+AwesomeDialog connectivityDialogBox(BuildContext context){
+  return AwesomeDialog(
+    context: context,
+    dialogType: DialogType.WARNING,
+    animType: AnimType.BOTTOMSLIDE,
+    title: 'Connectivity Error',
+    desc: 'Hmm..looks like there is no connectivity...',
+    btnOkOnPress: () {},
+  )..show();
 }

@@ -1,12 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:io';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:jaldiio/Models/FamEvent.dart';
-import 'package:jaldiio/Models/UserValue.dart';
-import 'package:jaldiio/Models/user.dart';
 import 'package:jaldiio/Services/DataBaseService.dart';
-import 'package:provider/provider.dart';
 
 class EventTile extends StatefulWidget {
 
@@ -23,7 +20,17 @@ class _EventTileState extends State<EventTile> {
 
   bool isdelete = false;
 
-
+  //Check for Internet connectivity
+  Future _checkForInternetConnection() async {
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        return true;
+      }
+    } on SocketException catch (_) {
+      return false;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,8 +52,10 @@ class _EventTileState extends State<EventTile> {
             trailing: IconButton(
               icon: Icon(Icons.delete, color: Colors.red,),
               onPressed: () async{
-                print(widget.code);
-                await DataBaseService(famCode: widget.code).deleteEvent(widget.events.id);
+                if(await _checkForInternetConnection()){
+                  print(widget.code);
+                  await DataBaseService(famCode: widget.code).deleteEvent(widget.events.id);
+                } else  {connectivityDialogBox(context);}
               } ,
             ),
           )
@@ -54,4 +63,16 @@ class _EventTileState extends State<EventTile> {
       ),
     );
   }
+}
+
+//Connectivity Error Dialog Box
+AwesomeDialog connectivityDialogBox(BuildContext context){
+  return AwesomeDialog(
+    context: context,
+    dialogType: DialogType.WARNING,
+    animType: AnimType.BOTTOMSLIDE,
+    title: 'Connectivity Error',
+    desc: 'Hmm..looks like there is no connectivity...',
+    btnOkOnPress: () {},
+  )..show();
 }

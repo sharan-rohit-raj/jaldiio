@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:jaldiio/Models/Task.dart';
@@ -13,6 +15,18 @@ class TaskTile extends StatefulWidget {
 }
 
 class _TaskTileState extends State<TaskTile> {
+
+  //Check for Internet connectivity
+  Future _checkForInternetConnection() async {
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        return true;
+      }
+    } on SocketException catch (_) {
+      return false;
+    }
+  }
 
   List<bool> isSelected = List.generate(2, (_) => false);
   @override
@@ -45,11 +59,25 @@ class _TaskTileState extends State<TaskTile> {
           trailing: IconButton(
             icon: Icon(Icons.delete, color: Colors.deepPurpleAccent),
             onPressed: () async{
-              print(widget.code);
-              await DataBaseService(famCode: widget.code).deleteTask(widget.task.id);
+              if(await _checkForInternetConnection()){
+                print(widget.code);
+                await DataBaseService(famCode: widget.code).deleteTask(widget.task.id);
+              } else  {connectivityDialogBox(context);}
             },
           )
         ),),
     );
   }
+}
+
+//Connectivity Error Dialog Box
+AwesomeDialog connectivityDialogBox(BuildContext context){
+  return AwesomeDialog(
+    context: context,
+    dialogType: DialogType.WARNING,
+    animType: AnimType.BOTTOMSLIDE,
+    title: 'Connectivity Error',
+    desc: 'Hmm..looks like there is no connectivity...',
+    btnOkOnPress: () {},
+  )..show();
 }

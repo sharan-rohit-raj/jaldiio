@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:jaldiio/Models/FamEvent.dart';
@@ -21,6 +23,18 @@ class EventCalendar extends StatefulWidget {
 class _EventCalendarState extends State<EventCalendar> {
   CalendarController _calcontrol;
   Map<DateTime, List<dynamic>> _famevent;
+
+  //Check for Internet connectivity
+  Future _checkForInternetConnection() async {
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        return true;
+      }
+    } on SocketException catch (_) {
+      return false;
+    }
+  }
 
   @override
   void initState() {
@@ -115,11 +129,14 @@ class _EventCalendarState extends State<EventCalendar> {
         ),
 
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => EventAdd()),
-          );
+        onPressed: () async{
+          if(await _checkForInternetConnection()){
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => EventAdd()),
+            );
+          } else {connectivityDialogBox(context);}
+
         },
         child: Icon(Icons.add, size: 50,color: Colors.white,),
         backgroundColor: Colors.deepPurple[600],
@@ -129,4 +146,16 @@ class _EventCalendarState extends State<EventCalendar> {
     ),
     );
   }
+}
+
+//Connectivity Error Dialog Box
+AwesomeDialog connectivityDialogBox(BuildContext context){
+  return AwesomeDialog(
+    context: context,
+    dialogType: DialogType.WARNING,
+    animType: AnimType.BOTTOMSLIDE,
+    title: 'Connectivity Error',
+    desc: 'Hmm..looks like there is no connectivity...',
+    btnOkOnPress: () {},
+  )..show();
 }

@@ -1,12 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:io';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:jaldiio/Models/Contact.dart';
-import 'package:jaldiio/Models/UserValue.dart';
-import 'package:jaldiio/Models/user.dart';
 import 'package:jaldiio/Services/DataBaseService.dart';
-import 'package:provider/provider.dart';
 
 class ContactTile extends StatefulWidget {
 
@@ -23,7 +20,17 @@ class _ContactTileState extends State<ContactTile> {
 
   bool isdelete = false;
 
-
+  //Check for Internet connectivity
+  Future _checkForInternetConnection() async {
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        return true;
+      }
+    } on SocketException catch (_) {
+      return false;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,15 +64,16 @@ class _ContactTileState extends State<ContactTile> {
               trailing: IconButton(
                   icon: Icon(Icons.remove_circle, color: Colors.red,),
                 onPressed: () async{
+                  if(await _checkForInternetConnection()){
                     print(widget.code);
                     await DataBaseService(famCode: widget.code)
                         .deleteContactDoc(widget.contact.emaild);
                     //if user is joined update user's familyCode value in user_collection
-                  if(widget.contact.joined){
-                    await DataBaseService(uid: widget.contact.uid).updateJoined(false);
-                    await DataBaseService(uid: widget.contact.uid).leaveFamily();
-                  }
-
+                    if(widget.contact.joined){
+                      await DataBaseService(uid: widget.contact.uid).updateJoined(false);
+                      await DataBaseService(uid: widget.contact.uid).leaveFamily();
+                    }
+                  } else  {connectivityDialogBox(context);}
               } ,
               ),
             )
@@ -73,4 +81,16 @@ class _ContactTileState extends State<ContactTile> {
         ),
     );
   }
+}
+
+//Connectivity Error Dialog Box
+AwesomeDialog connectivityDialogBox(BuildContext context){
+  return AwesomeDialog(
+    context: context,
+    dialogType: DialogType.WARNING,
+    animType: AnimType.BOTTOMSLIDE,
+    title: 'Connectivity Error',
+    desc: 'Hmm..looks like there is no connectivity...',
+    btnOkOnPress: () {},
+  )..show();
 }
