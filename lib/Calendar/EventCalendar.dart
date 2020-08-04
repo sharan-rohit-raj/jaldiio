@@ -50,14 +50,20 @@ class _EventCalendarState extends State<EventCalendar> {
     child: Scaffold(
       appBar: PreferredSize(preferredSize: Size.fromHeight(80.0),
     child: AppBar(
-        backgroundColor: Color(0xff211175),
+        backgroundColor: Colors.deepPurpleAccent,
         title: Text('Family Events',
-            style: TextStyle(
-            fontSize: 28.0,
-          fontWeight: FontWeight.bold,
-          color: Colors.white,
+            style: GoogleFonts.openSans(
+              fontSize: 28,
+              color: Colors.white,
+            )
         ),
-        ),
+      leading: IconButton(icon: Icon(Icons.arrow_back_ios),
+      color: Colors.white,
+        onPressed: () async{
+          if(await _checkForInternetConnection()){
+            Navigator.pop(context);
+          } else  {connectivityDialogBox(context);}
+        },),
       centerTitle: true,
       )),
       body: Stack(

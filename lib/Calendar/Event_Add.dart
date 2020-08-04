@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:jaldiio/Models/FamilyCodeValue.dart';
 import 'package:jaldiio/Models/user.dart';
 import 'package:jaldiio/Services/DataBaseService.dart';
@@ -59,14 +60,21 @@ class _EventAddState extends State<EventAdd> {
     return Scaffold(
       appBar: PreferredSize(preferredSize: Size.fromHeight(80.0),
       child: AppBar(
-        backgroundColor: Color(0xff211175),
+        backgroundColor: Colors.transparent,
+        elevation: 0.0,
         title: Text('Add Event',
-          style: TextStyle(
-            fontSize: 28.0,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
+          style: GoogleFonts.openSans(
+            fontSize: 28,
+            color: Colors.deepPurpleAccent,
+          )
         ),
+        leading: IconButton(icon: Icon(Icons.arrow_back_ios),
+        color: Colors.deepPurpleAccent,
+        onPressed: () async{
+          if(await _checkForInternetConnection()){
+            Navigator.pop(context);
+          } else  {connectivityDialogBox(context);}
+        },),
         centerTitle: true,
       ),
       key: _key,
