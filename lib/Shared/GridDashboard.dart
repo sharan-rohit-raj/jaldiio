@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:jaldiio/Animation/FadeAnimation.dart';
 import 'package:jaldiio/Contacts/ContactSection.dart';
-import 'package:jaldiio/ImagesSection/CarouselSection.dart';
+import 'package:jaldiio/ImagesSection/ImageSection.dart';
 import 'package:jaldiio/ImagesSection/ImageAdd.dart';
 import 'package:jaldiio/ImagesSection/ImageSection.dart';
 import 'package:jaldiio/Models/FamilyCodeValue.dart';
@@ -97,7 +97,7 @@ class GridDashboard extends StatelessWidget {
                                 case "Images":
                                   Navigator.push(
                                     context,
-                                    MaterialPageRoute(builder: (context) => CarouselSection(famCode: code.familyID,)),
+                                    MaterialPageRoute(builder: (context) => ImageSection(famCode: code.familyID,)),
                                   );
                                   break;
                                 case "Recipe Zone":

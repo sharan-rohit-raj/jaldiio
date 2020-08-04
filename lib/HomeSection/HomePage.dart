@@ -8,8 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:jaldiio/Animation/FadeAnimation.dart';
 import 'package:jaldiio/Contacts/ContactSection.dart';
-import 'package:jaldiio/HomeSection/CustomIcons.dart';
-import 'package:jaldiio/ImagesSection/CarouselSection.dart';
+import 'package:jaldiio/ImagesSection/ImageSection.dart';
 import 'package:jaldiio/ImagesSection/ImageSection.dart';
 import 'package:jaldiio/ManageFamily/CreateFamily.dart';
 import 'package:jaldiio/ManageFamily/DeleteFamily.dart';
@@ -27,7 +26,6 @@ import 'package:jaldiio/ToDos/ToDoList.dart';
 import 'package:provider/provider.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:string_validator/string_validator.dart';
-import 'CardScroll.dart';
 import 'Data.dart';
 import '../ContactUs.dart';
 import '../ManageAccount/EditProfile.dart';
@@ -279,12 +277,17 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                             ),
                             subMenuItems: [
                               MLSubmenu(
-                                onClick: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => new EditProfile()),
-                                  );
+                                onClick: () async{
+                                  if(await _checkForInternetConnection()){
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => new EditProfile()),
+                                    );
+                                  }else{
+                                    connectivityDialogBox();
+                                  }
+
                                 },
                                 submenuContent: Text(
                                   "Edit Profile",
@@ -294,27 +297,32 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                 ),
                               ),
                               MLSubmenu(
-                                  onClick: () {
-                                    String id = user_val.email;
-                                    if(partOfFamilyValidator() && familyCodeValue != null){
+                                  onClick: () async{
+                                    if(await _checkForInternetConnection()){
+                                      String id = user_val.email;
+                                      if(partOfFamilyValidator() && familyCodeValue != null){
 
-                                      if(userValue.admin){
-                                        //String familyCode, String uid, String contactId,
-                                        reAuthenticateDialog(true, familyCodeValue.familyID, user_val.uid, id,
-                                            _auth, "Delete Family Member Admin Account", 'As you are the admin, first you must delete your existing family to delete your account.',
-                                            Colors.deepPurpleAccent, Colors.red, Colors.transparent, Colors.grey[100], Colors.grey, Colors.black);
+                                        if(userValue.admin){
+                                          //String familyCode, String uid, String contactId,
+                                          reAuthenticateDialog(true, familyCodeValue.familyID, user_val.uid, id,
+                                              _auth, "Delete Family Member Admin Account", 'As you are the admin, first you must delete your existing family to delete your account.',
+                                              Colors.deepPurpleAccent, Colors.red, Colors.transparent, Colors.grey[100], Colors.grey, Colors.black);
+                                        }
+                                        else{
+                                          reAuthenticateDialog(false, familyCodeValue.familyID, user_val.uid, id,
+                                              _auth, "Delete Family Member Account", 'Are you sure you wish to delete this account? You will not have access to this family anymore.',
+                                              Colors.deepPurpleAccent, Colors.red, Colors.transparent, Colors.grey[100], Colors.grey, Colors.black);
+                                        }
                                       }
                                       else{
-                                        reAuthenticateDialog(false, familyCodeValue.familyID, user_val.uid, id,
-                                            _auth, "Delete Family Member Account", 'Are you sure you wish to delete this account? You will not have access to this family anymore.',
+                                        reAuthenticateDialog(false, null, user_val.uid, id,
+                                            _auth, "Delete user Account", 'Are you sure you wish to delete this account?',
                                             Colors.deepPurpleAccent, Colors.red, Colors.transparent, Colors.grey[100], Colors.grey, Colors.black);
                                       }
+                                    }else{
+                                      connectivityDialogBox();
                                     }
-                                    else{
-                                      reAuthenticateDialog(false, null, user_val.uid, id,
-                                          _auth, "Delete user Account", 'Are you sure you wish to delete this account?',
-                                          Colors.deepPurpleAccent, Colors.red, Colors.transparent, Colors.grey[100], Colors.grey, Colors.black);
-                                    }
+
                                   },
                                   submenuContent: Text(
                                     "Delete Account",
@@ -339,14 +347,19 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
                               if(partOfFamilyValidator() && familyCodeValue != null) ...[
                                 MLSubmenu(
-                                    onClick: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => ContactSection(
-                                        code: familyCodeValue.familyID,
-                                      )),
-                                );
+                                    onClick: () async{
+                                      if(await _checkForInternetConnection()){
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) => ContactSection(
+                                                code: familyCodeValue.familyID,
+                                              )),
+                                        );
+                                      }else{
+                                        connectivityDialogBox();
+                                      }
+
                                     },
                                     submenuContent: Text(
                                       "Add/View Family",
@@ -359,15 +372,20 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
                               if (partOfFamilyValidator() && adminValidator()) ...[
                                 MLSubmenu(
-                                    onClick: () {
-                                      print(familyCodeValue.familyID);
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => DeleteFamily(
-                                                  familyCode: familyCodeValue.familyID,
-                                                )),
-                                      );
+                                    onClick: () async{
+                                      if(await _checkForInternetConnection()){
+                                        print(familyCodeValue.familyID);
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) => DeleteFamily(
+                                                familyCode: familyCodeValue.familyID,
+                                              )),
+                                        );
+                                      }else{
+                                        connectivityDialogBox();
+                                      }
+
                                     },
                                     submenuContent: Text(
                                       "Delete Family",
@@ -378,14 +396,19 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                               ],
                               if (partOfFamilyValidator() && !adminValidator()) ...[
                                 MLSubmenu(
-                                    onClick: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => LeaveFamily(
-                                                  familyCode: userValue.familyID,
-                                                )),
-                                      );
+                                    onClick: () async{
+                                      if(await _checkForInternetConnection()){
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) => LeaveFamily(
+                                                familyCode: userValue.familyID,
+                                              )),
+                                        );
+                                      }else{
+                                        connectivityDialogBox();
+                                      }
+
                                     },
                                     submenuContent: Text(
                                       "Leave Family",
@@ -396,12 +419,17 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                               ],
                               if (!partOfFamilyValidator()) ...[
                                 MLSubmenu(
-                                    onClick: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => CreateFamily()),
-                                      );
+                                    onClick: () async{
+                                      if(await _checkForInternetConnection()){
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) => CreateFamily()),
+                                        );
+                                      }else{
+                                        connectivityDialogBox();
+                                      }
+
                                     },
                                     submenuContent: Text(
                                       "Create Family",
@@ -410,12 +438,17 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                       ),
                                     )),
                                 MLSubmenu(
-                                    onClick: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => JoinFamily()),
-                                      );
+                                    onClick: () async{
+                                      if(await _checkForInternetConnection()){
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) => JoinFamily()),
+                                        );
+                                      }else{
+                                        connectivityDialogBox();
+                                      }
+
                                     },
                                     submenuContent: Text(
                                       "Join Family",
@@ -434,11 +467,16 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                               color: Colors.white,
                             ),
                           ),
-                          onClick: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => ContactUs()),
-                            );
+                          onClick: () async{
+                            if(await _checkForInternetConnection()){
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => ContactUs()),
+                              );
+                            }else{
+                              connectivityDialogBox();
+                            }
+
                           },
                         ),
                         MLMenuItem(
@@ -457,14 +495,19 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                               color: Colors.white,
                             ),
                           ),
-                          onClick: () {
-                            showDialog(
-                                context: context,
-                                builder: (_) => partOfFamilyValidator()
-                                    ? OkalertDialog("Family Joined",
-                                        "You belong to Rohit Family.")
-                                    : OkalertDialog("Family not Joined",
-                                        "You don't belong to any Family."));
+                          onClick: () async{
+                            if(await _checkForInternetConnection()){
+                              showDialog(
+                                  context: context,
+                                  builder: (_) => partOfFamilyValidator()
+                                      ? OkalertDialog("Family Joined",
+                                      "You belong to Rohit Family.")
+                                      : OkalertDialog("Family not Joined",
+                                      "You don't belong to any Family."));
+                            }else{
+                              connectivityDialogBox();
+                            }
+
                           },
                         ),
                       ]);
@@ -524,12 +567,17 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                         ),
                         subMenuItems: [
                           MLSubmenu(
-                            onClick: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => new EditProfile()),
-                              );
+                            onClick: () async{
+                              if(await _checkForInternetConnection()){
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => new EditProfile()),
+                                );
+                              }else{
+                                connectivityDialogBox();
+                              }
+
                             },
                             submenuContent: Text(
                               "Create Profile",
@@ -539,10 +587,15 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                             ),
                           ),
                           MLSubmenu(
-                              onClick: () {
-                                reAuthenticateDialog(false, null, null, null,
-                                    _auth, "Delete user Account", 'Are you sure you wish to delete this account?',
-                                    Colors.deepPurpleAccent, Colors.red, Colors.transparent, Colors.grey[100], Colors.grey, Colors.black);
+                              onClick: () async{
+                                if(await _checkForInternetConnection()){
+                                  reAuthenticateDialog(false, null, null, null,
+                                      _auth, "Delete user Account", 'Are you sure you wish to delete this account?',
+                                      Colors.deepPurpleAccent, Colors.red, Colors.transparent, Colors.grey[100], Colors.grey, Colors.black);
+                                }else{
+                                  connectivityDialogBox();
+                                }
+
                               },
                               submenuContent: Text(
                                 "Delete Account",
@@ -562,13 +615,18 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                           color: Colors.white,
                         ),
                       ),
-                      onClick: () {
-                        showDialog(
-                          context: context,
-                          builder: (_) => OkalertDialog("Family",
-                              "Please Create a profile to access this feature."),
-                          barrierDismissible: true,
-                        );
+                      onClick: () async{
+                        if(await _checkForInternetConnection()){
+                          showDialog(
+                            context: context,
+                            builder: (_) => OkalertDialog("Family",
+                                "Please Create a profile to access this feature."),
+                            barrierDismissible: true,
+                          );
+                        }else{
+                          connectivityDialogBox();
+                        }
+
                       },
                     ),
 
@@ -580,11 +638,16 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                           color: Colors.white,
                         ),
                       ),
-                      onClick: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => ContactUs()),
-                        );
+                      onClick: () async{
+                        if(await _checkForInternetConnection()) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => ContactUs()),
+                          );
+                        }else{
+                          connectivityDialogBox();
+                        }
+
                       },
                     ),
                   ]);
@@ -781,7 +844,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => CarouselSection(
+                        builder: (context) => ImageSection(
                           famCode: famCode,
                         )),);
                   break;
@@ -865,17 +928,22 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   animType: AnimType.BOTTOMSLIDE,
   title: title,
   desc: desc,
-  btnOkOnPress: () {
-    if(!adminCheck){
-      reLogin(_auth, familyCode, contactId, uid, formColor, borderColor, hintColor, textColor, cancelBtnColor);
+  btnOkOnPress: () async{
+    if(await _checkForInternetConnection()){
+      if(!adminCheck){
+        reLogin(_auth, familyCode, contactId, uid, formColor, borderColor, hintColor, textColor, cancelBtnColor);
+      }
+      else{
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => new DeleteFamily(familyCode: familyCode)),
+        );
+      }
+    }else{
+      connectivityDialogBox();
     }
-    else{
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => new DeleteFamily(familyCode: familyCode)),
-      );
-    }
+
 
   },
   btnCancelOnPress: () {},
@@ -985,32 +1053,38 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             child: IconButton(
               icon: Icon(Icons.check,size: 30,color: Colors.deepPurpleAccent,),
               onPressed: () async{
-                if(_formKey.currentState.validate()){
-                  if(await _auth.reAuth(email, password) == null){
-                    reAuthenticateError(okBtnColor);
-                  }
-                  else{
-                  //Delete Contact Doc
-                    if(familyCode != null && familyCode.isNotEmpty){
-                      await DataBaseService(famCode: familyCode).deleteContactDoc(contactId);
-                    }
-                    //Delete User
-                    if(uid != null && uid.isNotEmpty){
-                      await DataBaseService(uid: uid).deleteUserProfile();
-                    }
 
-                    //Delete User Profile Image
-                    if(uid != null){
-                      await CloudStorageService(uid: uid).deleteProfileImg();
-
+                if(await _checkForInternetConnection()){
+                  if(_formKey.currentState.validate()){
+                    if(await _auth.reAuth(email, password) == null){
+                      reAuthenticateError(okBtnColor);
                     }
+                    else{
+                      //Delete Contact Doc
+                      if(familyCode != null && familyCode.isNotEmpty){
+                        await DataBaseService(famCode: familyCode).deleteContactDoc(contactId);
+                      }
+                      //Delete User
+                      if(uid != null && uid.isNotEmpty){
+                        await DataBaseService(uid: uid).deleteUserProfile();
+                      }
 
-                    //Delete Account
-                    await _auth.deleteAccount();
+                      //Delete User Profile Image
+                      if(uid != null){
+                        await CloudStorageService(uid: uid).deleteProfileImg();
+
+                      }
+
+                      //Delete Account
+                      await _auth.deleteAccount();
 
                       Navigator.of(context, rootNavigator: false).pop();
+                    }
                   }
+                }else{
+                  connectivityDialogBox();
                 }
+
               },
             ),
           )

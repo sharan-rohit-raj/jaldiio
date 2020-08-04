@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -24,8 +26,10 @@ class _ContactSectionState extends State<ContactSection> {
 
 
   void showInSnackBar(String value) {
-    _scaffoldKey.currentState.showSnackBar(new SnackBar(content: new Text(value)));
+    _scaffoldKey.currentState.showSnackBar(
+        new SnackBar(content: new Text(value)));
   }
+
   @override
   Widget build(BuildContext context) {
 //    print("code: "+widget.code);
@@ -36,33 +40,47 @@ class _ContactSectionState extends State<ContactSection> {
       child: Scaffold(
         key: _scaffoldKey,
         backgroundColor: Colors.white,
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            DataBaseService(famCode: widget.code).contacts.listen((event) {
-              //Checks if the max family member is reached
-              if(event.length <= 5){
-                print(event.length);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => AddContact()),
-                );
+        floatingActionButton: StreamBuilder<List<Contact>>(
+            stream: DataBaseService(famCode: widget.code).contacts,
+            builder: (context, snapshot) {
+              int contactListLength;
+              if (snapshot.hasData) {
+                contactListLength = snapshot.data.length;
+              } else {
+                contactListLength = -1;
               }
-              else{
-                AwesomeDialog(
-                  context: context,
-                  dialogType: DialogType.INFO,
-                  animType: AnimType.BOTTOMSLIDE,
-                  title: 'Max Family Member Limit',
-                  desc: 'Sorry, the max family members limits has reached...',
-                  btnOkOnPress: () {},
-                )..show();
-              }
-            });
-          },
-          child: Icon(Icons.add, size: 50,color: Colors.white,),
-          backgroundColor: Colors.deepPurple[600],
-
-
+              return FloatingActionButton(
+                onPressed: () async {
+                  //Check for internet connectivity
+                  if (await _checkForInternetConnection()) {
+                    //Checks if the max family member is reached
+                    if (contactListLength == -1 || contactListLength <= 5) {
+                      print("Contact List Length: " +
+                          contactListLength.toString());
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => AddContact()),
+                      );
+                    }
+                    else {
+                      AwesomeDialog(
+                        context: context,
+                        dialogType: DialogType.INFO,
+                        animType: AnimType.BOTTOMSLIDE,
+                        title: 'Max Family Member Limit',
+                        desc: 'Sorry, the max family members limits has reached...',
+                        btnOkOnPress: () {},
+                      )
+                        ..show();
+                    }
+                  } else {
+                    connectivityDialogBox();
+                  }
+                },
+                child: Icon(Icons.add, size: 50, color: Colors.white,),
+                backgroundColor: Colors.deepPurple[600],
+              );
+            }
         ),
         body: Stack(
           // alignment: Alignment.center,
@@ -89,8 +107,14 @@ class _ContactSectionState extends State<ContactSection> {
                       Icons.arrow_back_ios,
                       color: Colors.deepPurpleAccent,
                     ),
-                    onPressed: () {
-                      Navigator.pop(context);
+                    onPressed: () async{
+                      //Check for internet connectivity
+                      if(await _checkForInternetConnection()){
+                        Navigator.pop(context);
+                      }else{
+                        connectivityDialogBox();
+                      }
+
                     },
                   ),
                   Text(
@@ -106,23 +130,52 @@ class _ContactSectionState extends State<ContactSection> {
             ),
 
             DraggableScrollableSheet(
-                maxChildSize: 0.85,
-                builder: (BuildContext context, ScrollController scrollController){
+              maxChildSize: 0.85,
+              builder: (BuildContext context,
+                  ScrollController scrollController) {
 //                  print(widget.code);
-                  return Container(
-                    decoration: BoxDecoration(
-                      color: Color.fromRGBO(193, 190, 235, 0.9),
-                      borderRadius: BorderRadius.only(topRight: Radius.circular(40), topLeft: Radius.circular(40)),
+                return Container(
+                  decoration: BoxDecoration(
+                    color: Color.fromRGBO(193, 190, 235, 0.9),
+                    borderRadius: BorderRadius.only(
+                        topRight: Radius.circular(40),
+                        topLeft: Radius.circular(40)),
 
-                    ),
-                    child: ContactList(scrollController: scrollController, code: widget.code),
+                  ),
+                  child: ContactList(
+                      scrollController: scrollController, code: widget.code),
 
-                  );
-                },
+                );
+              },
             ),
           ],
         ),
       ),
     );
+  }
+
+  //Connectivity Error Dialog Box
+  AwesomeDialog connectivityDialogBox() {
+    return AwesomeDialog(
+      context: context,
+      dialogType: DialogType.WARNING,
+      animType: AnimType.BOTTOMSLIDE,
+      title: 'Connectivity Error',
+      desc: 'Hmm..looks like there is no connectivity...',
+      btnOkOnPress: () {},
+    )
+      ..show();
+  }
+
+//Check for Internet connectivity
+  Future _checkForInternetConnection() async {
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        return true;
+      }
+    } on SocketException catch (_) {
+      return false;
+    }
   }
 }

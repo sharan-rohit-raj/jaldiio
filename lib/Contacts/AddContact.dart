@@ -260,22 +260,16 @@ class _AddContactState extends State<AddContact> {
                                         if(_formKey.currentState.validate()) {
                                           name = snapshot.data.name;
                                           code = snapshotCode.data.familyID;
-                                          final FirebaseUser fireuser = await FirebaseAuth
-                                              .instance.currentUser();
-
                                           await DataBaseService(famCode: code)
                                               .updateContactsInfo(
                                               _emailController.text,
                                               _NameController.text,
-                                              int.parse(_phnoController.text));
-
-
-//                                          PLEASE REMEMBER TO UNCOMMENT THIS FINALLY!
+                                              int.parse(_phnoController.text)).then((value) {
+                                            //PLEASE REMEMBER TO UNCOMMENT THIS FINALLY!
 //                                          send();
+                                            showInSnackBar("Invitation sent successfully.");
 
-                                          showInSnackBar("Invitation sent successfully.");
-
-                                        }
+                                          });}
                                       },
                                     );
                                   }

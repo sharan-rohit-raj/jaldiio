@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -19,11 +22,29 @@ class CreateFamily extends StatefulWidget {
 class _CreateFamilyState extends State<CreateFamily> {
   final _formKey = GlobalKey<FormState>();
   final _codeController = TextEditingController(text: "");
-  final codeStored = SnackBar(content: Center(child: Text('Yay! your family code has been created!', textAlign: TextAlign.center,)));
+  final codeStored = SnackBar(
+      content: Center(
+          child: Text(
+    'Yay! your family code has been created!',
+    textAlign: TextAlign.center,
+  )));
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   void showInSnackBar(String value) {
-    _scaffoldKey.currentState.showSnackBar(new SnackBar(content: new Text(value)));
+    _scaffoldKey.currentState
+        .showSnackBar(new SnackBar(content: new Text(value)));
+  }
+
+  //Check for Internet connectivity
+  Future _checkForInternetConnection() async {
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        return true;
+      }
+    } on SocketException catch (_) {
+      return false;
+    }
   }
 
   @override
@@ -40,7 +61,8 @@ class _CreateFamilyState extends State<CreateFamily> {
             decoration: BoxDecoration(
               image: DecorationImage(
                 image: AssetImage("assets/images/createFamily.png"),
-                colorFilter: new ColorFilter.mode(Colors.white.withOpacity(0.3), BlendMode.dstATop),
+                colorFilter: new ColorFilter.mode(
+                    Colors.white.withOpacity(0.3), BlendMode.dstATop),
                 fit: BoxFit.contain,
               ),
             ),
@@ -58,8 +80,13 @@ class _CreateFamilyState extends State<CreateFamily> {
                           Icons.arrow_back_ios,
                           color: Colors.deepPurpleAccent,
                         ),
-                        onPressed: () {
-                          Navigator.pop(context);
+                        onPressed: () async{
+                          if(await _checkForInternetConnection()){
+                            Navigator.pop(context);
+                          }else{
+                            connectivityDialogBox();
+                          }
+
                         },
                       ),
                       Text(
@@ -118,28 +145,31 @@ class _CreateFamilyState extends State<CreateFamily> {
                                   padding: EdgeInsets.all(10.0),
                                   decoration: BoxDecoration(
                                     border: Border(
-                                      bottom: BorderSide(color: Colors.grey[100]),
+                                      bottom:
+                                          BorderSide(color: Colors.grey[100]),
                                     ),
                                   ),
                                   child: TextFormField(
                                     controller: _codeController,
                                     decoration: InputDecoration(
                                       focusedBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(color: Colors.deepPurpleAccent, width: 1.0),
+                                          borderSide: BorderSide(
+                                              color: Colors.deepPurpleAccent,
+                                              width: 1.0),
                                           borderRadius: BorderRadius.all(
-                                              Radius.circular(15)
-                                          )
-                                      ),
+                                              Radius.circular(15))),
                                       enabledBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(color: Colors.deepPurpleAccent, width: 0.5),
+                                          borderSide: BorderSide(
+                                              color: Colors.deepPurpleAccent,
+                                              width: 0.5),
                                           borderRadius: BorderRadius.all(
-                                              Radius.circular(15)
-                                          )
-                                      ),
+                                              Radius.circular(15))),
                                       filled: true,
                                       fillColor: Colors.white,
                                       hintText: "Unique Family Code",
-                                      hintStyle: TextStyle(color: Colors.deepPurple[200], fontWeight: FontWeight.w100),
+                                      hintStyle: TextStyle(
+                                          color: Colors.deepPurple[200],
+                                          fontWeight: FontWeight.w100),
                                     ),
                                     style: GoogleFonts.openSans(
                                       textStyle: TextStyle(
@@ -158,7 +188,8 @@ class _CreateFamilyState extends State<CreateFamily> {
                                 ),
                                 SizedBox(height: 30),
                                 FlatButton(
-                                  padding: EdgeInsets.only(left: 100, right: 100),
+                                  padding:
+                                      EdgeInsets.only(left: 100, right: 100),
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(15),
                                       side: BorderSide(
@@ -169,46 +200,71 @@ class _CreateFamilyState extends State<CreateFamily> {
                                         fontSize: 18,
                                         color: Colors.deepPurpleAccent),
                                   ),
-                                  onPressed: !isAlreadyPressed ? () async {
-                                    setState(() {
-                                      isAlreadyPressed = true;
-                                    });
-                                    if (_formKey.currentState.validate()) {
-                                      final QuerySnapshot result =
-                                      await Firestore.instance.collection('family_info').getDocuments();
-                                      final List<DocumentSnapshot> documents = result.documents;
-                                      bool found = false;
-                                      int index =0;
-                                      print(documents.length);
-                                      while(index < documents.length && found == false){
+                                  onPressed: !isAlreadyPressed
+                                      ? () async {
+                                          if (await _checkForInternetConnection()) {
+                                            setState(() {
+                                              isAlreadyPressed = true;
+                                            });
+                                            if (_formKey.currentState
+                                                .validate()) {
+                                              final QuerySnapshot result =
+                                                  await Firestore.instance
+                                                      .collection('family_info')
+                                                      .getDocuments();
+                                              final List<DocumentSnapshot>
+                                                  documents = result.documents;
+                                              bool found = false;
+                                              int index = 0;
+                                              print(documents.length);
+                                              while (index < documents.length &&
+                                                  found == false) {
 //                                    print(documents[index].documentID);
-                                        if(documents[index].documentID.compareTo(_codeController.text)==0){
-                                          found = true;
+                                                if (documents[index]
+                                                        .documentID
+                                                        .compareTo(
+                                                            _codeController
+                                                                .text) ==
+                                                    0) {
+                                                  found = true;
+                                                }
+                                                index++;
+                                              }
+
+                                              if (found == false) {
+                                                await DataBaseService(
+                                                        famCode: _codeController
+                                                            .text)
+                                                    .initializeDocField();
+                                                await DataBaseService(
+                                                        famCode: _codeController
+                                                            .text)
+                                                    .initializeImageTagField();
+                                                final FirebaseUser fireuser =
+                                                    await FirebaseAuth.instance
+                                                        .currentUser();
+                                                await DataBaseService(
+                                                        uid: fireuser.uid)
+                                                    .updateFamilyCode(
+                                                        _codeController.text);
+                                                await DataBaseService(
+                                                        uid: fireuser.uid)
+                                                    .updateAdmin(true);
+                                                await DataBaseService(
+                                                        uid: fireuser.uid)
+                                                    .updateJoined(true);
+                                                showInSnackBar(
+                                                    "Yay! your family name was stored successfully!");
+                                              } else {
+                                                showInSnackBar(
+                                                    "We are sorry, that code was already taken by another family. Please try again.");
+                                              }
+                                            } else {
+                                              connectivityDialogBox();
+                                            }
+                                          }
                                         }
-                                        index++;
-                                      }
-
-                                      if(found == false){
-                                        await DataBaseService(famCode: _codeController.text).initializeDocField();
-                                        await DataBaseService(famCode: _codeController.text).initializeImageTagField();
-                                        final FirebaseUser fireuser =
-                                        await FirebaseAuth.instance.currentUser();
-                                        await DataBaseService(uid: fireuser.uid)
-                                            .updateFamilyCode(
-                                            _codeController.text
-                                        );
-                                        await DataBaseService(uid: fireuser.uid).updateAdmin(true);
-                                        await DataBaseService(uid: fireuser.uid).updateJoined(true);
-                                        showInSnackBar("Yay! your family name was stored successfully!");
-
-
-                                      }
-                                      else{
-                                        showInSnackBar("We are sorry, that code was already taken by another family. Please try again.");
-                                      }
-
-                                    }
-                                  }: null,
+                                      : null,
                                 ),
                               ],
                             ),
@@ -224,5 +280,17 @@ class _CreateFamilyState extends State<CreateFamily> {
         ],
       ),
     );
+  }
+
+  //Connectivity Error Dialog Box
+  AwesomeDialog connectivityDialogBox() {
+    return AwesomeDialog(
+      context: context,
+      dialogType: DialogType.WARNING,
+      animType: AnimType.BOTTOMSLIDE,
+      title: 'Connectivity Error',
+      desc: 'Hmm..looks like there is no connectivity...',
+      btnOkOnPress: () {},
+    )..show();
   }
 }

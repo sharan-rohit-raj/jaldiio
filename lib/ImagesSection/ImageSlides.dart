@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -9,21 +10,17 @@ import 'package:jaldiio/ImagesSection/ImageView.dart';
 import 'package:jaldiio/Models/ImageTags.dart';
 import 'package:jaldiio/Services/DataBaseService.dart';
 import 'package:jaldiio/Shared/Loading.dart';
-import 'package:queries/collections.dart';
-import 'package:queries/queries.dart';
-import 'package:content_placeholder/content_placeholder.dart';
-import 'package:transparent_image/transparent_image.dart';
 
-class SlideShow extends StatefulWidget {
+class ImageSlides extends StatefulWidget {
 
   String famCode;
-  SlideShow({Key key, @required this.famCode}) : super(key: key);
+  ImageSlides({Key key, @required this.famCode}) : super(key: key);
 
   @override
-  _SlideShowState createState() => _SlideShowState();
+  _ImageSlidesState createState() => _ImageSlidesState();
 }
 
-class _SlideShowState extends State<SlideShow> with SingleTickerProviderStateMixin{
+class _ImageSlidesState extends State<ImageSlides> with SingleTickerProviderStateMixin{
   AnimationController _animationController ;
 //  AnimationController _subHeadingAnimationController;
   final PageController ctrl = PageController(viewportFraction: 0.8);
@@ -31,6 +28,19 @@ class _SlideShowState extends State<SlideShow> with SingleTickerProviderStateMix
   int currentPage =0;
   String activeTag = 'favourites';
   Stream slides;
+
+  //Check for Internet connectivity
+  Future _checkForInternetConnection() async{
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        return true;
+      }
+    } on SocketException catch (_) {
+      return false;
+    }
+
+  }
 
   @override
   void initState(){
@@ -42,8 +52,6 @@ class _SlideShowState extends State<SlideShow> with SingleTickerProviderStateMix
       duration: Duration(seconds: 1),
     );
     Timer(Duration(milliseconds: 200), () => _animationController.forward());
-
-
 
     ctrl.addListener(() {
       int next  = ctrl.page.round();
@@ -114,20 +122,7 @@ class _SlideShowState extends State<SlideShow> with SingleTickerProviderStateMix
         .document(widget.famCode)
         .collection("images").where("tag", arrayContains: tag);
 
-
-//     query.getDocuments().then((value){
-//       List<DocumentSnapshot> documents = value.documents;
-//       int i =0;
-//       while(i < documents.length){
-//         print(documents[i].documentID.toString());
-//         i++;
-//       }
-//     });
-
-
     slides = query.snapshots().map((list) => list.documents.map((doc) => doc.data));
-
-//    print(slides);
 
     setState(() {
       activeTag = tag;
@@ -157,40 +152,24 @@ class _SlideShowState extends State<SlideShow> with SingleTickerProviderStateMix
                   child:Text(
                     data['name'], style: TextStyle(fontSize: 40, color: Colors.white),
                   )),
-//          child: Stack(
-//            children: <Widget>[
-//              Center(child: ContentPlaceholder()),
-//              Center(
-//                child: FadeInImage.memoryNetwork(
-//                    placeholder: kTransparentImage,
-//                    image: data['url'],
-//                    fit: BoxFit.fill,
-//
-//                ),
-//              ),
-//              Center(
-//                  child:Text(
-//                    data['name'], style: TextStyle(fontSize: 40, color: Colors.white),
-//                  ))
-//            ],
-//          ),
         ),
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => ImageView(
-                  url: data['url'] ,
-                  id: data['id'],
-                  famCode: widget.famCode,
-                )),);
-          print(data['name']);
+        onTap: () async{
+          if(await _checkForInternetConnection()){
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => ImageView(
+                    url: data['url'] ,
+                    id: data['id'],
+                    famCode: widget.famCode,
+                  )),);
+            print(data['name']);
+          }else{
+            connectivityDialogBox();
+          }
         },
       );
   }
-
-
-
 
    _buildTagPage(){
     return Container(
@@ -273,7 +252,8 @@ class _SlideShowState extends State<SlideShow> with SingleTickerProviderStateMix
                             color: Colors.black87
                           ),),
                         onLongPress: () async{
-//                          print("loooong");
+                          //Check for internet connectivity
+                          if(await _checkForInternetConnection()){
                             AwesomeDialog(
                               context: context,
                               dialogType: DialogType.WARNING,
@@ -288,9 +268,18 @@ class _SlideShowState extends State<SlideShow> with SingleTickerProviderStateMix
                               btnOkColor: Colors.red,
                               btnCancelColor: Colors.deepPurpleAccent,
                             )..show();
+                          }else{
+                            connectivityDialogBox();
+                          }
+
                         },
-                        onTap: () {
-                          queryDb(tag: '$index');
+                        onTap: () async{
+                          //Check for internet connectivity
+                          if(await _checkForInternetConnection()){
+                            queryDb(tag: '$index');
+                          }else{
+                            connectivityDialogBox();
+                          }
                         },);
                       }).toList(),
                     );
@@ -317,14 +306,15 @@ class _SlideShowState extends State<SlideShow> with SingleTickerProviderStateMix
     );
   }
 
-//  _buildList(tag){
-//    Color color = tag == activeTag ? Colors.purple : Colors.white;
-//    return ListTile
-//      (
-//      key: ObjectKey(tag),
-//      title: Text('$tag',style: GoogleFonts.openSans(
-//        color: Colors.black87
-//      ),),
-//      onTap: () => queryDb(tag: tag),);
-//  }
+  //Connectivity Error Dialog Box
+  AwesomeDialog connectivityDialogBox(){
+    return AwesomeDialog(
+      context: context,
+      dialogType: DialogType.WARNING,
+      animType: AnimType.BOTTOMSLIDE,
+      title: 'Connectivity Error',
+      desc: 'Hmm..looks like there is no connectivity...',
+      btnOkOnPress: () {},
+    )..show();
+  }
 }

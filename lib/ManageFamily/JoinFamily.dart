@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -24,6 +27,18 @@ class _JoinFamilyState extends State<JoinFamily> {
 
   void showInSnackBar(String value) {
     _scaffoldKey.currentState.showSnackBar(new SnackBar(content: new Text(value)));
+  }
+
+  Future _checkForInternetConnection() async{
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        return true;
+      }
+    } on SocketException catch (_) {
+      return false;
+    }
+
   }
 
   @override
@@ -56,9 +71,13 @@ class _JoinFamilyState extends State<JoinFamily> {
                           Icons.arrow_back_ios,
                           color: Colors.deepPurpleAccent,
                         ),
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
+                        onPressed: () async {
+                          if(await _checkForInternetConnection()){
+                            Navigator.pop(context);
+                          }else{
+                            connectivityDialogBox();
+                          }
+                          },
                       ),
                       Text(
                         "Join Family",
@@ -172,51 +191,58 @@ class _JoinFamilyState extends State<JoinFamily> {
                                               color: Colors.deepPurpleAccent),
                                         ),
                                         onPressed: () async{
-                                          if(_formKey.currentState.validate()) {
-                                            final QuerySnapshot result =
-                                            await Firestore.instance.collection('family_info').getDocuments();
-                                            final List<DocumentSnapshot> documents = result.documents;
+                                          if(await _checkForInternetConnection()){
+                                            if(_formKey.currentState.validate()) {
+                                              final QuerySnapshot result =
+                                              await Firestore.instance.collection('family_info').getDocuments();
+                                              final List<DocumentSnapshot> documents = result.documents;
 
-                                            bool found = false;
-                                            int index =0;
-                                            print(documents.length);
-                                            while(index < documents.length && found == false){
-                                              print(documents[index].documentID);
-                                              if(documents[index].documentID.compareTo(_codeController.text)==0){
-                                                found = true;
+                                              bool found = false;
+                                              int index =0;
+                                              print(documents.length);
+                                              while(index < documents.length && found == false){
+                                                print(documents[index].documentID);
+                                                if(documents[index].documentID.compareTo(_codeController.text)==0){
+                                                  found = true;
+                                                }
+                                                index++;
                                               }
-                                              index++;
-                                            }
 
-                                            if(found){
-                                              final FirebaseUser fireuser =
-                                              await FirebaseAuth.instance.currentUser();
-                                              try{
-                                                await DataBaseService(famCode: _codeController.text).updateContactjoined(fireuser.email, true);
-                                                await DataBaseService(famCode: _codeController.text).updateContactUID(fireuser.email, fireuser.uid);
-                                                await DataBaseService(uid: fireuser.uid)
-                                                    .updateFamilyCode(
-                                                    _codeController.text
-                                                );
+                                              if(found){
+                                                final FirebaseUser fireuser =
+                                                await FirebaseAuth.instance.currentUser();
+                                                try{
+                                                  String url = fireuser.photoUrl != null || fireuser.photoUrl.isNotEmpty ? fireuser.photoUrl : null;
+                                                  await DataBaseService(famCode: _codeController.text).updateContactjoined(fireuser.email, true, url);
+                                                  await DataBaseService(famCode: _codeController.text).updateContactUID(fireuser.email, fireuser.uid);
+                                                  await DataBaseService(uid: fireuser.uid)
+                                                      .updateFamilyCode(
+                                                      _codeController.text
+                                                  );
 //                                                await DataBaseService(uid: fireuser.uid, famCode: _codeController.text)
 //                                                    .updateMembers(snapshot.data.name, snapshot.data.phoneNum);
-                                                await DataBaseService(uid: fireuser.uid).updateJoined(true);
-                                                showInSnackBar("Yay! you joined a family!");
+                                                  await DataBaseService(uid: fireuser.uid).updateJoined(true);
+                                                  showInSnackBar("Yay! you joined a family!");
+
+
+                                                }
+                                                catch(e){
+                                                  print(e.toString());
+                                                  showInSnackBar("Oh..Oh seems like you weren't invited. Please make sure the admin invites you.");
+                                                }
 
 
                                               }
-                                              catch(e){
-                                                print(e.toString());
-                                                showInSnackBar("Oh..Oh seems like you weren't invited. Please make sure the admin invites you.");
+                                              else{
+                                                showInSnackBar("hmm.. we were not expecting that code. Please try again.");
                                               }
 
-
                                             }
-                                            else{
-                                              showInSnackBar("hmm.. we were not expecting that code. Please try again.");
-                                            }
-
+                                          }else{
+                                            connectivityDialogBox();
                                           }
+
+
                                         },
                                       );
                                     }
@@ -235,5 +261,17 @@ class _JoinFamilyState extends State<JoinFamily> {
         ],
       ),
     );
+  }
+
+  //Connectivity Error Dialog Box
+  AwesomeDialog connectivityDialogBox(){
+    return AwesomeDialog(
+      context: context,
+      dialogType: DialogType.WARNING,
+      animType: AnimType.BOTTOMSLIDE,
+      title: 'Connectivity Error',
+      desc: 'Hmm..looks like there is no connectivity...',
+      btnOkOnPress: () {},
+    )..show();
   }
 }

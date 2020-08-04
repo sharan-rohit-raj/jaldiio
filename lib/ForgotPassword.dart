@@ -1,7 +1,11 @@
+import 'dart:io';
+
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:jaldiio/LoginPage.dart';
+import 'package:string_validator/string_validator.dart';
 import './Animation/FadeAnimation.dart';
 import 'package:jaldiio/LoginPage.dart';
 
@@ -17,6 +21,18 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   final _formKey = GlobalKey<FormState>();
   String error = '';
   String email_id = " ";
+
+  Future _checkForInternetConnection() async{
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        return true;
+      }
+    } on SocketException catch (_) {
+      return false;
+    }
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -141,7 +157,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                       fontWeight: FontWeight.w400
                                   ),
                                 ),
-                                validator: (val) => val.isEmpty ? 'Enter an Email ID' : null,
+                                validator: (val) => !isEmail(val) ? 'Enter a valid Email ID' : null,
                                 onChanged: (val){
                                   setState(() => email_id = val);
                                 },
@@ -172,11 +188,13 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                           ),
                         ),),
                       onPressed: () async {
+                        if(await _checkForInternetConnection()){
                           if(_formKey.currentState.validate()){
-                              FirebaseAuth.instance.sendPasswordResetEmail(email: email_id).then((value) => print("Password link has been sent to the registered Email-ID."));
+                            FirebaseAuth.instance.sendPasswordResetEmail(email: email_id).then((value) => print("Password link has been sent to the registered Email-ID."));
                           }
-                          
-                      
+                        }else{
+                          connectivityDialogBox();
+                        }
                       },
                     ),
                     SizedBox(
@@ -196,5 +214,17 @@ class _ForgotPasswordState extends State<ForgotPassword> {
         ),
       ),
     );
+  }
+
+  //Connectivity Error Dialog Box
+  AwesomeDialog connectivityDialogBox(){
+    return AwesomeDialog(
+      context: context,
+      dialogType: DialogType.WARNING,
+      animType: AnimType.BOTTOMSLIDE,
+      title: 'Connectivity Error',
+      desc: 'Hmm..looks like there is no connectivity...',
+      btnOkOnPress: () {},
+    )..show();
   }
 }

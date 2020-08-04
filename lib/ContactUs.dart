@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:jaldiio/Animation/FadeAnimation.dart';
@@ -40,6 +43,19 @@ class _ContactUsState extends State<ContactUs> {
     ));
   }
 
+  //Check for Internet connection
+  Future _checkForInternetConnection() async{
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        return true;
+      }
+    } on SocketException catch (_) {
+      return false;
+    }
+
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -68,8 +84,12 @@ class _ContactUsState extends State<ContactUs> {
                           Icons.arrow_back_ios,
                           color: Colors.deepPurpleAccent,
                         ),
-                        onPressed: () {
-                          Navigator.pop(context);
+                        onPressed: () async{
+                          if(await _checkForInternetConnection()){
+                            Navigator.pop(context);
+                          }else{
+                            connectivityDialogBox();
+                          }
                         },
                       ),
                       Text(
@@ -205,9 +225,14 @@ class _ContactUsState extends State<ContactUs> {
                                         fontSize: 18,
                                         color: Colors.deepPurpleAccent),
                                   ),
-                                  onPressed: () {
-                                    if(_formKey.currentState.validate())
-                                      send();
+                                  onPressed: () async{
+                                    if(await _checkForInternetConnection()){
+                                      if(_formKey.currentState.validate())
+                                        send();
+                                    }else{
+                                    connectivityDialogBox();
+                                    }
+
                                   },
                                 ),
                                 Padding(
@@ -233,5 +258,16 @@ class _ContactUsState extends State<ContactUs> {
         ),
       ),
     );
+  }
+  //Connectivity Error Dialog Box
+  AwesomeDialog connectivityDialogBox(){
+    return AwesomeDialog(
+      context: context,
+      dialogType: DialogType.WARNING,
+      animType: AnimType.BOTTOMSLIDE,
+      title: 'Connectivity Error',
+      desc: 'Hmm..looks like there is no connectivity...',
+      btnOkOnPress: () {},
+    )..show();
   }
 }
