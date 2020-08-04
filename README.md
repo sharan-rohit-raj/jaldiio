@@ -26,7 +26,7 @@ The project's main goal is to bring the users closer together. The people today 
 
 - Clone this repository to your Local Machine using the following command:
 
-  `https://github.com/sharan-rohit-raj/jaldiio.git`
+  `git clone https://github.com/sharan-rohit-raj/jaldiio.git`
 
   
 
