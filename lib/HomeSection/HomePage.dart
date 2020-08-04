@@ -24,6 +24,8 @@ import 'package:jaldiio/Services/FireBaseUser.dart';
 import 'package:jaldiio/Shared/Loading.dart';
 import 'package:jaldiio/Shared/MLDrawer.dart';
 import 'package:jaldiio/ToDos/ToDoList.dart';
+import 'package:jaldiio/RecipesZone/RecipeZone.dart';
+import 'package:jaldiio/Calendar/EventCalendar.dart';
 import 'package:provider/provider.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:string_validator/string_validator.dart';
@@ -787,25 +789,22 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   break;
 
                 case "Family Events":
-                  AwesomeDialog(
-                    context: context,
-                    dialogType: DialogType.INFO,
-                    animType: AnimType.BOTTOMSLIDE,
-                    title: title,
-                    desc: 'Under Construction...',
-                    btnOkOnPress: () {},
-                  )..show();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => EventCalendar(
+                          code: famCode,
+                        )),);
                   break;
 
                 case "Recipe Zone":
-                  AwesomeDialog(
-                    context: context,
-                    dialogType: DialogType.INFO,
-                    animType: AnimType.BOTTOMSLIDE,
-                    title: title,
-                    desc: 'Under Construction...',
-                    btnOkOnPress: () {},
-                  )..show();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => RecipeZone(
+                          famCode: famCode,
+                        )),
+                  );
                   break;
 
                 default:
