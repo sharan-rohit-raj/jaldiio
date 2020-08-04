@@ -1,3 +1,4 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -29,6 +30,7 @@ class _ContactSectionState extends State<ContactSection> {
   Widget build(BuildContext context) {
 //    print("code: "+widget.code);
     final user_val = Provider.of<User>(context);
+    int contactLength = -1;
     return StreamProvider<List<Contact>>.value(
       value: DataBaseService(famCode: widget.code).contacts,
       child: Scaffold(
@@ -36,10 +38,26 @@ class _ContactSectionState extends State<ContactSection> {
         backgroundColor: Colors.white,
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => AddContact()),
-            );
+            DataBaseService(famCode: widget.code).contacts.listen((event) {
+              //Checks if the max family member is reached
+              if(event.length <= 5){
+                print(event.length);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AddContact()),
+                );
+              }
+              else{
+                AwesomeDialog(
+                  context: context,
+                  dialogType: DialogType.INFO,
+                  animType: AnimType.BOTTOMSLIDE,
+                  title: 'Max Family Member Limit',
+                  desc: 'Sorry, the max family members limits has reached...',
+                  btnOkOnPress: () {},
+                )..show();
+              }
+            });
           },
           child: Icon(Icons.add, size: 50,color: Colors.white,),
           backgroundColor: Colors.deepPurple[600],

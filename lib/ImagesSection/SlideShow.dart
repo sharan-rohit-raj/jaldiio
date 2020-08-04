@@ -11,6 +11,8 @@ import 'package:jaldiio/Services/DataBaseService.dart';
 import 'package:jaldiio/Shared/Loading.dart';
 import 'package:queries/collections.dart';
 import 'package:queries/queries.dart';
+import 'package:content_placeholder/content_placeholder.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 class SlideShow extends StatefulWidget {
 
@@ -147,13 +149,31 @@ class _SlideShowState extends State<SlideShow> with SingleTickerProviderStateMix
             image : DecorationImage(
               fit: BoxFit.cover,
               image: NetworkImage(data['url']),
+
             ),
             boxShadow: [BoxShadow(color:Colors.black87, blurRadius: blur, offset: Offset(offset, offset))],
           ),
           child: Center(
-              child:Text(
-            data['name'], style: TextStyle(fontSize: 40, color: Colors.white),
-          )),
+                  child:Text(
+                    data['name'], style: TextStyle(fontSize: 40, color: Colors.white),
+                  )),
+//          child: Stack(
+//            children: <Widget>[
+//              Center(child: ContentPlaceholder()),
+//              Center(
+//                child: FadeInImage.memoryNetwork(
+//                    placeholder: kTransparentImage,
+//                    image: data['url'],
+//                    fit: BoxFit.fill,
+//
+//                ),
+//              ),
+//              Center(
+//                  child:Text(
+//                    data['name'], style: TextStyle(fontSize: 40, color: Colors.white),
+//                  ))
+//            ],
+//          ),
         ),
         onTap: () {
           Navigator.push(
