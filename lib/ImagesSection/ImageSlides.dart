@@ -58,7 +58,7 @@ class _ImageSlidesState extends State<ImageSlides> with SingleTickerProviderStat
 
       if(currentPage != next){
         setState(() {
-          currentPage = next;
+            currentPage = next;
         });
       }
 
@@ -75,40 +75,40 @@ class _ImageSlidesState extends State<ImageSlides> with SingleTickerProviderStat
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-        stream: slides,
-        builder: (context, AsyncSnapshot snapshot) {
+      stream: slides,
+      builder: (context, AsyncSnapshot snapshot) {
 
 
-          if(snapshot.hasData){
+        if(snapshot.hasData){
 //          print(snapshot.data);
-            List slideList = snapshot.data.toList();
-            return PageView.builder(
-                controller: ctrl,
-                itemCount: slideList.length+1,
-                itemBuilder: (context, int current){
+          List slideList = snapshot.data.toList();
+          return PageView.builder(
+              controller: ctrl,
+              itemCount: slideList.length+1,
+              itemBuilder: (context, int current){
 //                print(slideList.length);
 
-                  if(current ==0){
-                    return _buildTagPage();
-                  }
-                  else if (slideList.length >= current){
-//                  print(slideList[current-1]);
-                    bool active = current == currentPage;
-                    return _buildStoryPage(slideList[current -1], active);
-                  }
-                  else{
-                    return Loading();
-                  }
-
+                if(current ==0){
+                  return _buildTagPage();
                 }
-            );
-          }
-          else{
-            return Loading();
-          }
+                else if (slideList.length >= current){
+//                  print(slideList[current-1]);
+                  bool active = current == currentPage;
+                  return _buildStoryPage(slideList[current -1], active);
+                }
+                else{
+                  return Loading();
+                }
 
-
+              }
+          );
         }
+        else{
+          return Loading();
+        }
+
+
+      }
     );
   }
 
@@ -116,8 +116,8 @@ class _ImageSlidesState extends State<ImageSlides> with SingleTickerProviderStat
     final CollectionReference familyCollection =
     Firestore.instance.collection('family_info');
 
-    print(tag);
-    print(widget.famCode);
+  print(tag);
+  print(widget.famCode);
     Query query = familyCollection
         .document(widget.famCode)
         .collection("images").where("tag", arrayContains: tag);
@@ -129,49 +129,49 @@ class _ImageSlidesState extends State<ImageSlides> with SingleTickerProviderStat
     });
   }
 
-  _buildStoryPage(Map data, bool active){
-    final double blur = active ? 30: 0;
-    final double offset =active ? 20:0;
-    final double top = active ? 100:200;
+   _buildStoryPage(Map data, bool active){
+      final double blur = active ? 30: 0;
+      final double offset =active ? 20:0;
+      final double top = active ? 100:200;
 
-    return InkWell(
-      child: AnimatedContainer(
-        duration: Duration(milliseconds: 500),
-        curve: Curves.easeOutQuint,
-        margin: EdgeInsets.only(top: top, bottom:  50, right: 50),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          image : DecorationImage(
-            fit: BoxFit.cover,
-            image: NetworkImage(data['url']),
+      return InkWell(
+        child: AnimatedContainer(
+          duration: Duration(milliseconds: 500),
+          curve: Curves.easeOutQuint,
+          margin: EdgeInsets.only(top: top, bottom:  50, right: 50),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            image : DecorationImage(
+              fit: BoxFit.cover,
+              image: NetworkImage(data['url']),
 
+            ),
+            boxShadow: [BoxShadow(color:Colors.black87, blurRadius: blur, offset: Offset(offset, offset))],
           ),
-          boxShadow: [BoxShadow(color:Colors.black87, blurRadius: blur, offset: Offset(offset, offset))],
+          child: Center(
+                  child:Text(
+                    data['name'], style: TextStyle(fontSize: 40, color: Colors.white),
+                  )),
         ),
-        child: Center(
-            child:Text(
-              data['name'], style: TextStyle(fontSize: 40, color: Colors.white),
-            )),
-      ),
-      onTap: () async{
-        if(await _checkForInternetConnection()){
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => ImageView(
-                  url: data['url'] ,
-                  id: data['id'],
-                  famCode: widget.famCode,
-                )),);
-          print(data['name']);
-        }else{
-          connectivityDialogBox();
-        }
-      },
-    );
+        onTap: () async{
+          if(await _checkForInternetConnection()){
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => ImageView(
+                    url: data['url'] ,
+                    id: data['id'],
+                    famCode: widget.famCode,
+                  )),);
+            print(data['name']);
+          }else{
+            connectivityDialogBox();
+          }
+        },
+      );
   }
 
-  _buildTagPage(){
+   _buildTagPage(){
     return Container(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -184,7 +184,7 @@ class _ImageSlidesState extends State<ImageSlides> with SingleTickerProviderStat
               end: Offset.zero,
             ).animate(_animationController),
             child: FadeTransition(
-                opacity: _animationController,
+              opacity: _animationController,
                 child: Text('Your Stories' , style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),)),
           ),
           SizedBox(
@@ -216,88 +216,88 @@ class _ImageSlidesState extends State<ImageSlides> with SingleTickerProviderStat
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(15),
                 border: Border.all(
-                    color: Colors.white
+                  color: Colors.white
                 ),
                 boxShadow: [BoxShadow(color:Colors.black87, blurRadius: 5, offset: Offset(5, 5))],
               ),
               child: StreamBuilder<ImageTags>(
-                  stream: DataBaseService(famCode: widget.famCode).imgTagData,
-                  builder: (context, snapshot) {
+                stream: DataBaseService(famCode: widget.famCode).imgTagData,
+                builder: (context, snapshot) {
 //                print("family: "+widget.famCode);
-                    if(snapshot.hasData){
-                      ImageTags tagsData = snapshot.data;
+                  if(snapshot.hasData){
+                    ImageTags tagsData = snapshot.data;
 
-                      void reorder(int oldIndex, int newIndex){
-                        if(newIndex > oldIndex)
-                          newIndex-=1;
+                    void reorder(int oldIndex, int newIndex){
+                      if(newIndex > oldIndex)
+                        newIndex-=1;
 
-                        final String x = tagsData.tags.removeAt(oldIndex);
-                        tagsData.tags.insert(newIndex, x);
+                      final String x = tagsData.tags.removeAt(oldIndex);
+                      tagsData.tags.insert(newIndex, x);
 
-                      }
-                      return ReorderableListView(
-                        padding: EdgeInsets.all(15),
-                        onReorder:  (oldIndex, newIndex){
-                          setState(() {
-                            reorder(oldIndex, newIndex);
-                          });
+                    }
+                    return ReorderableListView(
+                      padding: EdgeInsets.all(15),
+                      onReorder:  (oldIndex, newIndex){
+                        setState(() {
+                          reorder(oldIndex, newIndex);
+                        });
+
+                      },
+                      children: tagsData.tags.map((index) {
+
+                        return ListTile(
+                          key: ObjectKey(index),
+                          title: Text("$index",
+                          style: GoogleFonts.openSans(
+                            color: Colors.black87
+                          ),),
+                        onLongPress: () async{
+                          //Check for internet connectivity
+                          if(await _checkForInternetConnection()){
+                            AwesomeDialog(
+                              context: context,
+                              dialogType: DialogType.WARNING,
+                              animType: AnimType.BOTTOMSLIDE,
+                              title: "Delete Tag",
+                              desc: 'Do you wish to delete this tag?',
+                              btnOkOnPress: () async {
+                                await DataBaseService(famCode: widget.famCode).deleteImgTag("$index");
+                              },
+                              btnCancelOnPress: () {},
+                              btnOkText: "Delete",
+                              btnOkColor: Colors.red,
+                              btnCancelColor: Colors.deepPurpleAccent,
+                            )..show();
+                          }else{
+                            connectivityDialogBox();
+                          }
 
                         },
-                        children: tagsData.tags.map((index) {
-
-                          return ListTile(
-                            key: ObjectKey(index),
-                            title: Text("$index",
-                              style: GoogleFonts.openSans(
-                                  color: Colors.black87
-                              ),),
-                            onLongPress: () async{
-                              //Check for internet connectivity
-                              if(await _checkForInternetConnection()){
-                                AwesomeDialog(
-                                  context: context,
-                                  dialogType: DialogType.WARNING,
-                                  animType: AnimType.BOTTOMSLIDE,
-                                  title: "Delete Tag",
-                                  desc: 'Do you wish to delete this tag?',
-                                  btnOkOnPress: () async {
-                                    await DataBaseService(famCode: widget.famCode).deleteImgTag("$index");
-                                  },
-                                  btnCancelOnPress: () {},
-                                  btnOkText: "Delete",
-                                  btnOkColor: Colors.red,
-                                  btnCancelColor: Colors.deepPurpleAccent,
-                                )..show();
-                              }else{
-                                connectivityDialogBox();
-                              }
-
-                            },
-                            onTap: () async{
-                              //Check for internet connectivity
-                              if(await _checkForInternetConnection()){
-                                queryDb(tag: '$index');
-                              }else{
-                                connectivityDialogBox();
-                              }
-                            },);
-                        }).toList(),
-                      );
-                    }
-                    else if(snapshot.hasError){
-                      return ListTile(
-                        title: Text("Emtpy"),
-                      );
-                    }
-                    else{
-                      return Container(
-                          height: 10,
-                          width: 30,
-                          child: LinearProgressIndicator(backgroundColor: Colors.deepPurpleAccent,)
-                      );
-                    }
-
+                        onTap: () async{
+                          //Check for internet connectivity
+                          if(await _checkForInternetConnection()){
+                            queryDb(tag: '$index');
+                          }else{
+                            connectivityDialogBox();
+                          }
+                        },);
+                      }).toList(),
+                    );
                   }
+                  else if(snapshot.hasError){
+                    return ListTile(
+                      title: Text("Emtpy"),
+                    );
+                  }
+                  else{
+                    return Container(
+                      height: 10,
+                        width: 30,
+                        child: LinearProgressIndicator(backgroundColor: Colors.deepPurpleAccent,)
+                    );
+                  }
+
+                }
               ),
             ),
           ),

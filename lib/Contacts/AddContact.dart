@@ -1,5 +1,3 @@
-import 'dart:io';
-import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -29,18 +27,6 @@ class _AddContactState extends State<AddContact> {
   final _formKey = GlobalKey<FormState>();
   String name;
   String code;
-
-  //Check for Internet connectivity
-  Future _checkForInternetConnection() async {
-    try {
-      final result = await InternetAddress.lookup('google.com');
-      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-        return true;
-      }
-    } on SocketException catch (_) {
-      return false;
-    }
-  }
 
   void showInSnackBar(String value) {
     _scaffoldKey.currentState.showSnackBar(new SnackBar(content: new Text(value)));
@@ -108,10 +94,8 @@ class _AddContactState extends State<AddContact> {
                           Icons.arrow_back_ios,
                           color: Colors.deepPurpleAccent,
                         ),
-                        onPressed: () async{
-                          if(await _checkForInternetConnection()){
-                            Navigator.pop(context);
-                          } else  {connectivityDialogBox(context);}
+                        onPressed: () {
+                          Navigator.pop(context);
                         },
                       ),
                       Text(
@@ -273,27 +257,19 @@ class _AddContactState extends State<AddContact> {
                                             color: Colors.deepPurpleAccent),
                                       ),
                                       onPressed: () async{
-                                        if(await _checkForInternetConnection()){
-                                          if(_formKey.currentState.validate()) {
-                                            name = snapshot.data.name;
-                                            code = snapshotCode.data.familyID;
-                                            final FirebaseUser fireuser = await FirebaseAuth
-                                                .instance.currentUser();
-
-                                            await DataBaseService(famCode: code)
-                                                .updateContactsInfo(
-                                                _emailController.text,
-                                                _NameController.text,
-                                                int.parse(_phnoController.text));
-
-
-//                                          PLEASE REMEMBER TO UNCOMMENT THIS FINALLY!
+                                        if(_formKey.currentState.validate()) {
+                                          name = snapshot.data.name;
+                                          code = snapshotCode.data.familyID;
+                                          await DataBaseService(famCode: code)
+                                              .updateContactsInfo(
+                                              _emailController.text,
+                                              _NameController.text,
+                                              int.parse(_phnoController.text)).then((value) {
+                                            //PLEASE REMEMBER TO UNCOMMENT THIS FINALLY!
 //                                          send();
-
                                             showInSnackBar("Invitation sent successfully.");
 
-                                          }
-                                        } else  {connectivityDialogBox(context);}
+                                          });}
                                       },
                                     );
                                   }
@@ -313,16 +289,4 @@ class _AddContactState extends State<AddContact> {
       }
     );
   }
-}
-
-//Connectivity Error Dialog Box
-AwesomeDialog connectivityDialogBox(BuildContext context){
-  return AwesomeDialog(
-    context: context,
-    dialogType: DialogType.WARNING,
-    animType: AnimType.BOTTOMSLIDE,
-    title: 'Connectivity Error',
-    desc: 'Hmm..looks like there is no connectivity...',
-    btnOkOnPress: () {},
-  )..show();
 }
