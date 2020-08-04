@@ -128,7 +128,7 @@ class _LeaveFamilyState extends State<LeaveFamily> {
                           stream: DataBaseService(uid: user_val.uid).userData,
                           builder: (context, snapshotUser) {
                             if(snapshotUser.hasData){
-                              String name_id = snapshotUser.data.name.toLowerCase() + "_" + snapshotUser.data.phoneNum.toString();
+                              String name_id = user_val.email;
                               return FlatButton(
                                 padding: EdgeInsets.only(left: 100, right: 100),
                                 shape: RoundedRectangleBorder(
