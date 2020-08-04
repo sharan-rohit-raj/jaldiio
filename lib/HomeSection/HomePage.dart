@@ -8,6 +8,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:jaldiio/Animation/FadeAnimation.dart';
 import 'package:jaldiio/Contacts/ContactSection.dart';
+import 'package:jaldiio/RecipesZone/RecipeZone.dart';
+import 'package:jaldiio/Calendar/EventCalendar.dart';
+import 'package:jaldiio/ImagesSection/ImageSection.dart';
 import 'package:jaldiio/ImagesSection/ImageSection.dart';
 import 'package:jaldiio/ManageFamily/CreateFamily.dart';
 import 'package:jaldiio/ManageFamily/DeleteFamily.dart';
@@ -22,13 +25,11 @@ import 'package:jaldiio/Services/FireBaseUser.dart';
 import 'package:jaldiio/Shared/Loading.dart';
 import 'package:jaldiio/Shared/MLDrawer.dart';
 import 'package:jaldiio/ToDos/ToDoList.dart';
-import 'package:jaldiio/RecipesZone/RecipeZone.dart';
-import 'package:jaldiio/Calendar/EventCalendar.dart';
 import 'package:provider/provider.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:string_validator/string_validator.dart';
 import 'Data.dart';
-import 'package:jaldiio/HomeSection/ContactUs.dart';
+import 'ContactUs.dart';
 import '../ManageAccount/EditProfile.dart';
 
 class HomePage extends StatefulWidget {
@@ -192,320 +193,327 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               userValue = snapshot.data;
 
               return StreamBuilder<FamilyCodeValue>(
-                stream: DataBaseService(uid: user_val.uid).codeData,
-                builder: (context, snapshotCode) {
-                  FamilyCodeValue familyCodeValue = null;
-                  if(snapshotCode.hasData){
-                    familyCodeValue = snapshotCode.data;
-                  }else{
-                    return Loading();
-                  }
-                  return new MultiLevelDrawer(
-                      backgroundColor: Color.fromRGBO(109, 49, 185, 0.9),
-                      rippleColor: Colors.white,
-                      subMenuBackgroundColor: Color.fromRGBO(253, 160, 41, 1),
-                      header: Container(
-                        // Header for Drawer
-                        child: Center(
-                            child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            SizedBox(
-                              height: 70,
-                            ),
-                            StreamBuilder<FirebaseUser>(
-                              stream: FirebaseAuth.instance.currentUser().asStream(),
-                              builder: (context, snapshot) {
-                                if(snapshot.hasData){
-                                  FirebaseUser user = snapshot.data;
-                                  return ClipRRect(
-                                    borderRadius: BorderRadius.circular(30),
-                                    child: user.photoUrl != null ?
-                                    CachedNetworkImage(
-                                      placeholder: (context, url) => CircularProgressIndicator(),
-                                      imageUrl: user.photoUrl,
-                                      fit: BoxFit.cover,
-                                      height: 100,
-                                      width: 100,
-                                    ):
-                                    Image.asset(
-                                      "assets/images/avatar_prof.png",
-                                      width: 100,
-                                      height: 100,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  );
-                                }
-                                else {
-                                  return CircularProgressIndicator();
-                                }
-
-                              }
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Text(
-                              userValue.name,
-                              style: GoogleFonts.openSans(
-                                color: Colors.white,
-                                fontSize: 25,
-                              ),
-                            ),
-                            Text(
-                              typeOfMember(
-                                  adminValidator(), partOfFamilyValidator()),
-                              style: GoogleFonts.openSans(
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
-                        )),
-                      ),
-                      children: [
-                        // Child Elements for Each Drawer Item
-                        MLMenuItem(
-                            leading: Icon(
-                              Icons.person,
-                              color: Colors.white,
-                            ),
-                            trailing: Icon(Icons.arrow_right, color: Colors.white),
-                            content: Text(
-                              "Account",
-                              style: GoogleFonts.openSans(
-                                color: Colors.white,
-                              ),
-                            ),
-                            subMenuItems: [
-                              MLSubmenu(
-                                onClick: () async{
-                                  if(await _checkForInternetConnection()){
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => new EditProfile()),
-                                    );
-                                  }else{
-                                    connectivityDialogBox();
-                                  }
-                                },
-                                submenuContent: Text(
-                                  "Edit Profile",
-                                  style: GoogleFonts.openSans(
-                                    color: Colors.white,
+                  stream: DataBaseService(uid: user_val.uid).codeData,
+                  builder: (context, snapshotCode) {
+                    FamilyCodeValue familyCodeValue = null;
+                    if(snapshotCode.hasData){
+                      familyCodeValue = snapshotCode.data;
+                    }else{
+                      return Loading();
+                    }
+                    return new MultiLevelDrawer(
+                        backgroundColor: Color.fromRGBO(109, 49, 185, 0.9),
+                        rippleColor: Colors.white,
+                        subMenuBackgroundColor: Color.fromRGBO(253, 160, 41, 1),
+                        header: Container(
+                          // Header for Drawer
+                          child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  SizedBox(
+                                    height: 70,
                                   ),
-                                ),
-                              ),
-                              MLSubmenu(
-                                  onClick: () async{
-                                    if(await _checkForInternetConnection()){
-                                      String id = user_val.email;
-                                      if(partOfFamilyValidator() && familyCodeValue != null){
-
-                                        if(userValue.admin){
-                                          //String familyCode, String uid, String contactId,
-                                          reAuthenticateDialog(true, familyCodeValue.familyID, user_val.uid, id,
-                                              _auth, "Delete Family Member Admin Account", 'As you are the admin, first you must delete your existing family to delete your account.',
-                                              Colors.deepPurpleAccent, Colors.red, Colors.transparent, Colors.grey[100], Colors.grey, Colors.black);
+                                  StreamBuilder<FirebaseUser>(
+                                      stream: FirebaseAuth.instance.currentUser().asStream(),
+                                      builder: (context, snapshot) {
+                                        if(snapshot.hasData){
+                                          FirebaseUser user = snapshot.data;
+                                          return ClipRRect(
+                                            borderRadius: BorderRadius.circular(30),
+                                            child: user.photoUrl != null ?
+                                            CachedNetworkImage(
+                                              placeholder: (context, url) => CircularProgressIndicator(),
+                                              imageUrl: user.photoUrl,
+                                              fit: BoxFit.cover,
+                                              height: 100,
+                                              width: 100,
+                                            ):
+                                            Image.asset(
+                                              "assets/images/avatar_prof.png",
+                                              width: 100,
+                                              height: 100,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          );
                                         }
-                                        else{
-                                          reAuthenticateDialog(false, null, user_val.uid, id,
-                                            _auth, "Delete user Account", 'Are you sure you wish to delete this account?',
-                                              Colors.deepPurpleAccent, Colors.red, Colors.transparent, Colors.grey[100], Colors.grey, Colors.black);
-                                        } access to this family anymore.',
-                                            Colors.deepPurpleAccent, Colors.red, Colors.transparent, Colors.grey[100], Colors.grey, Colors.black);
+                                        else {
+                                          return CircularProgressIndicator();
+                                        }
+
                                       }
-                                    }
-                                    
-                                  },
-                                  submenuContent: Text(
-                                    "Delete Account",
+                                  ),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                  Text(
+                                    userValue.name,
+                                    style: GoogleFonts.openSans(
+                                      color: Colors.white,
+                                      fontSize: 25,
+                                    ),
+                                  ),
+                                  Text(
+                                    typeOfMember(
+                                        adminValidator(), partOfFamilyValidator()),
                                     style: GoogleFonts.openSans(
                                       color: Colors.white,
                                     ),
-                                  )),
-                            ],
-                            onClick: () {}),
+                                  ),
+                                ],
+                              )),
+                        ),
+                        children: [
+                          // Child Elements for Each Drawer Item
+                          MLMenuItem(
+                              leading: Icon(
+                                Icons.person,
+                                color: Colors.white,
+                              ),
+                              trailing: Icon(Icons.arrow_right, color: Colors.white),
+                              content: Text(
+                                "Account",
+                                style: GoogleFonts.openSans(
+                                  color: Colors.white,
+                                ),
+                              ),
+                              subMenuItems: [
+                                MLSubmenu(
+                                  onClick: () async{
+                                    if(await _checkForInternetConnection()){
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => new EditProfile()),
+                                      );
+                                    }else{
+                                      connectivityDialogBox();
+                                    }
 
-                        MLMenuItem(
-                            leading: Icon(Icons.people, color: Colors.white),
-                            trailing: Icon(Icons.arrow_right, color: Colors.white),
+                                  },
+                                  submenuContent: Text(
+                                    "Edit Profile",
+                                    style: GoogleFonts.openSans(
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                                MLSubmenu(
+                                    onClick: () async{
+                                      if(await _checkForInternetConnection()){
+                                        String id = user_val.email;
+                                        if(partOfFamilyValidator() && familyCodeValue != null){
+
+                                          if(userValue.admin){
+                                            //String familyCode, String uid, String contactId,
+                                            reAuthenticateDialog(true, familyCodeValue.familyID, user_val.uid, id,
+                                                _auth, "Delete Family Member Admin Account", 'As you are the admin, first you must delete your existing family to delete your account.',
+                                                Colors.deepPurpleAccent, Colors.red, Colors.transparent, Colors.grey[100], Colors.grey, Colors.black);
+                                          }
+                                          else{
+                                            reAuthenticateDialog(false, familyCodeValue.familyID, user_val.uid, id,
+                                                _auth, "Delete Family Member Account", 'Are you sure you wish to delete this account? You will not have access to this family anymore.',
+                                                Colors.deepPurpleAccent, Colors.red, Colors.transparent, Colors.grey[100], Colors.grey, Colors.black);
+                                          }
+                                        }
+                                        else{
+                                          reAuthenticateDialog(false, null, user_val.uid, id,
+                                              _auth, "Delete user Account", 'Are you sure you wish to delete this account?',
+                                              Colors.deepPurpleAccent, Colors.red, Colors.transparent, Colors.grey[100], Colors.grey, Colors.black);
+                                        }
+                                      }else{
+                                        connectivityDialogBox();
+                                      }
+
+                                    },
+                                    submenuContent: Text(
+                                      "Delete Account",
+                                      style: GoogleFonts.openSans(
+                                        color: Colors.white,
+                                      ),
+                                    )),
+                              ],
+                              onClick: () {}),
+
+                          MLMenuItem(
+                              leading: Icon(Icons.people, color: Colors.white),
+                              trailing: Icon(Icons.arrow_right, color: Colors.white),
+                              content: Text(
+                                "Family",
+                                style: GoogleFonts.openSans(
+                                  color: Colors.white,
+                                ),
+                              ),
+                              onClick: () {},
+                              subMenuItems: [
+
+                                if(partOfFamilyValidator() && familyCodeValue != null) ...[
+                                  MLSubmenu(
+                                      onClick: () async{
+                                        if(await _checkForInternetConnection()){
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) => ContactSection(
+                                                  code: familyCodeValue.familyID,
+                                                )),
+                                          );
+                                        }else{
+                                          connectivityDialogBox();
+                                        }
+
+                                      },
+                                      submenuContent: Text(
+                                        "Add/View Family",
+                                        style: GoogleFonts.openSans(
+                                          color: Colors.white,
+                                        ),
+                                      )),
+                                ],
+
+
+                                if (partOfFamilyValidator() && adminValidator()) ...[
+                                  MLSubmenu(
+                                      onClick: () async{
+                                        if(await _checkForInternetConnection()){
+                                          print(familyCodeValue.familyID);
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) => DeleteFamily(
+                                                  familyCode: familyCodeValue.familyID,
+                                                )),
+                                          );
+                                        }else{
+                                          connectivityDialogBox();
+                                        }
+
+                                      },
+                                      submenuContent: Text(
+                                        "Delete Family",
+                                        style: GoogleFonts.openSans(
+                                          color: Colors.white,
+                                        ),
+                                      )),
+                                ],
+                                if (partOfFamilyValidator() && !adminValidator()) ...[
+                                  MLSubmenu(
+                                      onClick: () async{
+                                        if(await _checkForInternetConnection()){
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) => LeaveFamily(
+                                                  familyCode: userValue.familyID,
+                                                )),
+                                          );
+                                        }else{
+                                          connectivityDialogBox();
+                                        }
+
+                                      },
+                                      submenuContent: Text(
+                                        "Leave Family",
+                                        style: GoogleFonts.openSans(
+                                          color: Colors.white,
+                                        ),
+                                      )),
+                                ],
+                                if (!partOfFamilyValidator()) ...[
+                                  MLSubmenu(
+                                      onClick: () async{
+                                        if(await _checkForInternetConnection()){
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) => CreateFamily()),
+                                          );
+                                        }else{
+                                          connectivityDialogBox();
+                                        }
+
+                                      },
+                                      submenuContent: Text(
+                                        "Create Family",
+                                        style: GoogleFonts.openSans(
+                                          color: Colors.white,
+                                        ),
+                                      )),
+                                  MLSubmenu(
+                                      onClick: () async{
+                                        if(await _checkForInternetConnection()){
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) => JoinFamily()),
+                                          );
+                                        }else{
+                                          connectivityDialogBox();
+                                        }
+
+                                      },
+                                      submenuContent: Text(
+                                        "Join Family",
+                                        style: GoogleFonts.openSans(
+                                          color: Colors.white,
+                                        ),
+                                      )),
+                                ],
+                              ]),
+
+                          MLMenuItem(
+                            leading: Icon(Icons.feedback, color: Colors.white),
                             content: Text(
-                              "Family",
+                              "Contact Us",
                               style: GoogleFonts.openSans(
                                 color: Colors.white,
                               ),
                             ),
-                            onClick: () {},
-                            subMenuItems: [
+                            onClick: () async{
+                              if(await _checkForInternetConnection()){
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => ContactUs()),
+                                );
+                              }else{
+                                connectivityDialogBox();
+                              }
 
-                              if(partOfFamilyValidator() && familyCodeValue != null) ...[
-                                MLSubmenu(
-                                    onClick: () async{
-                                      if(await _checkForInternetConnection()){
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) => ContactSection(
-                                                code: familyCodeValue.familyID,
-                                              )),
-                                        );
-                                      }else{
-                                        connectivityDialogBox();
-                                      }
-
-                                    },
-                                    submenuContent: Text(
-                                      "Add/View Family",
-                                      style: GoogleFonts.openSans(
-                                        color: Colors.white,
-                                      ),
-                                    )),
-                              ],
-
-
-                              if (partOfFamilyValidator() && adminValidator()) ...[
-                                MLSubmenu(
-                                    onClick: () async{
-                                      if(await _checkForInternetConnection()){
-                                        print(familyCodeValue.familyID);
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) => DeleteFamily(
-                                                familyCode: familyCodeValue.familyID,
-                                              )),
-                                        );
-                                      }else{
-                                        connectivityDialogBox();
-                                      }
-
-                                    },
-                                    submenuContent: Text(
-                                      "Delete Family",
-                                      style: GoogleFonts.openSans(
-                                        color: Colors.white,
-                                      ),
-                                    )),
-                              ],
-                              if (partOfFamilyValidator() && !adminValidator()) ...[
-                                MLSubmenu(
-                                    onClick: () async{
-                                      if(await _checkForInternetConnection()){
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) => LeaveFamily(
-                                                familyCode: userValue.familyID,
-                                              )),
-                                        );
-                                      }else{
-                                        connectivityDialogBox();
-                                      }
-
-                                    },
-                                    submenuContent: Text(
-                                      "Leave Family",
-                                      style: GoogleFonts.openSans(
-                                        color: Colors.white,
-                                      ),
-                                    )),
-                              ],
-                              if (!partOfFamilyValidator()) ...[
-                                MLSubmenu(
-                                     onClick: () async{
-                                      if(await _checkForInternetConnection()){
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) => CreateFamily()),
-                                        );
-                                      }else{
-                                        connectivityDialogBox();
-                                      }
-
-                                    },
-                                    submenuContent: Text(
-                                      "Create Family",
-                                      style: GoogleFonts.openSans(
-                                        color: Colors.white,
-                                      ),
-                                    )),
-                                MLSubmenu(
-                                     onClick: () async{
-                                      if(await _checkForInternetConnection()){
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) => JoinFamily()),
-                                        );
-                                      }else{
-                                        connectivityDialogBox();
-                                      }
-
-                                    },
-                                    submenuContent: Text(
-                                      "Join Family",
-                                      style: GoogleFonts.openSans(
-                                        color: Colors.white,
-                                      ),
-                                    )),
-                              ],
-                            ]),
-
-                        MLMenuItem(
-                          leading: Icon(Icons.feedback, color: Colors.white),
-                          content: Text(
-                            "Contact Us",
-                            style: GoogleFonts.openSans(
+                            },
+                          ),
+                          MLMenuItem(
+                            leading: partOfFamilyValidator()
+                                ? Icon(
+                              Icons.mood,
+                              color: Colors.green,
+                            )
+                                : Icon(
+                              Icons.mood_bad,
                               color: Colors.white,
                             ),
-                          ),
-                          onClick: () async{
-                            if(await _checkForInternetConnection()){
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => ContactUs()),
-                              );
-                            }else{
-                              connectivityDialogBox();
-                            }
-
-                          },
-                        ),
-                        MLMenuItem(
-                          leading: partOfFamilyValidator()
-                              ? Icon(
-                                  Icons.mood,
-                                  color: Colors.green,
-                                )
-                              : Icon(
-                                  Icons.mood_bad,
-                                  color: Colors.white,
-                                ),
-                          content: Text(
-                            "Family Status",
-                            style: GoogleFonts.openSans(
-                              color: Colors.white,
+                            content: Text(
+                              "Family Status",
+                              style: GoogleFonts.openSans(
+                                color: Colors.white,
+                              ),
                             ),
-                          ),
-                          onClick: () async{
-                            if(await _checkForInternetConnection()){
-                              showDialog(
-                                  context: context,
-                                  builder: (_) => partOfFamilyValidator()
-                                      ? OkalertDialog("Family Joined",
-                                      "You belong to Rohit Family.")
-                                      : OkalertDialog("Family not Joined",
-                                      "You don't belong to any Family."));
-                            }else{
-                              connectivityDialogBox();
-                            }
+                            onClick: () async{
+                              if(await _checkForInternetConnection()){
+                                showDialog(
+                                    context: context,
+                                    builder: (_) => partOfFamilyValidator()
+                                        ? OkalertDialog("Family Joined",
+                                        "You belong to loving and a caring Family :)")
+                                        : OkalertDialog("Family not Joined",
+                                        "You don't belong to any Family."));
+                              }else{
+                                connectivityDialogBox();
+                              }
 
-                          },
-                        ),
-                      ]);
-                }
+                            },
+                          ),
+                        ]);
+                  }
               );
             } else if (snapshot.hasError) {
               return new MultiLevelDrawer(
@@ -516,34 +524,34 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                     // Header for Drawer
                     child: Center(
                         child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        SizedBox(
-                          height: 70,
-                        ),
-                        Image.asset(
-                          "assets/images/avatar.png",
-                          width: 100,
-                          height: 100,
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Text(
-                          "User",
-                          style: GoogleFonts.openSans(
-                            color: Colors.white,
-                            fontSize: 25,
-                          ),
-                        ),
-                        Text(
-                          "Member",
-                          style: GoogleFonts.openSans(
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    )),
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            SizedBox(
+                              height: 70,
+                            ),
+                            Image.asset(
+                              "assets/images/avatar.png",
+                              width: 100,
+                              height: 100,
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Text(
+                              "User",
+                              style: GoogleFonts.openSans(
+                                color: Colors.white,
+                                fontSize: 25,
+                              ),
+                            ),
+                            Text(
+                              "Member",
+                              style: GoogleFonts.openSans(
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        )),
                   ),
                   children: [
                     // Child Elements for Each Drawer Item
@@ -676,11 +684,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                     Padding(
                       padding: const EdgeInsets.only(top: 10),
                       child: InkWell(
-                          child: Image.asset("assets/images/HomeLogo.png"),
+                        child: Image.asset("assets/images/HomeLogo.png"),
                         onTap: () {
-                            setState(() {
-                              reassemble();
-                            });
+                          setState(() {
+                            reassemble();
+                          });
                         },
                       ),
                     ),
@@ -811,9 +819,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           ),
           child: Center(
               child: Text(
-            title,
-            style: TextStyle(fontSize: 40, color: Colors.white),
-          )),
+                title,
+                style: TextStyle(fontSize: 40, color: Colors.white),
+              )),
         ),
         onTap: () async{
           //Check for internet connection
@@ -911,38 +919,39 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     );
   }
 
- AwesomeDialog reAuthenticateDialog(bool adminCheck, String familyCode, String uid, String contactId, AuthService _auth, String title,
-     String desc, Color cancelBtnColor, Color okBtnColor, Color formColor, Color borderColor, Color hintColor, Color textColor){
-  return AwesomeDialog(
-  context: context,
-  dialogType: DialogType.WARNING,
-  animType: AnimType.BOTTOMSLIDE,
-  title: title,
-  desc: desc,
-  btnOkOnPress: () async{
-    if(await _checkForInternetConnection()){
-      if(!adminCheck){
-        reLogin(_auth, familyCode, contactId, uid, formColor, borderColor, hintColor, textColor, cancelBtnColor);
-      }
-      else{
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => new DeleteFamily(familyCode: familyCode)),
-        );
-      }
-    }else{
-      connectivityDialogBox();
-    }
+  AwesomeDialog reAuthenticateDialog(bool adminCheck, String familyCode, String uid, String contactId, AuthService _auth, String title,
+      String desc, Color cancelBtnColor, Color okBtnColor, Color formColor, Color borderColor, Color hintColor, Color textColor){
+    return AwesomeDialog(
+      context: context,
+      dialogType: DialogType.WARNING,
+      animType: AnimType.BOTTOMSLIDE,
+      title: title,
+      desc: desc,
+      btnOkOnPress: () async{
+        if(await _checkForInternetConnection()){
+          if(!adminCheck){
+            reLogin(_auth, familyCode, contactId, uid, formColor, borderColor, hintColor, textColor, cancelBtnColor);
+          }
+          else{
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => new DeleteFamily(familyCode: familyCode)),
+            );
+          }
+        }else{
+          connectivityDialogBox();
+        }
 
-  },
-  btnCancelOnPress: () {},
-  btnCancelColor: cancelBtnColor,
-    btnOkColor: okBtnColor,
-  )..show();}
 
- AwesomeDialog reLogin(AuthService _auth,String familyCode, String contactId,
-     String uid, Color formColor, Color borderColor, Color hintColor, Color textColor, Color okBtnColor){
+      },
+      btnCancelOnPress: () {},
+      btnCancelColor: cancelBtnColor,
+      btnOkColor: okBtnColor,
+    )..show();}
+
+  AwesomeDialog reLogin(AuthService _auth,String familyCode, String contactId,
+      String uid, Color formColor, Color borderColor, Color hintColor, Color textColor, Color okBtnColor){
     return   AwesomeDialog(
       context: context,
       dialogType: DialogType.INFO,
@@ -1043,7 +1052,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             child: IconButton(
               icon: Icon(Icons.check,size: 30,color: Colors.deepPurpleAccent,),
               onPressed: () async{
-                
+
                 if(await _checkForInternetConnection()){
                   if(_formKey.currentState.validate()){
                     if(await _auth.reAuth(email, password) == null){
@@ -1058,15 +1067,14 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                       if(uid != null && uid.isNotEmpty){
                         await DataBaseService(uid: uid).deleteUserProfile();
                       }
-                    }
 
-                     //Delete User Profile Image
+                      //Delete User Profile Image
                       if(uid != null){
                         await CloudStorageService(uid: uid).deleteProfileImg();
 
-                    }
+                      }
 
-                     //Delete Account
+                      //Delete Account
                       await _auth.deleteAccount();
 
                       Navigator.of(context, rootNavigator: false).pop();
@@ -1098,7 +1106,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     )..show();
   }
 
- AwesomeDialog reAuthenticateError(Color okBtnColor){
+  AwesomeDialog reAuthenticateError(Color okBtnColor){
     return   AwesomeDialog(
       context: context,
       dialogType: DialogType.ERROR,
