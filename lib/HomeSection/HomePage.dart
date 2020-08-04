@@ -501,7 +501,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                   context: context,
                                   builder: (_) => partOfFamilyValidator()
                                       ? OkalertDialog("Family Joined",
-                                      "You belong to Rohit Family.")
+                                      "You belong to loving and a caring Family :)")
                                       : OkalertDialog("Family not Joined",
                                       "You don't belong to any Family."));
                             }else{
