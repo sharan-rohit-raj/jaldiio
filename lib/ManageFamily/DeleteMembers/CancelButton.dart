@@ -38,8 +38,8 @@ class CancelButton extends StatelessWidget {
       ),
       onPressed: () async{
         if(await _checkForInternetConnection()){
+          Navigator.pop(context);
         } else  {connectivityDialogBox(context);}
-        Navigator.pop(context);
       },
     );
   }
