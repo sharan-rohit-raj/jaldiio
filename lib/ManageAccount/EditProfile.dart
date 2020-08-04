@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -8,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:jaldiio/Animation/FadeAnimation.dart';
-import 'package:jaldiio/Home.dart';
 import 'package:jaldiio/LoginPage.dart';
 import 'package:jaldiio/Models/UserInformation.dart';
 import 'package:jaldiio/Models/UserValue.dart';
@@ -16,6 +16,7 @@ import 'package:jaldiio/Services/CloudStorageService.dart';
 import 'package:jaldiio/Services/DataBaseService.dart';
 import 'package:jaldiio/Services/FireBaseUser.dart';
 import 'package:provider/provider.dart';
+import 'package:string_validator/string_validator.dart';
 
 import '../Models/user.dart';
 
@@ -59,6 +60,19 @@ class _EditProfileState extends State<EditProfile> {
     key.currentState.showSnackBar(new SnackBar(content: new Text(value)));
   }
 
+  //Check for Internet connection
+  Future _checkForInternetConnection() async{
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        return true;
+      }
+    } on SocketException catch (_) {
+      return false;
+    }
+
+  }
+
   //Displays the date picker
   DateTime selectedDate = DateTime.now(); //Current date
   Future<Null> _selectDate(BuildContext context) async {
@@ -80,8 +94,6 @@ class _EditProfileState extends State<EditProfile> {
 
   @override
   Widget build(BuildContext context) {
-
-
     final user_val = Provider.of<User>(context);
     bool profilePhotoChange = false;
         return Scaffold(
@@ -100,8 +112,13 @@ class _EditProfileState extends State<EditProfile> {
                 Icons.arrow_back_ios,
                 color: Colors.deepPurpleAccent,
               ),
-              onPressed: () {
-                Navigator.pop(context);
+              onPressed: () async{
+                if(await _checkForInternetConnection()){
+                  Navigator.pop(context);
+                }else{
+                  connectivityDialogBox();
+                }
+
               },
             ),
           ),
@@ -218,24 +235,29 @@ class _EditProfileState extends State<EditProfile> {
                                           ),
                                           onPressed: () async{
 
-                                            //Show image picker
-                                             showPicker().then((value) async{
-                                              //Debug Statement
-                                              _image != null ?
-                                              print("image file: " + _image.toString()):
-                                              print("Did not choose yet.");
+                                            if(await _checkForInternetConnection()){
+                                              //Show image picker
+                                              showPicker().then((value) async{
+                                                //Debug Statement
+                                                _image != null ?
+                                                print("image file: " + _image.toString()):
+                                                print("Did not choose yet.");
 
-                                              if(_image != null){
-                                                String imgURL="";
-                                                StorageReference strgimgrfrnc = CloudStorageService(uid: user_val.uid).uploadProfileImgRef();
-                                                showSnackBar("Please wait while we upload your profile image...", _scaffoldKey);
-                                                StorageUploadTask profileUpload = strgimgrfrnc.putFile(_image);
-                                                StorageTaskSnapshot storageTaskSnapShot = await profileUpload.onComplete;
-                                                imgURL = await storageTaskSnapShot.ref.getDownloadURL();
-                                                print("The image url is :"+ imgURL);
-                                                await _auth.uploadProfileImage(imgURL).then((value) => showSnackBar("Profile Image Updated", _scaffoldKey));
-                                              }
-                                            });
+                                                if(_image != null){
+                                                  String imgURL="";
+                                                  StorageReference strgimgrfrnc = CloudStorageService(uid: user_val.uid).uploadProfileImgRef();
+                                                  showSnackBar("Please wait while we upload your profile image...", _scaffoldKey);
+                                                  StorageUploadTask profileUpload = strgimgrfrnc.putFile(_image);
+                                                  StorageTaskSnapshot storageTaskSnapShot = await profileUpload.onComplete;
+                                                  imgURL = await storageTaskSnapShot.ref.getDownloadURL();
+                                                  print("The image url is :"+ imgURL);
+                                                  await _auth.uploadProfileImage(imgURL).then((value) => showSnackBar("Profile Image Updated", _scaffoldKey));
+                                                }
+                                              });
+                                            }else{
+                                              connectivityDialogBox();
+                                            }
+
 
                                           },
                                         )
@@ -520,10 +542,9 @@ class _EditProfileState extends State<EditProfile> {
                                                 fontSize: 18,
                                                 color: Colors.deepPurpleAccent
                                             ),
-                                            keyboardType: TextInputType.datetime,
-                                            validator: (val) => val.length == 10
-                                                ? null
-                                                : "Please type a valid date",
+                                            validator: (val) => (val.length == 0) || (val.length < 8)
+                                                ? "Please pick a valid date."
+                                                : null,
                                             onChanged: (val) {
 //                              setState(() => password = val);
                                             },
@@ -585,12 +606,9 @@ class _EditProfileState extends State<EditProfile> {
                                             ),
                                             keyboardType: TextInputType.phone,
                                             validator: (val) =>
-                                            val.length < 10
+                                            !isNumeric(val) || val.length < 10
                                                 ? 'Enter a valid phone number'
                                                 : null,
-                                            onChanged: (val) {
-//                              setState(() => password = val);
-                                            },
                                           ),
                                         )
                                       ],
@@ -614,16 +632,21 @@ class _EditProfileState extends State<EditProfile> {
                                   fontSize: 18, color: Colors.deepPurpleAccent),
                             ),
                             onPressed: () async {
-                              if (_formKey.currentState.validate()) {
-                                final FirebaseUser fireuser = await FirebaseAuth
-                                    .instance.currentUser();
-                                await DataBaseService(uid: fireuser.uid)
-                                    .updateUserInfo(
+                              if(await _checkForInternetConnection()){
+                                if (_formKey.currentState.validate()) {
+                                  final FirebaseUser fireuser = await FirebaseAuth
+                                      .instance.currentUser();
+                                  await DataBaseService(uid: fireuser.uid)
+                                      .updateUserInfo(
                                     _customerNameController.text,
                                     _customerStatusController.text,
                                     _customerDateController.text,
                                     int.parse(_customerPhoneController.text),);
+                                }
+                              }else{
+                                connectivityDialogBox();
                               }
+
                             },
                           )
                         ],
@@ -635,5 +658,17 @@ class _EditProfileState extends State<EditProfile> {
 
         );
       }
+
+  //Connectivity Error Dialog Box
+  AwesomeDialog connectivityDialogBox(){
+    return AwesomeDialog(
+      context: context,
+      dialogType: DialogType.WARNING,
+      animType: AnimType.BOTTOMSLIDE,
+      title: 'Connectivity Error',
+      desc: 'Hmm..looks like there is no connectivity...',
+      btnOkOnPress: () {},
+    )..show();
+  }
   }
 

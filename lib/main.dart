@@ -7,7 +7,6 @@ import 'package:jaldiio/ToDos/ToDoList.dart';
 import 'package:provider/provider.dart';
 import 'LoginPage.dart';
 import 'SignUpPage.dart';
-import 'WelcomePage.dart';
 import 'ForgotPassword.dart';
 import 'Wrapper.dart';
 import 'package:google_fonts/google_fonts.dart';

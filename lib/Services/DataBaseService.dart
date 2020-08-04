@@ -272,6 +272,7 @@ class DataBaseService {
       'phNo': phNo,
       'joined': false,
       'uid': null,
+	  'photoURL': null,
     });
   }
 
@@ -293,14 +294,14 @@ class DataBaseService {
     });
   }
 
-  Future updateContactjoined(String id, bool joined) async{
+  Future updateContactjoined(String id, bool joined, String photoURL) async{
     String name_id = id;
     return await familyCollection
         .document(famCode)
         .collection("contacts")
         .document(name_id).updateData({
       'joined': joined,
-
+	  'photoURL': photoURL,
     });
   }
 
@@ -364,6 +365,7 @@ class DataBaseService {
         emaild: doc.data['emailID'] ?? '',
         joined: doc.data['joined'] ?? false,
         uid: doc.data['uid'] ?? '',
+		photoURL: doc.data['photoURL'] ?? '',
       );
     }).toList();
   }

@@ -4,6 +4,7 @@ class Contact{
   final int phNo;
   final bool joined;
   final String uid;
+  final String photoURL;
 
-  Contact({this.name, this.emaild, this.phNo, this.joined, this.uid});
+  Contact({this.name, this.emaild, this.phNo, this.joined, this.uid, this.photoURL});
 }

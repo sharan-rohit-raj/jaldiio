@@ -9,6 +9,7 @@ import 'package:jaldiio/ForgotPassword.dart';
 import 'package:jaldiio/Services/FireBaseUser.dart';
 import 'package:jaldiio/Shared/Loading.dart';
 import 'package:jaldiio/SignUpPage.dart';
+import 'package:string_validator/string_validator.dart';
 import './Animation/FadeAnimation.dart';
 
 class LoginPage extends StatefulWidget {
@@ -28,7 +29,19 @@ class _LoginPageState extends State<LoginPage> {
   String password = " ";
   String error = '';
   bool load = false;
-  StreamSubscription<ConnectivityResult> subscription;
+
+
+  Future _checkForInternetConnection() async{
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        return true;
+      }
+    } on SocketException catch (_) {
+      return false;
+    }
+
+  }
 
 
   @override
@@ -127,7 +140,7 @@ class _LoginPageState extends State<LoginPage> {
                                           fontWeight: FontWeight.w400
                                       ),
                                     ),
-                                    validator: (val) => val.isEmpty ? 'Enter an Email ID' : null,
+                                    validator: (val) => !isEmail(val) ? 'Enter a valid Email ID' : null,
                                     onChanged: (val) {
                                         setState(() => email_id = val);
                                     },
@@ -173,11 +186,16 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ),
                           ),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => ForgotPassword()),
-                            );
+                          onPressed: () async{
+                            if(await _checkForInternetConnection()){
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => ForgotPassword()),
+                              );
+                            }else{
+                              connectivityDialogBox();
+                            }
+
                           }
                         ),
                         SizedBox(
@@ -200,32 +218,24 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ),),
                           onPressed: () async{
-                            try {
-                              final result = await InternetAddress.lookup('google.com');
-                              if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-                                if(_formKey.currentState.validate()){
+                            if(await _checkForInternetConnection()){
+                              if(_formKey.currentState.validate()){
+                                setState(() {
+                                  load = true;
+                                });
+                                dynamic result = await _auth.signinWithEmailAndPassword(email_id, password);
+
+                                if(result == null){
                                   setState(() {
-                                    load = true;
+                                    error = 'Oh..Oh that seems to be incorrect. Please try again.';
+                                    load = false;
                                   });
-                                  dynamic result = await _auth.signinWithEmailAndPassword(email_id, password);
 
-                                  if(result == null){
-                                    setState(() {
-                                      error = 'Oh..Oh that seems to be incorrect. Please try again.';
-                                      load = false;
-                                    });
-
-                                  }
                                 }
                               }
-                            } on SocketException catch (_) {
+                            }else{
                               connectivityDialogBox();
                             }
-
-
-
-
-
                           },
                         ),
                         SizedBox(
@@ -241,8 +251,12 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                               ),
                             ),
-                            onPressed: () {
-                              widget.toggleView();
+                            onPressed: () async{
+                              if(await _checkForInternetConnection())
+                                widget.toggleView();
+                              else{
+                                connectivityDialogBox();
+                              }
                             }
                         ),
                         SizedBox(

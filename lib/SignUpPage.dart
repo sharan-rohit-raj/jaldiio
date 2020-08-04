@@ -1,9 +1,12 @@
+import 'dart:io';
+
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:jaldiio/LoginPage.dart';
 import 'package:jaldiio/Services/FireBaseUser.dart';
 import 'package:jaldiio/Shared/Loading.dart';
-import 'package:jaldiio/WelcomePage.dart';
+import 'package:string_validator/string_validator.dart';
 import './Animation/FadeAnimation.dart';
 import 'dart:developer';
 
@@ -23,8 +26,21 @@ class _SignUpPageState extends State<SignUpPage> {
   //text field state
   String email_id = " ";
   String password = " ";
+  String initPassword = "";
   String error = '';
   bool load = false;
+
+  Future _checkForInternetConnection() async{
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        return true;
+      }
+    } on SocketException catch (_) {
+      return false;
+    }
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -144,7 +160,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                       fontWeight: FontWeight.w400
                                   ),
                                 ),
-                                validator: (val) => val.isEmpty ? 'Enter an Email ID' : null,
+                                validator: (val) => !isEmail(val) ? 'Enter a valid Email ID' : null,
                                 onChanged: (val){
                                      setState(() => email_id = val);
                                 },
@@ -166,6 +182,11 @@ class _SignUpPageState extends State<SignUpPage> {
                                 ),
                                 style: TextStyle(color: Colors.white, fontSize: 18),
                                 obscureText: true,
+                                onChanged: (val) {
+                                  setState(() {
+                                    initPassword = val;
+                                  });
+                                },
                                 validator: (val) => val.length < 6 ? 'Enter a Password 6+ characters long' : null, 
                               ),
                             ),
@@ -218,22 +239,37 @@ class _SignUpPageState extends State<SignUpPage> {
                           ),
                         ),),
                       onPressed: () async {
+
+                        if(await _checkForInternetConnection()){
                           if(_formKey.currentState.validate()){
-                            setState(() {
-                              load = true;
-                            });
-                            dynamic result = await _auth.registerWithEmailAndPassword(email_id, password);
-
-                            if(result == null){
+                            if(password.compareTo(initPassword)==0){
                               setState(() {
-                                load = false;
-                                error = 'Please supply a valid email';
+                                load = true;
                               });
-
+                              dynamic result = await _auth.registerWithEmailAndPassword(email_id, password);
+                              if(result == null){
+                                setState(() {
+                                  load = false;
+                                  error = 'Please supply a valid email';
+                                });
+                              }
+                            }else{
+                              AwesomeDialog(
+                                context: context,
+                                dialogType: DialogType.WARNING,
+                                animType: AnimType.BOTTOMSLIDE,
+                                title: 'Password not confirmed',
+                                desc: 'The passwords you have entered do not match.' ,
+                                btnOkOnPress: () {},
+                              )..show();
                             }
 
-
                           }
+                        }
+                        else{
+                          connectivityDialogBox();
+                        }
+
                       },
                     ),
                     SizedBox(
@@ -255,5 +291,16 @@ class _SignUpPageState extends State<SignUpPage> {
         ),
       ),
     );
+  }
+  //Connectivity Error Dialog Box
+  AwesomeDialog connectivityDialogBox(){
+    return AwesomeDialog(
+      context: context,
+      dialogType: DialogType.WARNING,
+      animType: AnimType.BOTTOMSLIDE,
+      title: 'Connectivity Error',
+      desc: 'Hmm..looks like there is no connectivity...',
+      btnOkOnPress: () {},
+    )..show();
   }
 }

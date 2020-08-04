@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -7,8 +10,6 @@ import 'package:jaldiio/Models/UserValue.dart';
 import 'package:jaldiio/Models/user.dart';
 import 'package:jaldiio/Shared/Loading.dart';
 import 'package:provider/provider.dart';
-
-import '../Home.dart';
 import '../Services/DataBaseService.dart';
 
 class LeaveFamily extends StatefulWidget {
@@ -28,6 +29,19 @@ class _LeaveFamilyState extends State<LeaveFamily> {
 
   void showInSnackBar(String value) {
     _scaffoldKey.currentState.showSnackBar(new SnackBar(content: new Text(value)));
+  }
+
+  //Check for internet connection
+  Future _checkForInternetConnection() async{
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        return true;
+      }
+    } on SocketException catch (_) {
+      return false;
+    }
+
   }
 
   @override
@@ -62,9 +76,13 @@ class _LeaveFamilyState extends State<LeaveFamily> {
                           Icons.arrow_back_ios,
                           color: Colors.deepPurpleAccent,
                         ),
-                        onPressed: () {
+                        onPressed: () async{
+                          if(await _checkForInternetConnection()){
+                            Navigator.pop(context);
 
-                          Navigator.pop(context);
+                          }else{
+                            connectivityDialogBox();
+                          }
                         },
                       ),
                       Text(
@@ -124,16 +142,21 @@ class _LeaveFamilyState extends State<LeaveFamily> {
                                       color: Colors.deepPurpleAccent),
                                 ),
                                 onPressed: () async{
-                                  final FirebaseUser fireuser =
-                                  await FirebaseAuth.instance.currentUser();
-                                  await DataBaseService(uid: fireuser.uid)
-                                      .leaveFamily();
-                                  await DataBaseService(famCode: snapshot.data.familyID, uid: fireuser.uid).removeMember(name_id);
-                                  await DataBaseService(uid: fireuser.uid).updateJoined(false);
-                                  await DataBaseService(famCode: snapshot.data.familyID)
-                                      .deleteContactDoc(name_id);
-                                  await DataBaseService(uid: fireuser.uid).leaveFamily();
-                                  showInSnackBar("Left family successfully.");
+
+                                  if(await _checkForInternetConnection()){
+                                    final FirebaseUser fireuser =
+                                    await FirebaseAuth.instance.currentUser();
+                                    await DataBaseService(uid: fireuser.uid)
+                                        .leaveFamily();
+                                    await DataBaseService(famCode: snapshot.data.familyID, uid: fireuser.uid).removeMember(name_id);
+                                    await DataBaseService(uid: fireuser.uid).updateJoined(false);
+                                    await DataBaseService(famCode: snapshot.data.familyID)
+                                        .deleteContactDoc(name_id);
+                                    await DataBaseService(uid: fireuser.uid).leaveFamily();
+                                    showInSnackBar("Left family successfully.");
+                                  }else{
+                                    connectivityDialogBox();
+                                  }
                                 },
                               );
                             }
@@ -171,5 +194,16 @@ class _LeaveFamilyState extends State<LeaveFamily> {
         ],
       ),
     );
+  }
+  //Connectivity Error Dialog Box
+  AwesomeDialog connectivityDialogBox(){
+    return AwesomeDialog(
+      context: context,
+      dialogType: DialogType.WARNING,
+      animType: AnimType.BOTTOMSLIDE,
+      title: 'Connectivity Error',
+      desc: 'Hmm..looks like there is no connectivity...',
+      btnOkOnPress: () {},
+    )..show();
   }
 }
