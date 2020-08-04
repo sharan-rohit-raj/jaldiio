@@ -4,7 +4,7 @@ The official repository to *Jaldi.io Project*. The following *README* file gives
 
 
 
-![Jaldi.io](assets\images\splash_screen.png)
+![Jaldi.io](https://github.com/sharan-rohit-raj/jaldiio/blob/master/assets/images/splash_screen.png)
 
 
 
