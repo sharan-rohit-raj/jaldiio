@@ -6,7 +6,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:jaldiio/LoginPage.dart';
 import 'package:jaldiio/Services/FireBaseUser.dart';
 import 'package:jaldiio/Shared/Loading.dart';
-import 'package:jaldiio/WelcomePage.dart';
 import 'package:string_validator/string_validator.dart';
 import './Animation/FadeAnimation.dart';
 import 'dart:developer';

@@ -10,8 +10,6 @@ import 'package:jaldiio/Animation/FadeAnimation.dart';
 import 'package:jaldiio/Models/Contact.dart';
 import 'package:jaldiio/Models/user.dart';
 import 'package:provider/provider.dart';
-
-import '../Home.dart';
 import '../Services/DataBaseService.dart';
 
 class CreateFamily extends StatefulWidget {

@@ -10,8 +10,6 @@ import 'package:jaldiio/Models/UserValue.dart';
 import 'package:jaldiio/Models/user.dart';
 import 'package:jaldiio/Shared/Loading.dart';
 import 'package:provider/provider.dart';
-
-import '../Home.dart';
 import '../Services/DataBaseService.dart';
 
 class LeaveFamily extends StatefulWidget {

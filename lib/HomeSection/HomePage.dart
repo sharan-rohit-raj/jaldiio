@@ -27,7 +27,7 @@ import 'package:provider/provider.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:string_validator/string_validator.dart';
 import 'Data.dart';
-import '../ContactUs.dart';
+import 'ContactUs.dart';
 import '../ManageAccount/EditProfile.dart';
 
 class HomePage extends StatefulWidget {

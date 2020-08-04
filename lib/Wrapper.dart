@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jaldiio/Authentication/Authenticate.dart';
 import 'package:provider/provider.dart';
-import 'Home.dart';
 import 'Models/user.dart';
 import 'package:jaldiio/HomeSection/HomePage.dart';
 
