@@ -1,5 +1,27 @@
+/// ------------------------------------------------------------------------
+/// LeaveFamily.dart
+/// ------------------------------------------------------------------------
+/// Description: Class to help user leave a family.
+/// Author(s): Sharan
+/// Date Approved: 10/07/2020
+/// Date Created: 9/07/2020
+/// Approved By: Ravish
+/// Reviewed By: Sharan
+/// ------------------------------------------------------------------------
+/// File(s) Accessed: null
+/// File(s) Modified: null
+/// ------------------------------------------------------------------------
+/// Input(s):Family code
+/// Output(s): Sends a signal to Database Service class to make the user leave
+/// the family so that it removes the user from contacts.
+/// ------------------------------------------------------------------------
+/// Error-Handling(s): Checks if there is internet connectivity.
+/// ------------------------------------------------------------------------
+/// Modification(s): 1. Internet Connectivity check added - 26th July, 2020
+/// ------------------------------------------------------------------------
+/// Fault(s): None
+/// ------------------------------------------------------------------------
 import 'dart:io';
-
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';

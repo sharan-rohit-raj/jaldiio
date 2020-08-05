@@ -1,50 +1,3 @@
-/// ------------------------------------------------------------------------
-
-/// [To-Do Wrapper]
-
-/// ------------------------------------------------------------------------
-
-/// Description: Builds the entire To-DO State from here
-
-/// Author(s): Sharan
-
-/// Date Approved: 14-06-2020
-
-/// Date Created: 17-06-2020
-
-/// Approved By: Sahil, Sharan
-
-/// Reviewed By: Kaish, Sharan
-
-/// ------------------------------------------------------------------------
-
-/// File(s) Accessed: NONE
-
-/// File(s) Modified: NONE
-
-/// ------------------------------------------------------------------------
-
-/// Input(s): 1. code - Family Code
-///           2. key - List key
-
-/// Output(s): 1. ToDoList - State Widget
-
-/// ------------------------------------------------------------------------
-
-/// Error-Handling(s): 1. Check for Internet Connection
-///                    2. Await for Synchronization
-
-/// ------------------------------------------------------------------------
-
-/// Modification(s): 1. Initial commit - 18th June, 2020
-///                  2. Internet Connectivity Check added - 26th July, 2020
-
-/// ------------------------------------------------------------------------
-
-/// Fault(s): NONE
-
-/// ------------------------------------------------------------------------
-
 import 'dart:io';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/cupertino.dart';
@@ -65,6 +18,7 @@ class ToDoList extends StatefulWidget {
 }
 
 class _ToDoListState extends State<ToDoList> {
+
   //Check for Internet connectivity
   Future _checkForInternetConnection() async {
     try {
@@ -84,22 +38,18 @@ class _ToDoListState extends State<ToDoList> {
       child: Scaffold(
         backgroundColor: Colors.white,
         floatingActionButton: FloatingActionButton(
-          onPressed: () async {
-            if (await _checkForInternetConnection()) {
+          onPressed: () async{
+            if(await _checkForInternetConnection()){
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => AddTask()),
               );
-            } else {
-              connectivityDialogBox(context);
-            }
+            } else  {connectivityDialogBox(context);}
           },
-          child: Icon(
-            Icons.add,
-            size: 50,
-            color: Colors.white,
-          ),
+          child: Icon(Icons.add, size: 50,color: Colors.white,),
           backgroundColor: Colors.deepPurple[600],
+
+
         ),
         body: Stack(
           // alignment: Alignment.center,
@@ -112,7 +62,7 @@ class _ToDoListState extends State<ToDoList> {
                   fit: BoxFit.contain,
                 ),
               ),
-            ),
+          ),
             SizedBox(
               height: 40,
             ),
@@ -126,12 +76,10 @@ class _ToDoListState extends State<ToDoList> {
                       Icons.arrow_back_ios,
                       color: Colors.deepPurpleAccent,
                     ),
-                    onPressed: () async {
-                      if (await _checkForInternetConnection()) {
+                    onPressed: () async{
+                      if(await _checkForInternetConnection()){
                         Navigator.pop(context);
-                      } else {
-                        connectivityDialogBox(context);
-                      }
+                      } else  {connectivityDialogBox(context);}
                     },
                   ),
                   Text(
@@ -145,22 +93,22 @@ class _ToDoListState extends State<ToDoList> {
                 ],
               ),
             ),
+
             DraggableScrollableSheet(
               maxChildSize: 0.85,
-              builder:
-                  (BuildContext context, ScrollController scrollController) {
+              builder: (BuildContext context, ScrollController scrollController){
                 return Container(
                   decoration: BoxDecoration(
                     color: Color.fromRGBO(193, 190, 235, 0.9),
-                    borderRadius: BorderRadius.only(
-                        topRight: Radius.circular(40),
-                        topLeft: Radius.circular(40)),
+                    borderRadius: BorderRadius.only(topRight: Radius.circular(40), topLeft: Radius.circular(40)),
+
                   ),
-                  child: Tasks(
-                      scrollController: scrollController, code: widget.code),
+                  child: Tasks(scrollController: scrollController, code: widget.code),
+
                 );
               },
             ),
+
           ],
         ),
       ),
@@ -169,7 +117,7 @@ class _ToDoListState extends State<ToDoList> {
 }
 
 //Connectivity Error Dialog Box
-AwesomeDialog connectivityDialogBox(BuildContext context) {
+AwesomeDialog connectivityDialogBox(BuildContext context){
   return AwesomeDialog(
     context: context,
     dialogType: DialogType.WARNING,
