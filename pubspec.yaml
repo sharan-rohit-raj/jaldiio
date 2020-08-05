@@ -50,6 +50,7 @@ dependencies:
   cached_network_image: ^2.2.0+1
   transparent_image: ^1.0.0
   connectivity: ^0.4.9
+  table_calendar: ^2.2.3
 
 
 dev_dependencies:
