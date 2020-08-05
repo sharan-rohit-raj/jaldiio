@@ -1,30 +1,8 @@
-/// ------------------------------------------------------------------------
-/// CloudStorageService.dart
-/// ------------------------------------------------------------------------
-/// Description: Class that contacts FirebaseCloud and send Storage Reference when needed
-/// Author(s): Sharan
-/// Date Approved: 06/06/2020
-/// Date Created: 06/06/2020
-/// Approved By: Ravish
-/// Reviewed By: Kaish
-/// ------------------------------------------------------------------------
-/// File(s) Accessed: null
-/// File(s) Modified: null
-/// ------------------------------------------------------------------------
-/// Input(s): Family Code, UID
-/// Output(s): Storage Reference, Signal to Cloud to delete all images
-/// ------------------------------------------------------------------------
-/// Error-Handling(s): Exception handling is done when needed.
-/// ------------------------------------------------------------------------
-/// Modification(s): None
-/// ------------------------------------------------------------------------
-/// Fault(s): None
-/// ------------------------------------------------------------------------
 import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
 
-class CloudStorageService{
+class CloudStorageService {
   final String famCode;
   final String uid;
 
@@ -44,33 +22,37 @@ class CloudStorageService{
 
     return string[0].toUpperCase() + string.substring(1).toLowerCase();
   }
-  StorageReference Imagesref(String name){
+
+  StorageReference Imagesref(String name) {
     return imageRef.child(famCode).child("Images").child(capitalize(name));
-
   }
+
   StorageReference Recipesref(String recipeCode, File file) {
-    return imageRef.child(famCode).child("Recipes").child(capitalize(recipeCode));
+    return imageRef
+        .child(famCode)
+        .child("Recipes")
+        .child(capitalize(recipeCode));
   }
 
-  Future deleteImage(String id) async{
+  Future deleteImage(String id) async {
     return await imageRef.child(famCode).child("Images").child(id).delete();
   }
 
-  Future deleteProfileImg() async{
-    try{
+  Future deleteProfileImg() async {
+    try {
       return await userRef.child(uid).delete();
-    }
-    catch(e){
-      print("Unable to delete.\nReason:  "+e.toString());
+    } catch (e) {
+      print("Unable to delete.\nReason:  " + e.toString());
       return null;
     }
-
-
   }
 
-  Future deleteAllFamilyImages() async{
+  Future deleteRecipes(String id) async {
+    return await imageRef.child(famCode).child("Recipes").child(id).delete();
+  }
 
-    if(await imageRef.child(famCode).child("Images").getName() != null){
+  Future deleteAllFamilyImages() async {
+    if (await imageRef.child(famCode).child("Images").getName() != null) {
       print(await imageRef.child(famCode).child("Images").getPath());
       await imageRef.child(famCode).child("Images").delete();
     }
@@ -79,12 +61,21 @@ class CloudStorageService{
       print(await imageRef.child(famCode).child("Recipes").getName());
       await imageRef.child(famCode).child("Recipes").delete();
     }
+  }
 
+  Future deleteAllFamilyRecipes() async {
+    if (await imageRef.child(famCode).child("Recipes").getName() != null) {
+      print(await imageRef.child(famCode).child("Recipes").getPath());
+      await imageRef.child(famCode).child("Recipes").delete();
+    }
 
+    if (await imageRef.child(famCode).child("Recipes").getName() != null) {
+      print(await imageRef.child(famCode).child("Recipes").getName());
+      await imageRef.child(famCode).child("Recipes").delete();
+    }
   }
 
   StorageReference uploadProfileImgRef() {
     return userRef.child(uid);
   }
-
 }

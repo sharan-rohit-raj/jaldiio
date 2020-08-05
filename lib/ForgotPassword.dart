@@ -1,26 +1,5 @@
-/// ------------------------------------------------------------------------
-/// ForgotPassword.dart
-/// ------------------------------------------------------------------------
-/// Description: ForgotPassword page for the app. Sends an email for password change.
-/// Author(s): Sharan
-/// Date Approved: 02/06/2020
-/// Date Created: 02/06/2020
-/// Approved By: Kaish
-/// Reviewed By: Kaish
-/// ------------------------------------------------------------------------
-/// File(s) Accessed: null
-/// File(s) Modified: null
-/// ------------------------------------------------------------------------
-/// Input(s): null
-/// Output(s): email_id
-/// ------------------------------------------------------------------------
-/// Error-Handling(s): Valid email id, internet connectivity
-/// ------------------------------------------------------------------------
-/// Modification(s): None
-/// ------------------------------------------------------------------------
-/// Fault(s): None
-/// ------------------------------------------------------------------------
 import 'dart:io';
+
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';

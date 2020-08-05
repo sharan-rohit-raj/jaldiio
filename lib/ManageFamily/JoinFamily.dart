@@ -1,29 +1,5 @@
-/// ------------------------------------------------------------------------
-/// JoinFamily.dart
-/// ------------------------------------------------------------------------
-/// Description: Class to help user join a family.
-/// Author(s): Sharan
-/// Date Approved: 10/07/2020
-/// Date Created: 9/07/2020
-/// Approved By: Ravish
-/// Reviewed By: Sharan
-/// ------------------------------------------------------------------------
-/// File(s) Accessed: null
-/// File(s) Modified: null
-/// ------------------------------------------------------------------------
-/// Input(s):
-/// Output(s): Sends a signal to Database Service class to add the user to
-/// the user requested family and updates the user as part of a family.
-/// ------------------------------------------------------------------------
-/// Error-Handling(s): Checks if the entered code is the correct family code
-/// with the existing family codes. Also checks if the user was invited. Checks
-/// internet connection.
-/// ------------------------------------------------------------------------
-/// Modification(s): 1. Internet Connectivity check added - 26th July, 2020
-/// ------------------------------------------------------------------------
-/// Fault(s): None
-/// ------------------------------------------------------------------------
 import 'dart:io';
+
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';

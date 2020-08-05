@@ -1,3 +1,49 @@
+/// ------------------------------------------------------------------------
+
+/// [EventsTile]
+
+/// ------------------------------------------------------------------------
+
+/// Description: Displays all upcoming events
+
+/// Author(s): Ravish
+
+/// Date Approved: 14-07-2020
+
+/// Date Created: 21-07-2020
+
+/// Approved By: Everyone
+
+/// Reviewed By: Kaish, Ravish
+
+/// ------------------------------------------------------------------------
+
+/// File(s) Accessed: NONE
+
+/// File(s) Modified: NONE
+
+/// ------------------------------------------------------------------------
+
+/// Input(s): 1. code - Family Code
+///           2. events - Event Model
+
+/// Output(s): 1. EventTile State - Widget
+
+/// ------------------------------------------------------------------------
+
+/// Error-Handling(s): 1. Check for Internet Connection
+///                    2. Await for Synchronization
+
+/// ------------------------------------------------------------------------
+
+/// Modification(s): 1. Initial commit - 24th July, 2020
+///                  2. Internet Connectivity Check added - 26th July, 2020
+
+/// ------------------------------------------------------------------------
+
+/// Fault(s): NONE
+
+/// ------------------------------------------------------------------------
 import 'dart:io';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
@@ -6,7 +52,6 @@ import 'package:jaldiio/Models/FamEvent.dart';
 import 'package:jaldiio/Services/DataBaseService.dart';
 
 class EventTile extends StatefulWidget {
-
   final EventModel events;
   String code;
   EventTile({this.events, this.code});
@@ -16,7 +61,10 @@ class EventTile extends StatefulWidget {
 }
 
 class _EventTileState extends State<EventTile> {
-  Icon icon =  Icon(Icons.remove, color: Colors.deepPurpleAccent,);
+  Icon icon = Icon(
+    Icons.remove,
+    color: Colors.deepPurpleAccent,
+  );
 
   bool isdelete = false;
 
@@ -44,29 +92,35 @@ class _EventTileState extends State<EventTile> {
           ),
           margin: EdgeInsets.fromLTRB(20, 6, 20, 0),
           child: ListTile(
-            title: Text(widget.events.title, style: GoogleFonts.openSans(fontSize: 25, color: Colors.black)),
-            subtitle: Text(widget.events.description + "\n" + widget.events.eventDate, style: GoogleFonts.openSans(
-              fontSize: 15, color: Colors.black26
-            ),),
+            title: Text(widget.events.title,
+                style: GoogleFonts.openSans(fontSize: 25, color: Colors.black)),
+            subtitle: Text(
+              widget.events.description + "\n" + widget.events.eventDate,
+              style: GoogleFonts.openSans(fontSize: 15, color: Colors.black26),
+            ),
             isThreeLine: true,
             trailing: IconButton(
-              icon: Icon(Icons.delete, color: Colors.red,),
-              onPressed: () async{
-                if(await _checkForInternetConnection()){
+              icon: Icon(
+                Icons.delete,
+                color: Colors.red,
+              ),
+              onPressed: () async {
+                if (await _checkForInternetConnection()) {
                   print(widget.code);
-                  await DataBaseService(famCode: widget.code).deleteEvent(widget.events.id);
-                } else  {connectivityDialogBox(context);}
-              } ,
+                  await DataBaseService(famCode: widget.code)
+                      .deleteEvent(widget.events.id);
+                } else {
+                  connectivityDialogBox(context);
+                }
+              },
             ),
-          )
-
-      ),
+          )),
     );
   }
 }
 
 //Connectivity Error Dialog Box
-AwesomeDialog connectivityDialogBox(BuildContext context){
+AwesomeDialog connectivityDialogBox(BuildContext context) {
   return AwesomeDialog(
     context: context,
     dialogType: DialogType.WARNING,

@@ -1,26 +1,4 @@
-/// ------------------------------------------------------------------------
-/// FireBaseUser.dart
-/// ------------------------------------------------------------------------
-/// Description: Class that contacts Firebase Authentication.
-/// Author(s): Sharan
-/// Date Approved: 15/06/2020
-/// Date Created: 12/06/2020
-/// Approved By: Ravish
-/// Reviewed By: Kaish
-/// ------------------------------------------------------------------------
-/// File(s) Accessed: null
-/// File(s) Modified: null
-/// ------------------------------------------------------------------------
-/// Input(s): Family Code, UID
-/// Output(s): Signal Firebase Authentication to create user account, Signin user,
-/// Signout user, delete user, reauthenticate user.
-/// ------------------------------------------------------------------------
-/// Error-Handling(s): Exception handling is done when needed.
-/// ------------------------------------------------------------------------
-/// Modification(s): None
-/// ------------------------------------------------------------------------
-/// Fault(s): None
-/// ------------------------------------------------------------------------
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:jaldiio/Models/user.dart';
 import 'package:jaldiio/Services/DataBaseService.dart';

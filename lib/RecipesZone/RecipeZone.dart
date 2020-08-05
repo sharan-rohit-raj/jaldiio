@@ -1,3 +1,51 @@
+/// ------------------------------------------------------------------------
+
+/// [RecipeZone Wrapper]
+
+/// ------------------------------------------------------------------------
+
+/// Description: Builds the entire RecipeZone State from here
+
+/// Author(s): Kaish, Sharan
+
+/// Date Approved: 14-07-2020
+
+/// Date Created: 19-07-2020
+
+/// Approved By: Kaish, Sharan
+
+/// Reviewed By: Ravish, Sharan
+
+/// ------------------------------------------------------------------------
+
+/// File(s) Accessed: NONE
+
+/// File(s) Modified: NONE
+
+/// ------------------------------------------------------------------------
+
+/// Input(s): 1. Family Code
+
+/// Output(s): 1. Image
+///            2. RecipeURL
+///            3. Recipe Name
+
+/// ------------------------------------------------------------------------
+
+/// Error-Handling(s): 1. Check for Internet Connection
+///                    2. Await for Synchronization
+
+/// ------------------------------------------------------------------------
+
+/// Modification(s): 1. Initial commit - 24th July, 2020
+///                  2. Internet Connectivity Check added - 26th July, 2020
+
+/// ------------------------------------------------------------------------
+
+/// Fault(s): NONE
+
+/// ------------------------------------------------------------------------
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';

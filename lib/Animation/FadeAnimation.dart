@@ -1,25 +1,3 @@
-/// ------------------------------------------------------------------------
-/// FadeAnimation.dart
-/// ------------------------------------------------------------------------
-/// Description: Class that performs animation when widgets need it.
-/// Author(s): Sharan
-/// Date Approved: 15/06/2020
-/// Date Created: 12/06/2020
-/// Approved By: Ravish
-/// Reviewed By: Kaish
-/// ------------------------------------------------------------------------
-/// File(s) Accessed: null
-/// File(s) Modified: null
-/// ------------------------------------------------------------------------
-/// Input(s): delay, child
-/// Output(s):
-/// ------------------------------------------------------------------------
-/// Error-Handling(s): Uses dart animation packages, so minimal testing is required.
-/// ------------------------------------------------------------------------
-/// Modification(s): None
-/// ------------------------------------------------------------------------
-/// Fault(s): None
-/// ------------------------------------------------------------------------
 import 'package:flutter/material.dart';
 import 'package:simple_animations/simple_animations.dart';
 

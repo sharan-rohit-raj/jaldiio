@@ -1,28 +1,6 @@
-/// ------------------------------------------------------------------------
-/// LoginPage.dart
-/// ------------------------------------------------------------------------
-/// Description: Login page for the app. Authenticates User.
-/// Author(s): Sharan
-/// Date Approved: 02/06/2020
-/// Date Created: 02/06/2020
-/// Approved By: Kaish
-/// Reviewed By: Kaish
-/// ------------------------------------------------------------------------
-/// File(s) Accessed: null
-/// File(s) Modified: null
-/// ------------------------------------------------------------------------
-/// Input(s): null
-/// Output(s): email_id, password
-/// ------------------------------------------------------------------------
-/// Error-Handling(s): Valid email id, valid password check, internet connectivity
-/// ------------------------------------------------------------------------
-/// Modification(s): None
-/// ------------------------------------------------------------------------
-/// Fault(s): None
-/// ------------------------------------------------------------------------
-
 import 'dart:async';
 import 'dart:io';
+
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
@@ -33,8 +11,6 @@ import 'package:jaldiio/Shared/Loading.dart';
 import 'package:jaldiio/SignUpPage.dart';
 import 'package:string_validator/string_validator.dart';
 import './Animation/FadeAnimation.dart';
-
-
 
 class LoginPage extends StatefulWidget {
 
