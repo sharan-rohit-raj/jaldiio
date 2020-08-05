@@ -1,5 +1,29 @@
+/// ------------------------------------------------------------------------
+/// CreateFamily.dart
+/// ------------------------------------------------------------------------
+/// Description: Class to help user create family.
+/// Author(s): Sharan
+/// Date Approved: 7/07/2020
+/// Date Created: 5/07/2020
+/// Approved By: Bhavya
+/// Reviewed By: Kaish
+/// ------------------------------------------------------------------------
+/// File(s) Accessed: null
+/// File(s) Modified: null
+/// ------------------------------------------------------------------------
+/// Input(s):
+/// Output(s): Sends a signal to Database Service class to initialise the
+/// document field for the family, make the current user admin and part of
+/// a family.
+/// ------------------------------------------------------------------------
+/// Error-Handling(s): Checks if family name is already taken or not and checks
+/// for internet connectivity.
+/// ------------------------------------------------------------------------
+/// Modification(s): 1. Internet Connectivity check added - 26th July, 2020
+/// ------------------------------------------------------------------------
+/// Fault(s): None
+/// ------------------------------------------------------------------------
 import 'dart:io';
-
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -7,7 +31,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:jaldiio/Animation/FadeAnimation.dart';
-import 'package:jaldiio/Models/Contact.dart';
 import 'package:jaldiio/Models/user.dart';
 import 'package:provider/provider.dart';
 import '../Services/DataBaseService.dart';
@@ -78,12 +101,13 @@ class _CreateFamilyState extends State<CreateFamily> {
                           Icons.arrow_back_ios,
                           color: Colors.deepPurpleAccent,
                         ),
-                        onPressed: () async {
-                          if (await _checkForInternetConnection()) {
+                        onPressed: () async{
+                          if(await _checkForInternetConnection()){
                             Navigator.pop(context);
-                          } else {
+                          }else{
                             connectivityDialogBox();
                           }
+
                         },
                       ),
                       Text(
@@ -206,11 +230,11 @@ class _CreateFamilyState extends State<CreateFamily> {
                                             if (_formKey.currentState
                                                 .validate()) {
                                               final QuerySnapshot result =
-                                                  await Firestore.instance
-                                                      .collection('family_info')
-                                                      .getDocuments();
+                                              await Firestore.instance
+                                                  .collection('family_info')
+                                                  .getDocuments();
                                               final List<DocumentSnapshot>
-                                                  documents = result.documents;
+                                              documents = result.documents;
                                               bool found = false;
                                               int index = 0;
                                               print(documents.length);
@@ -218,10 +242,10 @@ class _CreateFamilyState extends State<CreateFamily> {
                                                   found == false) {
 //                                    print(documents[index].documentID);
                                                 if (documents[index]
-                                                        .documentID
-                                                        .compareTo(
-                                                            _codeController
-                                                                .text) ==
+                                                    .documentID
+                                                    .compareTo(
+                                                    _codeController
+                                                        .text) ==
                                                     0) {
                                                   found = true;
                                                 }
@@ -230,29 +254,25 @@ class _CreateFamilyState extends State<CreateFamily> {
 
                                               if (found == false) {
                                                 await DataBaseService(
-                                                        famCode: _codeController
-                                                            .text)
+                                                    famCode: _codeController
+                                                        .text)
                                                     .initializeDocField();
                                                 await DataBaseService(
-                                                        famCode: _codeController
-                                                            .text)
+                                                    famCode: _codeController
+                                                        .text)
                                                     .initializeImageTagField();
-                                                await DataBaseService(
-                                                        famCode: _codeController
-                                                            .text)
-                                                    .initializeRecipeTagField();
                                                 final FirebaseUser fireuser =
-                                                    await FirebaseAuth.instance
-                                                        .currentUser();
+                                                await FirebaseAuth.instance
+                                                    .currentUser();
                                                 await DataBaseService(
-                                                        uid: fireuser.uid)
+                                                    uid: fireuser.uid)
                                                     .updateFamilyCode(
-                                                        _codeController.text);
+                                                    _codeController.text);
                                                 await DataBaseService(
-                                                        uid: fireuser.uid)
+                                                    uid: fireuser.uid)
                                                     .updateAdmin(true);
                                                 await DataBaseService(
-                                                        uid: fireuser.uid)
+                                                    uid: fireuser.uid)
                                                     .updateJoined(true);
                                                 showInSnackBar(
                                                     "Yay! your family name was stored successfully!");
@@ -262,8 +282,8 @@ class _CreateFamilyState extends State<CreateFamily> {
                                               }
                                             }
                                           } else {
-                                            connectivityDialogBox();
-                                          }
+                                              connectivityDialogBox();
+                                            }
                                         }
                                       : null,
                                 ),

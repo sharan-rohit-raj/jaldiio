@@ -1,3 +1,25 @@
+/// ------------------------------------------------------------------------
+/// main.dart
+/// ------------------------------------------------------------------------
+/// Description: main class for the app
+/// Author(s): Sharan
+/// Date Approved: 02/06/2020
+/// Date Created: 02/06/2020
+/// Approved By: Kaish
+/// Reviewed By: Kaish
+/// ------------------------------------------------------------------------
+/// File(s) Accessed: null
+/// File(s) Modified: null
+/// ------------------------------------------------------------------------
+/// Input(s): null
+/// Output(s): null
+/// ------------------------------------------------------------------------
+/// Error-Handling(s): Nothing, as basic class should work regardless
+/// ------------------------------------------------------------------------
+/// Modification(s): None
+/// ------------------------------------------------------------------------
+/// Fault(s): None
+/// ------------------------------------------------------------------------
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
