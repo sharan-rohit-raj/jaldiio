@@ -207,11 +207,11 @@ class _CreateFamilyState extends State<CreateFamily> {
                                             if (_formKey.currentState
                                                 .validate()) {
                                               final QuerySnapshot result =
-                                                  await Firestore.instance
-                                                      .collection('family_info')
-                                                      .getDocuments();
+                                              await Firestore.instance
+                                                  .collection('family_info')
+                                                  .getDocuments();
                                               final List<DocumentSnapshot>
-                                                  documents = result.documents;
+                                              documents = result.documents;
                                               bool found = false;
                                               int index = 0;
                                               print(documents.length);
@@ -219,10 +219,10 @@ class _CreateFamilyState extends State<CreateFamily> {
                                                   found == false) {
 //                                    print(documents[index].documentID);
                                                 if (documents[index]
-                                                        .documentID
-                                                        .compareTo(
-                                                            _codeController
-                                                                .text) ==
+                                                    .documentID
+                                                    .compareTo(
+                                                    _codeController
+                                                        .text) ==
                                                     0) {
                                                   found = true;
                                                 }
@@ -231,25 +231,25 @@ class _CreateFamilyState extends State<CreateFamily> {
 
                                               if (found == false) {
                                                 await DataBaseService(
-                                                        famCode: _codeController
-                                                            .text)
+                                                    famCode: _codeController
+                                                        .text)
                                                     .initializeDocField();
                                                 await DataBaseService(
-                                                        famCode: _codeController
-                                                            .text)
+                                                    famCode: _codeController
+                                                        .text)
                                                     .initializeImageTagField();
                                                 final FirebaseUser fireuser =
-                                                    await FirebaseAuth.instance
-                                                        .currentUser();
+                                                await FirebaseAuth.instance
+                                                    .currentUser();
                                                 await DataBaseService(
-                                                        uid: fireuser.uid)
+                                                    uid: fireuser.uid)
                                                     .updateFamilyCode(
-                                                        _codeController.text);
+                                                    _codeController.text);
                                                 await DataBaseService(
-                                                        uid: fireuser.uid)
+                                                    uid: fireuser.uid)
                                                     .updateAdmin(true);
                                                 await DataBaseService(
-                                                        uid: fireuser.uid)
+                                                    uid: fireuser.uid)
                                                     .updateJoined(true);
                                                 showInSnackBar(
                                                     "Yay! your family name was stored successfully!");
@@ -257,10 +257,10 @@ class _CreateFamilyState extends State<CreateFamily> {
                                                 showInSnackBar(
                                                     "We are sorry, that code was already taken by another family. Please try again.");
                                               }
-                                            } else {
+                                            }
+                                          } else {
                                               connectivityDialogBox();
                                             }
-                                          }
                                         }
                                       : null,
                                 ),

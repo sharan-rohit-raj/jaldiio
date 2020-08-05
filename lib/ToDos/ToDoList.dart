@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -16,6 +18,19 @@ class ToDoList extends StatefulWidget {
 }
 
 class _ToDoListState extends State<ToDoList> {
+
+  //Check for Internet connectivity
+  Future _checkForInternetConnection() async {
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        return true;
+      }
+    } on SocketException catch (_) {
+      return false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return StreamProvider<List<Task>>.value(
@@ -23,11 +38,13 @@ class _ToDoListState extends State<ToDoList> {
       child: Scaffold(
         backgroundColor: Colors.white,
         floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => AddTask()),
-            );
+          onPressed: () async{
+            if(await _checkForInternetConnection()){
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AddTask()),
+              );
+            } else  {connectivityDialogBox(context);}
           },
           child: Icon(Icons.add, size: 50,color: Colors.white,),
           backgroundColor: Colors.deepPurple[600],
@@ -59,8 +76,10 @@ class _ToDoListState extends State<ToDoList> {
                       Icons.arrow_back_ios,
                       color: Colors.deepPurpleAccent,
                     ),
-                    onPressed: () {
-                      Navigator.pop(context);
+                    onPressed: () async{
+                      if(await _checkForInternetConnection()){
+                        Navigator.pop(context);
+                      } else  {connectivityDialogBox(context);}
                     },
                   ),
                   Text(
@@ -95,4 +114,16 @@ class _ToDoListState extends State<ToDoList> {
       ),
     );
   }
+}
+
+//Connectivity Error Dialog Box
+AwesomeDialog connectivityDialogBox(BuildContext context){
+  return AwesomeDialog(
+    context: context,
+    dialogType: DialogType.WARNING,
+    animType: AnimType.BOTTOMSLIDE,
+    title: 'Connectivity Error',
+    desc: 'Hmm..looks like there is no connectivity...',
+    btnOkOnPress: () {},
+  )..show();
 }

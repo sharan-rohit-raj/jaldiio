@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +21,18 @@ class _AddTaskState extends State<AddTask> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final _textController = TextEditingController(text: "");
   final _formKey = GlobalKey<FormState>();
+
+  //Check for Internet connectivity
+  Future _checkForInternetConnection() async {
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        return true;
+      }
+    } on SocketException catch (_) {
+      return false;
+    }
+  }
 
   void showInSnackBar(String value) {
     _scaffoldKey.currentState.showSnackBar(new SnackBar(content: new Text(value)));
@@ -46,8 +60,10 @@ class _AddTaskState extends State<AddTask> {
                       Icons.arrow_back_ios,
                       color: Colors.deepPurpleAccent,
                     ),
-                    onPressed: () {
-                      Navigator.pop(context);
+                    onPressed: () async{
+                      if(await _checkForInternetConnection()){
+                        Navigator.pop(context);
+                      } else  {connectivityDialogBox(context);}
                     },
                   ),
                   Text(
@@ -158,19 +174,22 @@ class _AddTaskState extends State<AddTask> {
                                           color: Colors.deepPurpleAccent),
                                     ),
                                     onPressed: () async{
-                                      if(_formKey.currentState.validate()) {
-                                        code = snapshotCode.data.familyID;
-                                        final FirebaseUser fireuser = await FirebaseAuth
-                                            .instance.currentUser();
+                                      if(await _checkForInternetConnection()){
+                                        if(_formKey.currentState.validate()) {
+                                          code = snapshotCode.data.familyID;
+                                          final FirebaseUser fireuser = await FirebaseAuth
+                                              .instance.currentUser();
 
-                                        await DataBaseService(famCode: code)
-                                            .updateTasks(
+                                          await DataBaseService(famCode: code)
+                                              .updateTasks(
                                               _textController.text,
                                               false);
 
-                                        Navigator.pop(context);
+                                          Navigator.pop(context);
 
-                                      }
+                                        }
+                                      } else  {connectivityDialogBox(context);}
+
                                     },
                                   );
                                 }
@@ -188,4 +207,16 @@ class _AddTaskState extends State<AddTask> {
       ),
     );
   }
+}
+
+//Connectivity Error Dialog Box
+AwesomeDialog connectivityDialogBox(BuildContext context){
+  return AwesomeDialog(
+    context: context,
+    dialogType: DialogType.WARNING,
+    animType: AnimType.BOTTOMSLIDE,
+    title: 'Connectivity Error',
+    desc: 'Hmm..looks like there is no connectivity...',
+    btnOkOnPress: () {},
+  )..show();
 }
