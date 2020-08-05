@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "840967226709",
+    "firebase_url": "https://jaldiio.firebaseio.com",
+    "project_id": "jaldiio",
+    "storage_bucket": "jaldiio.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:840967226709:android:17bb73b7de04be7996dbdc",
+        "android_client_info": {
+          "package_name": "com.example.jaldiio"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "840967226709-cpugqok4cg2vqi8h22b8fbjhum9f487i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA6Eio8BdZnqEP4VgEGtz_9UBR8DMGw7IQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "840967226709-cpugqok4cg2vqi8h22b8fbjhum9f487i.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
