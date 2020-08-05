@@ -261,6 +261,10 @@ class _CreateFamilyState extends State<CreateFamily> {
                                                     famCode: _codeController
                                                         .text)
                                                     .initializeImageTagField();
+                                                await DataBaseService(
+                                                    famCode: _codeController
+                                                        .text)
+                                                    .initializeRecipeTagField();
                                                 final FirebaseUser fireuser =
                                                 await FirebaseAuth.instance
                                                     .currentUser();
