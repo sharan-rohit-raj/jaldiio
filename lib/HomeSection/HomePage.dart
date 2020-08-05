@@ -1,3 +1,28 @@
+/**
+ * ------------------------------------------------------------------------
+ * HomePage.dart
+ * ------------------------------------------------------------------------
+ * Description:
+ * Author(s): SHARAN ROHIT RAJ NATARAJAN
+ * Date Approved: July 30, 2020
+ * Date Created: July 31, 2020
+ * Approved By: SHARAN ROHIT RAJ NATARAJAN
+ * Reviewed By: Ravish Virani, Kaish Panjawani, Sahil Lalany, Bhavya Karnavat
+ * ------------------------------------------------------------------------
+ * File(s) Accessed: NULL
+ * File(s) Modified: NULL
+ * ------------------------------------------------------------------------
+ * Input(s): NULL
+ * Output(s): Navigate user to Different Modules
+ * ------------------------------------------------------------------------
+ * Error-Handling(s): Checking Internet Connectivity
+ * ------------------------------------------------------------------------
+ * Modification(s):
+ * ------------------------------------------------------------------------
+ * Fault(s): NULL
+ * ------------------------------------------------------------------------
+ */
+
 import 'dart:async';
 import 'dart:io';
 
@@ -10,7 +35,6 @@ import 'package:jaldiio/Animation/FadeAnimation.dart';
 import 'package:jaldiio/Contacts/ContactSection.dart';
 import 'package:jaldiio/RecipesZone/RecipeZone.dart';
 import 'package:jaldiio/Calendar/EventCalendar.dart';
-import 'package:jaldiio/ImagesSection/ImageSection.dart';
 import 'package:jaldiio/ImagesSection/ImageSection.dart';
 import 'package:jaldiio/ManageFamily/CreateFamily.dart';
 import 'package:jaldiio/ManageFamily/DeleteFamily.dart';

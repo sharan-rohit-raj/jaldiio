@@ -266,7 +266,7 @@ class _AddContactState extends State<AddContact> {
                                               _NameController.text,
                                               int.parse(_phnoController.text)).then((value) {
                                             //PLEASE REMEMBER TO UNCOMMENT THIS FINALLY!
-//                                          send();
+                                            send();
                                             showInSnackBar("Invitation sent successfully.");
 
                                           });}
