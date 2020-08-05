@@ -109,6 +109,7 @@ class _RecipeAddState extends State<RecipeAdd> {
   final _tag1 = TextEditingController(text: "");
   final _tag2 = TextEditingController(text: "");
   final _tag3 = TextEditingController(text: "");
+  final _recipeSteps = TextEditingController(text: "");
   String imgName;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final _formKey = GlobalKey<FormState>();
@@ -116,9 +117,9 @@ class _RecipeAddState extends State<RecipeAdd> {
 
   List<String> populateList(String tag1, String tag2, String tag3) {
     List<String> tags = new List<String>();
-    tags.add('#' + capitalize(tag1));
-    if (tag2.isNotEmpty) tags.add('#' + capitalize(tag2));
-    if (tag3.isNotEmpty) tags.add('#' + capitalize(tag3));
+    tags.add("#" + capitalize(tag1));
+    if (tag2.isNotEmpty) tags.add("#" + capitalize(tag2));
+    if (tag3.isNotEmpty) tags.add("#" + capitalize(tag3));
 
     return tags;
   }
@@ -353,6 +354,34 @@ class _RecipeAddState extends State<RecipeAdd> {
                             onChanged: (val) {},
                           ),
                         ),
+                        Container(
+                          padding: EdgeInsets.all(10.0),
+                          decoration: BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(color: Colors.grey[100]),
+                            ),
+                          ),
+                          child: TextFormField(
+                            controller: _recipeSteps,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              hintText: "Add Recipe Steps Here",
+                              hintStyle: TextStyle(color: Colors.grey),
+                            ),
+                            style: GoogleFonts.openSans(
+                              textStyle: TextStyle(
+                                  color: Colors.deepPurpleAccent,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w400),
+                            ),
+                            keyboardType: TextInputType.multiline,
+                            maxLines: null,
+                            validator: (val) => (val.length > 7)
+                                ? null
+                                : "Please enter recipe steps",
+                            onChanged: (val) {},
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -390,10 +419,15 @@ class _RecipeAddState extends State<RecipeAdd> {
 
                   url = await storageTaskSnapshot.ref.getDownloadURL();
 //                  print(url);
-                  await DataBaseService(famCode: widget.famCode).addImageURL(
-                      capitalize(_nameController.text).trim(), id, url, tags);
+                  await DataBaseService(famCode: widget.famCode).addRecipeURL(
+                    capitalize(_nameController.text).trim(),
+                    id,
+                    url,
+                    tags,
+                    _recipeSteps.text,
+                  );
                   await DataBaseService(famCode: widget.famCode)
-                      .updateTags(tags);
+                      .updateRecipeTags(tags);
                   showInSnackBar("Recipe uploaded successfully!");
                 }
               },

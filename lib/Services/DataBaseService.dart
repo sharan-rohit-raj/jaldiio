@@ -28,6 +28,8 @@ import 'package:jaldiio/Models/Contact.dart';
 import 'package:jaldiio/Models/FamilyCodeValue.dart';
 import 'package:jaldiio/Models/ImageTags.dart';
 import 'package:jaldiio/Models/ImageUrls.dart';
+import 'package:jaldiio/Models/RecipeTags.dart';
+import 'package:jaldiio/Models/RecipeURL.dart';
 import 'package:jaldiio/Models/Task.dart';
 import 'package:jaldiio/Models/UserInformation.dart';
 import 'package:jaldiio/Models/UserValue.dart';
@@ -412,8 +414,8 @@ class DataBaseService {
     });
   }
 
-  Future addRecipeURL(
-      String name, String id, String url, List<String> tags) async {
+  Future addRecipeURL(String name, String id, String url, List<String> tags,
+      String _recipeSteps) async {
     return await familyCollection
         .document(famCode)
         .collection("recipes")
@@ -423,6 +425,7 @@ class DataBaseService {
       'name': capitalize(name),
       'id': id,
       'tag': tags,
+      'recipeSteps': _recipeSteps,
     });
   }
 
@@ -485,6 +488,17 @@ class DataBaseService {
     }).toList();
   }
 
+  List<RecipeUrls> _recipeURLList(QuerySnapshot snapshot) {
+    return snapshot.documents.map((doc) {
+      return RecipeUrls(
+        url: doc.data['url'] ?? '',
+        name: doc.data['name'] ?? '',
+        id: doc.data['id'] ?? '',
+        recipe: doc.data['recipeSteps'] ?? '',
+      );
+    }).toList();
+  }
+
   List<Task> _taskListFromSnapShot(QuerySnapshot snapshot) {
     return snapshot.documents.map((doc) {
       return Task(
@@ -528,6 +542,14 @@ class DataBaseService {
     );
   }
 
+  RecipeTags _recipeTags(DocumentSnapshot snapshot) {
+    List<String> emptyList = new List<String>();
+    emptyList.add("");
+    return RecipeTags(
+      tags: List.from(snapshot.data['tagValues']) ?? emptyList,
+    );
+  }
+
   FamilyCodeValue _familyCodeValue(DocumentSnapshot snapshot) {
     return FamilyCodeValue(
       familyID: snapshot.data['familyID'] ?? '',
@@ -561,13 +583,13 @@ class DataBaseService {
         .map(_imageTags);
   }
 
-  Stream<ImageTags> get recipeTagData {
+  Stream<RecipeTags> get recipeTagData {
     return familyCollection
         .document(famCode)
         .collection("recipes")
         .document("tagList")
         .snapshots()
-        .map(_imageTags);
+        .map(_recipeTags);
   }
 
   Stream<UserValue> get userData {
@@ -608,6 +630,14 @@ class DataBaseService {
         .collection("images")
         .snapshots()
         .map(_urlListFromSnapShot);
+  }
+
+  Stream<List<RecipeUrls>> get recipeUrls {
+    return familyCollection
+        .document(famCode)
+        .collection("recipes")
+        .snapshots()
+        .map(_recipeURLList);
   }
 
   Stream<FamilyCodeValue> get codeData {

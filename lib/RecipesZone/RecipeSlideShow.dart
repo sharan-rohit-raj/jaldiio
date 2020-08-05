@@ -53,6 +53,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:jaldiio/Models/RecipeTags.dart';
 import 'package:jaldiio/RecipesZone/RecipeView.dart';
 import 'package:jaldiio/Models/ImageTags.dart';
 import 'package:jaldiio/Services/DataBaseService.dart';
@@ -201,10 +202,10 @@ class _RecipeSlideShowState extends State<RecipeSlideShow>
           context,
           MaterialPageRoute(
               builder: (context) => RecipeView(
-                    url: data['url'],
-                    id: data['id'],
-                    famCode: widget.famCode,
-                  )),
+                  url: data['url'],
+                  id: data['id'],
+                  famCode: widget.famCode,
+                  recipe: data["recipeSteps"])),
         );
         print(data['name']);
       },
@@ -267,12 +268,13 @@ class _RecipeSlideShowState extends State<RecipeSlideShow>
                       offset: Offset(5, 5))
                 ],
               ),
-              child: StreamBuilder<ImageTags>(
-                  stream: DataBaseService(famCode: widget.famCode).imgTagData,
+              child: StreamBuilder<RecipeTags>(
+                  stream:
+                      DataBaseService(famCode: widget.famCode).recipeTagData,
                   builder: (context, snapshot) {
 //                print("family: "+widget.famCode);
                     if (snapshot.hasData) {
-                      ImageTags tagsData = snapshot.data;
+                      RecipeTags tagsData = snapshot.data;
 
                       void reorder(int oldIndex, int newIndex) {
                         if (newIndex > oldIndex) newIndex -= 1;
@@ -306,7 +308,7 @@ class _RecipeSlideShowState extends State<RecipeSlideShow>
                                 desc: 'Do you wish to delete this tag?',
                                 btnOkOnPress: () async {
                                   await DataBaseService(famCode: widget.famCode)
-                                      .deleteImgTag("$index");
+                                      .deleteRecipeTag("$index");
                                 },
                                 btnCancelOnPress: () {},
                                 btnOkText: "Delete",
