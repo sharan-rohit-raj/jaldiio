@@ -76,7 +76,7 @@ class RecipeZone extends StatelessWidget {
           );
         },
         child: Icon(
-          Icons.add_photo_alternate,
+          Icons.fastfood,
           size: 40,
           color: Colors.white,
         ),
