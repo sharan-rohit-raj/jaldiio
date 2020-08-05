@@ -50,7 +50,7 @@ class CloudStorageService {
     return imageRef.child(famCode).child("Images").child(capitalize(name));
   }
 
-  StorageReference Recipesref(String recipeCode, File file) {
+  StorageReference Recipesref(String recipeCode) {
     return imageRef
         .child(famCode)
         .child("Recipes")

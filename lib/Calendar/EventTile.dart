@@ -96,7 +96,7 @@ class _EventTileState extends State<EventTile> {
                 style: GoogleFonts.openSans(fontSize: 25, color: Colors.black)),
             subtitle: Text(
               widget.events.description + "\n" + widget.events.eventDate,
-              style: GoogleFonts.openSans(fontSize: 15, color: Colors.black26),
+              style: GoogleFonts.openSans(fontSize: 15, color: Colors.black54),
             ),
             isThreeLine: true,
             trailing: IconButton(

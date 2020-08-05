@@ -83,15 +83,15 @@ class _RecipeViewState extends State<RecipeView> {
             context: context,
             dialogType: DialogType.WARNING,
             animType: AnimType.BOTTOMSLIDE,
-            title: "Delete s",
+            title: "Delete Recipe",
             desc: 'Are you sure you want to delete this recipe?',
             btnOkOnPress: () async {
               showInSnackBar("Please wait while we delete your recipe...");
               await CloudStorageService(famCode: widget.famCode)
-                  .deleteImage(widget.id)
-                  .then((value) => print("Success"));
+                  .deleteRecipes(widget.id)
+                  .then((value) => showInSnackBar("Recipe image deleted"));
               await DataBaseService(famCode: widget.famCode)
-                  .deleteImg(widget.id);
+                  .deleteRecipe(widget.id);
               AwesomeDialog(
                 dismissOnTouchOutside: false,
                 context: context,

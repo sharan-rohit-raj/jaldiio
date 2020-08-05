@@ -410,7 +410,7 @@ class _RecipeAddState extends State<RecipeAdd> {
                   String id = imageIDgenerator(_nameController.text);
                   StorageReference ref =
                       CloudStorageService(famCode: widget.famCode)
-                          .Imagesref(id);
+                          .Recipesref(id);
                   showInSnackBar("Please wait while we upload your recipe...");
                   StorageUploadTask upload = ref.putFile(_image);
 
