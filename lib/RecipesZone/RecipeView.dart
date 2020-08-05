@@ -1,3 +1,51 @@
+/// ------------------------------------------------------------------------
+
+/// [Recipe View]
+
+/// ------------------------------------------------------------------------
+
+/// Description: Builds individual Recipe Pages
+
+/// Author(s): Kaish, Sharan
+
+/// Date Approved: 14-07-2020
+
+/// Date Created: 20-07-2020
+
+/// Approved By: Kaish, Sharan
+
+/// Reviewed By: Ravish, Sharan
+
+/// ------------------------------------------------------------------------
+
+/// File(s) Accessed: NONE
+
+/// File(s) Modified: NONE
+
+/// ------------------------------------------------------------------------
+
+/// Input(s): 1. Family Code
+
+/// Output(s): 1. Image
+///            2. RecipeURL
+///            3. Recipe Name
+
+/// ------------------------------------------------------------------------
+
+/// Error-Handling(s): 1. Check for Internet Connection
+///                    2. Await for Synchronization
+
+/// ------------------------------------------------------------------------
+
+/// Modification(s): 1. Initial commit - 24th July, 2020
+///                  2. Internet Connectivity Check added - 26th July, 2020
+
+/// ------------------------------------------------------------------------
+
+/// Fault(s): NONE
+
+/// ------------------------------------------------------------------------
+
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -85,14 +133,9 @@ class _RecipeViewState extends State<RecipeView> {
           backgroundColor: Colors.deepPurple[600],
         ),
         body: Container(
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              fit: BoxFit.cover,
-              image: NetworkImage(
-                widget.url,
-              ),
-            ),
-          ),
-        ));
+            child: AspectRatio(
+          aspectRatio: 16.0 / 9.0,
+          child: Image.network(widget.url, fit: BoxFit.cover),
+        )));
   }
 }

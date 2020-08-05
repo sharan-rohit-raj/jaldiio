@@ -1,3 +1,51 @@
+/// ------------------------------------------------------------------------
+
+/// [Image Add]
+
+/// ------------------------------------------------------------------------
+
+/// Description: Adds New Images
+
+/// Author(s): Sharan
+
+/// Date Approved: 04-07-2020
+
+/// Date Created: 09-07-2020
+
+/// Approved By: Kaish, Sharan
+
+/// Reviewed By: Kaish, Sharan
+
+/// ------------------------------------------------------------------------
+
+/// File(s) Accessed: NONE
+
+/// File(s) Modified: NONE
+
+/// ------------------------------------------------------------------------
+
+/// Input(s): 1. famCode - Family Code
+
+/// Output(s): 1. _image - Image
+///            2. ImageURL
+///            3. Image Name
+
+/// ------------------------------------------------------------------------
+
+/// Error-Handling(s): 1. Check for Internet Connection
+///                    2. Await for Synchronization
+
+/// ------------------------------------------------------------------------
+
+/// Modification(s): 1. Initial commit - 14th July, 2020
+///                  2. Internet Connectivity Check added - 26th July, 2020
+
+/// ------------------------------------------------------------------------
+
+/// Fault(s): NONE
+
+/// ------------------------------------------------------------------------
+
 import 'dart:io';
 import 'dart:math';
 
@@ -30,9 +78,12 @@ class _ImageAddState extends State<ImageAdd> {
       _image = File(pickedFile.path);
     });
   }
+
   void showInSnackBar(String value) {
-    _scaffoldKey.currentState.showSnackBar(new SnackBar(content: new Text(value)));
+    _scaffoldKey.currentState
+        .showSnackBar(new SnackBar(content: new Text(value)));
   }
+
   String capitalize(String string) {
     if (string == null) {
       throw ArgumentError("string: $string");
@@ -44,11 +95,13 @@ class _ImageAddState extends State<ImageAdd> {
 
     return string[0].toUpperCase() + string.substring(1).toLowerCase();
   }
-  String imageIDgenerator(String name){
+
+  String imageIDgenerator(String name) {
     var random = Random.secure();
     var value = random.nextInt(1000000000);
     String code = value.toString();
-    String id = capitalize(name.toLowerCase().trim().replaceAll(' ', ''))+"_"+code;
+    String id =
+        capitalize(name.toLowerCase().trim().replaceAll(' ', '')) + "_" + code;
     return id;
   }
 
@@ -61,18 +114,14 @@ class _ImageAddState extends State<ImageAdd> {
   final _formKey = GlobalKey<FormState>();
   List<String> tags;
 
-
-  List<String> populateList(String tag1, String tag2, String tag3){
+  List<String> populateList(String tag1, String tag2, String tag3) {
     List<String> tags = new List<String>();
-    tags.add('#'+capitalize(tag1));
-    if(tag2.isNotEmpty)
-      tags.add('#'+capitalize(tag2));
-    if(tag3.isNotEmpty)
-      tags.add('#'+capitalize(tag3));
+    tags.add('#' + capitalize(tag1));
+    if (tag2.isNotEmpty) tags.add('#' + capitalize(tag2));
+    if (tag3.isNotEmpty) tags.add('#' + capitalize(tag3));
 
     return tags;
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +130,7 @@ class _ImageAddState extends State<ImageAdd> {
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
       floatingActionButton: FloatingActionButton(
-        onPressed: () async{
+        onPressed: () async {
           showPicker();
           print("image file: " + _image.toString());
 //          tags = populateList(_tag1.text, _tag2.text, _tag3.text);
@@ -219,9 +268,7 @@ class _ImageAddState extends State<ImageAdd> {
                             validator: (val) => (val.length > 0) && isAlpha(val)
                                 ? null
                                 : "Please enter an valid name",
-                            onChanged: (val) {
-
-                            },
+                            onChanged: (val) {},
                           ),
                         ),
                         Container(
@@ -247,9 +294,7 @@ class _ImageAddState extends State<ImageAdd> {
                             validator: (val) => (val.length > 0) && isAlpha(val)
                                 ? null
                                 : "Please enter a valid tag",
-                            onChanged: (val) {
-
-                            },
+                            onChanged: (val) {},
                           ),
                         ),
                         Container(
@@ -272,12 +317,12 @@ class _ImageAddState extends State<ImageAdd> {
                                   fontSize: 18,
                                   fontWeight: FontWeight.w400),
                             ),
-                            validator: (val) => (isAlpha(val) && val.length >0) || val.length==0
-                                ? null
-                                : "Please enter a valid tag",
-                            onChanged: (val) {
-
-                            },
+                            validator: (val) =>
+                                (isAlpha(val) && val.length > 0) ||
+                                        val.length == 0
+                                    ? null
+                                    : "Please enter a valid tag",
+                            onChanged: (val) {},
                           ),
                         ),
                         Container(
@@ -300,12 +345,12 @@ class _ImageAddState extends State<ImageAdd> {
                                   fontSize: 18,
                                   fontWeight: FontWeight.w400),
                             ),
-                            validator: (val) => (isAlpha(val) && val.length >0) || val.length==0
-                                ? null
-                                : "Please enter a valid tag",
-                            onChanged: (val) {
-
-                            },
+                            validator: (val) =>
+                                (isAlpha(val) && val.length > 0) ||
+                                        val.length == 0
+                                    ? null
+                                    : "Please enter a valid tag",
+                            onChanged: (val) {},
                           ),
                         ),
                       ],
@@ -314,51 +359,49 @@ class _ImageAddState extends State<ImageAdd> {
                 ),
               ),
             ),
-            SizedBox(
-              height: 30
-            ),
+            SizedBox(height: 30),
             FlatButton(
-              child: Text("Upload",
+              child: Text(
+                "Upload",
                 style: GoogleFonts.openSans(
-                    fontSize: 18,
-                    color: Colors.deepPurpleAccent),),
+                    fontSize: 18, color: Colors.deepPurpleAccent),
+              ),
               color: Colors.white,
               padding: EdgeInsets.only(left: 100, right: 100),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15),
-                  side: BorderSide(
-                      color: Colors.deepPurpleAccent)),
+                  side: BorderSide(color: Colors.deepPurpleAccent)),
               onPressed: () async {
                 //              final StorageReference firebaseRef = FirebaseStorage.instance.ref().child("images").child("Firstimg.png");
                 //              final StorageUploadTask task = firebaseRef.putFile(_image);
-                if(_formKey.currentState.validate()){
+                if (_formKey.currentState.validate()) {
                   String url = "";
-                  List<String> tags = populateList(_tag1.text, _tag2.text, _tag3.text);
+                  List<String> tags =
+                      populateList(_tag1.text, _tag2.text, _tag3.text);
                   String id = imageIDgenerator(_nameController.text);
-                  StorageReference ref = CloudStorageService(famCode: widget.famCode).
-                  Imagesref(id);
+                  StorageReference ref =
+                      CloudStorageService(famCode: widget.famCode)
+                          .Imagesref(id);
                   showInSnackBar("Please wait while we upload your image...");
-                  StorageUploadTask upload =  ref.putFile(_image);
+                  StorageUploadTask upload = ref.putFile(_image);
 
-                  StorageTaskSnapshot storageTaskSnapshot = await upload.onComplete;
+                  StorageTaskSnapshot storageTaskSnapshot =
+                      await upload.onComplete;
 
                   url = await storageTaskSnapshot.ref.getDownloadURL();
 //                  print(url);
-                  await DataBaseService(famCode: widget.famCode).addImageURL(capitalize(_nameController.text).trim(),id, url, tags);
-                  await DataBaseService(famCode: widget.famCode).updateTags(tags);
+                  await DataBaseService(famCode: widget.famCode).addImageURL(
+                      capitalize(_nameController.text).trim(), id, url, tags);
+                  await DataBaseService(famCode: widget.famCode)
+                      .updateTags(tags);
                   showInSnackBar("Image uploaded successfully!");
-
                 }
-
               },
             ),
-            SizedBox(
-                height: 30
-            ),
+            SizedBox(height: 30),
           ],
         ),
       ),
     );
   }
-
 }

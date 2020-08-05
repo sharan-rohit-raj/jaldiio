@@ -1,3 +1,49 @@
+/// ------------------------------------------------------------------------
+
+/// [ContactSection]
+
+/// ------------------------------------------------------------------------
+
+/// Description: Build ContactSection State
+
+/// Author(s): Sharan
+
+/// Date Approved: 14-06-2020
+
+/// Date Created: 21-06-2020
+
+/// Approved By: Everyone
+
+/// Reviewed By: Sahil
+
+/// ------------------------------------------------------------------------
+
+/// File(s) Accessed: NONE
+
+/// File(s) Modified: NONE
+
+/// ------------------------------------------------------------------------
+
+/// Input(s): 1. code - Family Code
+
+/// Output(s): 1. ContactSection - State Widget
+
+/// ------------------------------------------------------------------------
+
+/// Error-Handling(s): 1. Check for Internet Connection
+///                    2. Await for Synchronization
+
+/// ------------------------------------------------------------------------
+
+/// Modification(s): 1. Initial commit - 24th June, 2020
+///                  2. Internet Connectivity Check added - 26th July, 2020
+
+/// ------------------------------------------------------------------------
+
+/// Fault(s): NONE
+
+/// ------------------------------------------------------------------------
+
 import 'dart:io';
 
 import 'package:awesome_dialog/awesome_dialog.dart';
@@ -24,10 +70,9 @@ class ContactSection extends StatefulWidget {
 class _ContactSectionState extends State<ContactSection> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
-
   void showInSnackBar(String value) {
-    _scaffoldKey.currentState.showSnackBar(
-        new SnackBar(content: new Text(value)));
+    _scaffoldKey.currentState
+        .showSnackBar(new SnackBar(content: new Text(value)));
   }
 
   @override
@@ -61,27 +106,29 @@ class _ContactSectionState extends State<ContactSection> {
                         context,
                         MaterialPageRoute(builder: (context) => AddContact()),
                       );
-                    }
-                    else {
+                    } else {
                       AwesomeDialog(
                         context: context,
                         dialogType: DialogType.INFO,
                         animType: AnimType.BOTTOMSLIDE,
                         title: 'Max Family Member Limit',
-                        desc: 'Sorry, the max family members limits has reached...',
+                        desc:
+                            'Sorry, the max family members limits has reached...',
                         btnOkOnPress: () {},
-                      )
-                        ..show();
+                      )..show();
                     }
                   } else {
                     connectivityDialogBox();
                   }
                 },
-                child: Icon(Icons.add, size: 50, color: Colors.white,),
+                child: Icon(
+                  Icons.add,
+                  size: 50,
+                  color: Colors.white,
+                ),
                 backgroundColor: Colors.deepPurple[600],
               );
-            }
-        ),
+            }),
         body: Stack(
           // alignment: Alignment.center,
 
@@ -107,14 +154,13 @@ class _ContactSectionState extends State<ContactSection> {
                       Icons.arrow_back_ios,
                       color: Colors.deepPurpleAccent,
                     ),
-                    onPressed: () async{
+                    onPressed: () async {
                       //Check for internet connectivity
-                      if(await _checkForInternetConnection()){
+                      if (await _checkForInternetConnection()) {
                         Navigator.pop(context);
-                      }else{
+                      } else {
                         connectivityDialogBox();
                       }
-
                     },
                   ),
                   Text(
@@ -128,11 +174,10 @@ class _ContactSectionState extends State<ContactSection> {
                 ],
               ),
             ),
-
             DraggableScrollableSheet(
               maxChildSize: 0.85,
-              builder: (BuildContext context,
-                  ScrollController scrollController) {
+              builder:
+                  (BuildContext context, ScrollController scrollController) {
 //                  print(widget.code);
                 return Container(
                   decoration: BoxDecoration(
@@ -140,11 +185,9 @@ class _ContactSectionState extends State<ContactSection> {
                     borderRadius: BorderRadius.only(
                         topRight: Radius.circular(40),
                         topLeft: Radius.circular(40)),
-
                   ),
                   child: ContactList(
                       scrollController: scrollController, code: widget.code),
-
                 );
               },
             ),
@@ -163,8 +206,7 @@ class _ContactSectionState extends State<ContactSection> {
       title: 'Connectivity Error',
       desc: 'Hmm..looks like there is no connectivity...',
       btnOkOnPress: () {},
-    )
-      ..show();
+    )..show();
   }
 
 //Check for Internet connectivity
