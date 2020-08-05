@@ -1,29 +1,3 @@
-/// ------------------------------------------------------------------------
-/// DeleteFamily.dart
-/// ------------------------------------------------------------------------
-/// Description: Class to help user delete family.
-/// Author(s): Sharan
-/// Date Approved: 7/07/2020
-/// Date Created: 5/07/2020
-/// Approved By: Bhavya
-/// Reviewed By: Kaish
-/// ------------------------------------------------------------------------
-/// File(s) Accessed: null
-/// File(s) Modified: null
-/// ------------------------------------------------------------------------
-/// Input(s): Family Code
-/// Output(s): Sends a signal to Database Service class to delete the family
-/// contents from the DataBase Service, sends Cloud Storage Service a signal to
-/// delete the images and signal the database service to inform admin of the
-/// family has exited.
-/// ------------------------------------------------------------------------
-/// Error-Handling(s): Checks if entered family name is the correct family name
-/// and checks for internet connectivity
-/// ------------------------------------------------------------------------
-/// Modification(s): 1. Internet Connectivity check added - 26th July, 2020
-/// ------------------------------------------------------------------------
-/// Fault(s): None
-/// ------------------------------------------------------------------------
 import 'dart:io';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
