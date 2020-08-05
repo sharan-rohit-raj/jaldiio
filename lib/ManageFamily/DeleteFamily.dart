@@ -1,4 +1,31 @@
-import 'package:firebase_auth/firebase_auth.dart';
+/// ------------------------------------------------------------------------
+/// DeleteFamily.dart
+/// ------------------------------------------------------------------------
+/// Description: Class to help user delete family.
+/// Author(s): Sharan
+/// Date Approved: 7/07/2020
+/// Date Created: 5/07/2020
+/// Approved By: Bhavya
+/// Reviewed By: Kaish
+/// ------------------------------------------------------------------------
+/// File(s) Accessed: null
+/// File(s) Modified: null
+/// ------------------------------------------------------------------------
+/// Input(s): Family Code
+/// Output(s): Sends a signal to Database Service class to delete the family
+/// contents from the DataBase Service, sends Cloud Storage Service a signal to
+/// delete the images and signal the database service to inform admin of the
+/// family has exited.
+/// ------------------------------------------------------------------------
+/// Error-Handling(s): Checks if entered family name is the correct family name
+/// and checks for internet connectivity
+/// ------------------------------------------------------------------------
+/// Modification(s): 1. Internet Connectivity check added - 26th July, 2020
+/// ------------------------------------------------------------------------
+/// Fault(s): None
+/// ------------------------------------------------------------------------
+import 'dart:io';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:jaldiio/Animation/FadeAnimation.dart';
@@ -23,6 +50,17 @@ class _DeleteFamilyState extends State<DeleteFamily> {
   final _codeController = TextEditingController(text: "");
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
+  //Check for Internet connectivity
+  Future _checkForInternetConnection() async {
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        return true;
+      }
+    } on SocketException catch (_) {
+      return false;
+    }
+  }
 
   void showInSnackBar(String value) {
     _scaffoldKey.currentState.showSnackBar(new SnackBar(content: new Text(value)));
@@ -70,8 +108,10 @@ class _DeleteFamilyState extends State<DeleteFamily> {
                           Icons.arrow_back_ios,
                           color: Colors.deepPurpleAccent,
                         ),
-                        onPressed: () {
-                          Navigator.pop(context);
+                        onPressed: () async{
+                          if(await _checkForInternetConnection()){
+                            Navigator.pop(context);
+                          } else  {connectivityDialogBox(context);}
                         },
                       ),
                       Text(
@@ -224,4 +264,16 @@ class _DeleteFamilyState extends State<DeleteFamily> {
       ),
     );
   }
+}
+
+//Connectivity Error Dialog Box
+AwesomeDialog connectivityDialogBox(BuildContext context){
+  return AwesomeDialog(
+    context: context,
+    dialogType: DialogType.WARNING,
+    animType: AnimType.BOTTOMSLIDE,
+    title: 'Connectivity Error',
+    desc: 'Hmm..looks like there is no connectivity...',
+    btnOkOnPress: () {},
+  )..show();
 }

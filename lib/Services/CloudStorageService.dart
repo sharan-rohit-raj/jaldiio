@@ -1,3 +1,25 @@
+/// ------------------------------------------------------------------------
+/// CloudStorageService.dart
+/// ------------------------------------------------------------------------
+/// Description: Class that contacts FirebaseCloud and send Storage Reference when needed
+/// Author(s): Sharan
+/// Date Approved: 06/06/2020
+/// Date Created: 06/06/2020
+/// Approved By: Ravish
+/// Reviewed By: Kaish
+/// ------------------------------------------------------------------------
+/// File(s) Accessed: null
+/// File(s) Modified: null
+/// ------------------------------------------------------------------------
+/// Input(s): Family Code, UID
+/// Output(s): Storage Reference, Signal to Cloud to delete all images
+/// ------------------------------------------------------------------------
+/// Error-Handling(s): Exception handling is done when needed.
+/// ------------------------------------------------------------------------
+/// Modification(s): None
+/// ------------------------------------------------------------------------
+/// Fault(s): None
+/// ------------------------------------------------------------------------
 import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';

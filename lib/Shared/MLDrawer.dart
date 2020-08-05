@@ -1,3 +1,26 @@
+/// ------------------------------------------------------------------------
+/// MLDrawer.dart
+/// ------------------------------------------------------------------------
+/// Description: Class for the drawer. Looks and features of the drawer is done here.
+/// Author(s): Sharan
+/// Date Approved: 02/06/2020
+/// Date Created: 02/06/2020
+/// Approved By: Kaish
+/// Reviewed By: Kaish
+/// ------------------------------------------------------------------------
+/// File(s) Accessed: null
+/// File(s) Modified: null
+/// ------------------------------------------------------------------------
+/// Input(s):
+/// Output(s):
+/// ------------------------------------------------------------------------
+/// Error-Handling(s): Basic class, no need of any error handling.
+/// ------------------------------------------------------------------------
+/// Modification(s): None
+/// ------------------------------------------------------------------------
+/// Fault(s): None
+/// ------------------------------------------------------------------------
+
 library multilevel_drawer;
 
 import 'package:flutter/material.dart';

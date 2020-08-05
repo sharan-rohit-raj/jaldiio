@@ -1,3 +1,27 @@
+/// ------------------------------------------------------------------------
+/// DataBaseService.dart
+/// ------------------------------------------------------------------------
+/// Description: Class that contacts Firebase real time database and send
+/// Signal to update or delete records
+/// Author(s): Sharan
+/// Date Approved: 13/06/2020
+/// Date Created: 12/06/2020
+/// Approved By: Ravish
+/// Reviewed By: Kaish
+/// ------------------------------------------------------------------------
+/// File(s) Accessed: null
+/// File(s) Modified: null
+/// ------------------------------------------------------------------------
+/// Input(s): Family Code, UID
+/// Output(s): Signal to update record with values to firebase, Signal to delete
+/// record from firebase.
+/// ------------------------------------------------------------------------
+/// Error-Handling(s): Exception handling is done when needed.
+/// ------------------------------------------------------------------------
+/// Modification(s): None
+/// ------------------------------------------------------------------------
+/// Fault(s): None
+/// ------------------------------------------------------------------------
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:jaldiio/Models/Contact.dart';
 import 'package:jaldiio/Models/FamilyCodeValue.dart';
@@ -6,6 +30,7 @@ import 'package:jaldiio/Models/ImageUrls.dart';
 import 'package:jaldiio/Models/Task.dart';
 import 'package:jaldiio/Models/UserInformation.dart';
 import 'package:jaldiio/Models/UserValue.dart';
+import 'package:jaldiio/Models/FamEvent.dart';
 import 'dart:math';
 
 import 'package:jaldiio/Services/CloudStorageService.dart';
@@ -21,6 +46,7 @@ class DataBaseService {
   final CollectionReference familyCollection =
       Firestore.instance.collection('family_info');
 
+  //Capitalize
   String capitalize(String string) {
     if (string == null) {
       throw ArgumentError("string: $string");
@@ -100,6 +126,13 @@ class DataBaseService {
     return await familyCollection
         .document(famCode)
         .collection("todos")
+        .document(id).delete();
+  }
+
+  Future deleteEvent(String id) async {
+    return await familyCollection
+        .document(famCode)
+        .collection("familyEvent")
         .document(id).delete();
   }
 
@@ -264,7 +297,25 @@ class DataBaseService {
       'phNo': phNo,
       'joined': false,
       'uid': null,
-      'photoURL': null,
+	  'photoURL': null,
+    });
+  }
+
+  Future updateEvents(String title, String description, String date) async{
+    var random = Random.secure();
+
+    var value = random.nextInt(1000000000);
+    String event_id = value.toString();
+    return await familyCollection
+        .document(famCode)
+        .collection("familyEvent")
+        .document(event_id)
+        .setData({
+      'title': capitalize(title),
+      'description': description,
+      'id': event_id,
+      'eventDate' : date,
+
     });
   }
 
@@ -275,7 +326,7 @@ class DataBaseService {
         .collection("contacts")
         .document(name_id).updateData({
       'joined': joined,
-      'photoURL': photoURL,
+	  'photoURL': photoURL,
     });
   }
 
@@ -330,6 +381,7 @@ class DataBaseService {
     });
   }
 
+
   List<Contact> _contactListFromSnapShot(QuerySnapshot snapshot) {
     return snapshot.documents.map((doc) {
       return Contact(
@@ -338,7 +390,7 @@ class DataBaseService {
         emaild: doc.data['emailID'] ?? '',
         joined: doc.data['joined'] ?? false,
         uid: doc.data['uid'] ?? '',
-        photoURL: doc.data['photoURL'] ?? '',
+		photoURL: doc.data['photoURL'] ?? '',
       );
     }).toList();
   }
@@ -360,6 +412,17 @@ class DataBaseService {
         task: doc.data['task'] ?? '',
         check: doc.data['check'] ?? false,
         id: doc.data['id'] ?? '',
+      );
+    }).toList();
+  }
+
+  List<EventModel> _eventListFromSnapShot(QuerySnapshot snapshot) {
+    return snapshot.documents.map((doc) {
+      return EventModel(
+        description: doc.data['description'] ?? '',
+        eventDate: doc.data['eventDate'] ?? '',
+        id: doc.data['id'] ?? '',
+        title: doc.data['title'] ?? '',
       );
     }).toList();
   }
@@ -436,6 +499,15 @@ class DataBaseService {
         .collection("todos")
         .snapshots()
         .map(_taskListFromSnapShot);
+  }
+
+  //get events stream
+  Stream<List<EventModel>> get events{
+    return familyCollection
+        .document(famCode)
+        .collection("familyEvent")
+        .snapshots()
+        .map(_eventListFromSnapShot);
   }
 
   //get urls stream

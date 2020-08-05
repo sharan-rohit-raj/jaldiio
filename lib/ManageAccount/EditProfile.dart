@@ -1,16 +1,34 @@
+/// ------------------------------------------------------------------------
+/// EditProfile.dart
+/// ------------------------------------------------------------------------
+/// Description: Class to help user to edit profile details
+/// Author(s): Sharan
+/// Date Approved: 25/06/2020
+/// Date Created: 22/06/2020
+/// Approved By: Sahil
+/// Reviewed By: Kaish
+/// ------------------------------------------------------------------------
+/// File(s) Accessed: null
+/// File(s) Modified: null
+/// ------------------------------------------------------------------------
+/// Input(s): BuildContext
+/// Output(s): Name, DOB, Status, Phone Number, Profile Picture
+/// ------------------------------------------------------------------------
+/// Error-Handling(s): Input Validation for name, phone number, Status, DOB
+/// ------------------------------------------------------------------------
+/// Modification(s): 1. Internet Connectivity check added - 26th July, 2020
+/// ------------------------------------------------------------------------
+/// Fault(s): None
+/// ------------------------------------------------------------------------
 import 'dart:io';
-
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:jaldiio/Animation/FadeAnimation.dart';
-import 'package:jaldiio/LoginPage.dart';
-import 'package:jaldiio/Models/UserInformation.dart';
 import 'package:jaldiio/Models/UserValue.dart';
 import 'package:jaldiio/Services/CloudStorageService.dart';
 import 'package:jaldiio/Services/DataBaseService.dart';
