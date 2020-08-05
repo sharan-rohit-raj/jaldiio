@@ -1,3 +1,50 @@
+/// ------------------------------------------------------------------------
+
+/// [ImageSection Wrapper]
+
+/// ------------------------------------------------------------------------
+
+/// Description: Builds the entire ImageSection State from here
+
+/// Author(s): Sharan
+
+/// Date Approved: 04-07-2020
+
+/// Date Created: 10-07-2020
+
+/// Approved By: Kaish, Sharan
+
+/// Reviewed By: Kaish, Sharan
+
+/// ------------------------------------------------------------------------
+
+/// File(s) Accessed: NONE
+
+/// File(s) Modified: NONE
+
+/// ------------------------------------------------------------------------
+
+/// Input(s): 1. famCode - Family Code
+
+/// Output(s): 1. _image - Image
+///            2. ImageSection - ImageSection State Widget
+
+/// ------------------------------------------------------------------------
+
+/// Error-Handling(s): 1. Check for Internet Connection
+///                    2. Await for Synchronization
+
+/// ------------------------------------------------------------------------
+
+/// Modification(s): 1. Initial commit - 14th July, 2020
+///                  2. Internet Connectivity Check added - 26th July, 2020
+
+/// ------------------------------------------------------------------------
+
+/// Fault(s): NONE
+
+/// ------------------------------------------------------------------------
+
 import 'dart:io';
 
 import 'package:awesome_dialog/awesome_dialog.dart';
@@ -17,7 +64,7 @@ class ImageSection extends StatelessWidget {
   ImageSection({Key key, @required this.famCode}) : super(key: key);
 
   //Check for Internet connectivity
-  Future _checkForInternetConnection() async{
+  Future _checkForInternetConnection() async {
     try {
       final result = await InternetAddress.lookup('google.com');
       if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
@@ -26,35 +73,40 @@ class ImageSection extends StatelessWidget {
     } on SocketException catch (_) {
       return false;
     }
-
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-        onPressed: () async{
-
-          if(await _checkForInternetConnection()){
+        onPressed: () async {
+          if (await _checkForInternetConnection()) {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => ImageAdd(famCode: famCode,)),
+              MaterialPageRoute(
+                  builder: (context) => ImageAdd(
+                        famCode: famCode,
+                      )),
             );
-          }else{
+          } else {
             connectivityDialogBox(context);
           }
-
         },
-        child: Icon(Icons.add_photo_alternate, size: 40,color: Colors.white,),
+        child: Icon(
+          Icons.add_photo_alternate,
+          size: 40,
+          color: Colors.white,
+        ),
         backgroundColor: Colors.deepPurple[600],
-
-
       ),
-      body: ImageSlides(famCode: famCode,),
+      body: ImageSlides(
+        famCode: famCode,
+      ),
     );
   }
+
   //Connectivity Error Dialog Box
-  AwesomeDialog connectivityDialogBox(BuildContext context){
+  AwesomeDialog connectivityDialogBox(BuildContext context) {
     return AwesomeDialog(
       context: context,
       dialogType: DialogType.WARNING,
@@ -64,7 +116,4 @@ class ImageSection extends StatelessWidget {
       btnOkOnPress: () {},
     )..show();
   }
-
 }
-
-

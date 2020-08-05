@@ -1,3 +1,51 @@
+/// ------------------------------------------------------------------------
+
+/// [Recipe SlideShow]
+
+/// ------------------------------------------------------------------------
+
+/// Description: Builds SlideShow Page and handles Animations
+
+/// Author(s): Kaish, Sharan
+
+/// Date Approved: 14-07-2020
+
+/// Date Created: 20-07-2020
+
+/// Approved By: Kaish, Sharan
+
+/// Reviewed By: Ravish, Sharan
+
+/// ------------------------------------------------------------------------
+
+/// File(s) Accessed: NONE
+
+/// File(s) Modified: NONE
+
+/// ------------------------------------------------------------------------
+
+/// Input(s): 1. Family Code
+
+/// Output(s): 1. Images
+///            2. Tag List
+///            3. Recipe Name
+
+/// ------------------------------------------------------------------------
+
+/// Error-Handling(s): 1. Check for Internet Connection
+///                    2. Await for Synchronization
+
+/// ------------------------------------------------------------------------
+
+/// Modification(s): 1. Initial commit - 24th July, 2020
+///                  2. Internet Connectivity Check added - 26th July, 2020
+
+/// ------------------------------------------------------------------------
+
+/// Fault(s): NONE
+
+/// ------------------------------------------------------------------------
+
 import 'dart:async';
 
 import 'package:awesome_dialog/awesome_dialog.dart';

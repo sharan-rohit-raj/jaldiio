@@ -1,3 +1,49 @@
+/// ------------------------------------------------------------------------
+
+/// [To-Do - Add Task]
+
+/// ------------------------------------------------------------------------
+
+/// Description: Add New Tasks to To-Dos
+
+/// Author(s): Sharan
+
+/// Date Approved: 14-06-2020
+
+/// Date Created: 17-06-2020
+
+/// Approved By: Sahil, Sharan
+
+/// Reviewed By: Kaish, Sharan
+
+/// ------------------------------------------------------------------------
+
+/// File(s) Accessed: NONE
+
+/// File(s) Modified: NONE
+
+/// ------------------------------------------------------------------------
+
+/// Input(s): 1. code - Family Code
+
+/// Output(s): 1. AddTask - State Widget
+
+/// ------------------------------------------------------------------------
+
+/// Error-Handling(s): 1. Check for Internet Connection
+///                    2. Await for Synchronization
+
+/// ------------------------------------------------------------------------
+
+/// Modification(s): 1. Initial commit - 18th June, 2020
+///                  2. Internet Connectivity Check added - 26th July, 2020
+
+/// ------------------------------------------------------------------------
+
+/// Fault(s): NONE
+
+/// ------------------------------------------------------------------------
+
 import 'dart:io';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -35,13 +81,13 @@ class _AddTaskState extends State<AddTask> {
   }
 
   void showInSnackBar(String value) {
-    _scaffoldKey.currentState.showSnackBar(new SnackBar(content: new Text(value)));
+    _scaffoldKey.currentState
+        .showSnackBar(new SnackBar(content: new Text(value)));
   }
 
   String code;
   @override
   Widget build(BuildContext context) {
-
     final user_val = Provider.of<User>(context);
 
     return Scaffold(
@@ -60,10 +106,12 @@ class _AddTaskState extends State<AddTask> {
                       Icons.arrow_back_ios,
                       color: Colors.deepPurpleAccent,
                     ),
-                    onPressed: () async{
-                      if(await _checkForInternetConnection()){
+                    onPressed: () async {
+                      if (await _checkForInternetConnection()) {
                         Navigator.pop(context);
-                      } else  {connectivityDialogBox(context);}
+                      } else {
+                        connectivityDialogBox(context);
+                      }
                     },
                   ),
                   Text(
@@ -151,7 +199,7 @@ class _AddTaskState extends State<AddTask> {
                                       fontWeight: FontWeight.w400),
                                 ),
                                 validator: (val) =>
-                                 val.isEmpty ? "Please enter a title" : null,
+                                    val.isEmpty ? "Please enter a title" : null,
                                 onChanged: (val) {
 //                              setState(() => email_id = val);
                                 },
@@ -159,10 +207,12 @@ class _AddTaskState extends State<AddTask> {
                             ),
                             SizedBox(height: 90),
                             StreamBuilder<FamilyCodeValue>(
-                                stream: DataBaseService(uid: user_val.uid).codeData,
+                                stream:
+                                    DataBaseService(uid: user_val.uid).codeData,
                                 builder: (context, snapshotCode) {
                                   return FlatButton(
-                                    padding: EdgeInsets.only(left: 100, right: 100),
+                                    padding:
+                                        EdgeInsets.only(left: 100, right: 100),
                                     shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(15),
                                         side: BorderSide(
@@ -173,27 +223,26 @@ class _AddTaskState extends State<AddTask> {
                                           fontSize: 18,
                                           color: Colors.deepPurpleAccent),
                                     ),
-                                    onPressed: () async{
-                                      if(await _checkForInternetConnection()){
-                                        if(_formKey.currentState.validate()) {
+                                    onPressed: () async {
+                                      if (await _checkForInternetConnection()) {
+                                        if (_formKey.currentState.validate()) {
                                           code = snapshotCode.data.familyID;
-                                          final FirebaseUser fireuser = await FirebaseAuth
-                                              .instance.currentUser();
+                                          final FirebaseUser fireuser =
+                                              await FirebaseAuth.instance
+                                                  .currentUser();
 
                                           await DataBaseService(famCode: code)
                                               .updateTasks(
-                                              _textController.text,
-                                              false);
+                                                  _textController.text, false);
 
                                           Navigator.pop(context);
-
                                         }
-                                      } else  {connectivityDialogBox(context);}
-
+                                      } else {
+                                        connectivityDialogBox(context);
+                                      }
                                     },
                                   );
-                                }
-                            ),
+                                }),
                           ],
                         ),
                       ),
@@ -210,7 +259,7 @@ class _AddTaskState extends State<AddTask> {
 }
 
 //Connectivity Error Dialog Box
-AwesomeDialog connectivityDialogBox(BuildContext context){
+AwesomeDialog connectivityDialogBox(BuildContext context) {
   return AwesomeDialog(
     context: context,
     dialogType: DialogType.WARNING,
