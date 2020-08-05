@@ -22,6 +22,7 @@
 /// ------------------------------------------------------------------------
 /// Fault(s): None
 /// ------------------------------------------------------------------------
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:jaldiio/Models/Contact.dart';
 import 'package:jaldiio/Models/FamilyCodeValue.dart';
@@ -46,7 +47,6 @@ class DataBaseService {
   final CollectionReference familyCollection =
       Firestore.instance.collection('family_info');
 
-  //Capitalize
   String capitalize(String string) {
     if (string == null) {
       throw ArgumentError("string: $string");
@@ -59,7 +59,8 @@ class DataBaseService {
     return string[0].toUpperCase() + string.substring(1).toLowerCase();
   }
 
-  Future updateUserInfo(String name, String status, String date, int phone_num) async {
+  Future updateUserInfo(
+      String name, String status, String date, int phone_num) async {
     return await userCollection.document(uid).setData({
       'name': capitalize(name),
       'status': capitalize(status),
@@ -70,15 +71,24 @@ class DataBaseService {
     });
   }
 
-  Future updateTags(List<String> tags) async{
-    return await familyCollection.document(famCode).collection("images")
-        .document("tagList").updateData({
-      'tagValues': FieldValue.arrayUnion(tags)
-    });
+  Future updateTags(List<String> tags) async {
+    return await familyCollection
+        .document(famCode)
+        .collection("images")
+        .document("tagList")
+        .updateData({'tagValues': FieldValue.arrayUnion(tags)});
   }
 
-  Future updateMembers(String name, int phNo) async{
-    String nameid = name.toLowerCase()+"_"+phNo.toString();
+  Future updateRecipeTags(List<String> tags) async {
+    return await familyCollection
+        .document(famCode)
+        .collection("recipes")
+        .document("tagList")
+        .updateData({'tagValues': FieldValue.arrayUnion(tags)});
+  }
+
+  Future updateMembers(String name, int phNo) async {
+    String nameid = name.toLowerCase() + "_" + phNo.toString();
     familyCollection
         .document(famCode)
         .collection("members")
@@ -95,18 +105,17 @@ class DataBaseService {
     });
   }
 
-  Future updateAdmin(bool admin) async{
+  Future updateAdmin(bool admin) async {
     return await userCollection.document(uid).updateData({
       'admin': admin,
     });
   }
 
-  Future updateJoined(bool joined) async{
+  Future updateJoined(bool joined) async {
     return await userCollection.document(uid).updateData({
       'joined': joined,
     });
   }
-
 
   Future updateTaskCheck(bool checked, String id) async {
     return await familyCollection
@@ -118,7 +127,7 @@ class DataBaseService {
     });
   }
 
-  Future deleteUserProfile() async{
+  Future deleteUserProfile() async {
     return await userCollection.document(uid).delete();
   }
 
@@ -126,163 +135,211 @@ class DataBaseService {
     return await familyCollection
         .document(famCode)
         .collection("todos")
-        .document(id).delete();
+        .document(id)
+        .delete();
   }
 
   Future deleteEvent(String id) async {
     return await familyCollection
         .document(famCode)
         .collection("familyEvent")
-        .document(id).delete();
+        .document(id)
+        .delete();
   }
 
-  Future deleteFamily() async{
+  Future deleteFamily() async {
     return await familyCollection.document(famCode).delete();
   }
-  Future leaveFamily() async{
+
+  Future leaveFamily() async {
     return await userCollection.document(uid).updateData({
-      'familyID' :FieldValue.delete(),
+      'familyID': FieldValue.delete(),
     });
   }
-  Future removeMember(String name_id) async{
-    return await familyCollection.document(famCode).collection("members").document(name_id).delete();
+
+  Future removeMember(String name_id) async {
+    return await familyCollection
+        .document(famCode)
+        .collection("members")
+        .document(name_id)
+        .delete();
   }
 
-  Future deleteImgTag(String tag) async{
+  Future deleteImgTag(String tag) async {
     List<String> tags = new List<String>();
     tags.add(tag);
-    return await familyCollection.document(famCode).collection("images")
-        .document("tagList").updateData({
-      'tagValues': FieldValue.arrayRemove(tags)
-    });
+    return await familyCollection
+        .document(famCode)
+        .collection("images")
+        .document("tagList")
+        .updateData({'tagValues': FieldValue.arrayRemove(tags)});
   }
 
-  Future deleteImg(String id) async{
-    return await familyCollection.document(famCode).collection("images").document(id).delete();
+  Future deleteImg(String id) async {
+    return await familyCollection
+        .document(famCode)
+        .collection("images")
+        .document(id)
+        .delete();
   }
 
-  Future deleteContactDoc(String name_id) async{
-    try{
+  Future deleteRecipeTag(String tag) async {
+    List<String> tags = new List<String>();
+    tags.add(tag);
+    return await familyCollection
+        .document(famCode)
+        .collection("recipes")
+        .document("tagList")
+        .updateData({'tagValues': FieldValue.arrayRemove(tags)});
+  }
+
+  Future deleteRecipe(String id) async {
+    return await familyCollection
+        .document(famCode)
+        .collection("recipes")
+        .document(id)
+        .delete();
+  }
+
+  Future deleteContactDoc(String name_id) async {
+    try {
       return await familyCollection
           .document(famCode)
           .collection("contacts")
-          .document(name_id).delete();
-    }
-    catch(e){
+          .document(name_id)
+          .delete();
+    } catch (e) {
       print("Unable to delete contact.");
       return null;
     }
-
   }
 
-  Future deleteTodoList() async{
+  Future deleteTodoList() async {
     return await familyCollection
         .document(famCode)
-        .collection("todos").getDocuments().then((snapshot) {
-          for(DocumentSnapshot ds in snapshot.documents){
-            ds.reference.delete();
-          }
-    });
-  }
-  Future deleteMembersList() async{
-    return await familyCollection
-        .document(famCode)
-        .collection("members").getDocuments().then((snapshot) {
-      for(DocumentSnapshot ds in snapshot.documents){
+        .collection("todos")
+        .getDocuments()
+        .then((snapshot) {
+      for (DocumentSnapshot ds in snapshot.documents) {
         ds.reference.delete();
       }
     });
   }
 
-  Future deleteContactsList() async{
+  Future deleteMembersList() async {
     return await familyCollection
         .document(famCode)
-        .collection("contacts").getDocuments().then((snapshot) {
-      for(DocumentSnapshot ds in snapshot.documents){
+        .collection("members")
+        .getDocuments()
+        .then((snapshot) {
+      for (DocumentSnapshot ds in snapshot.documents) {
         ds.reference.delete();
       }
     });
   }
 
-
-  Future deleteFamilyEventsList() async{
+  Future deleteContactsList() async {
     return await familyCollection
         .document(famCode)
-        .collection("familyEvents").getDocuments().then((snapshot) {
-      for(DocumentSnapshot ds in snapshot.documents){
+        .collection("contacts")
+        .getDocuments()
+        .then((snapshot) {
+      for (DocumentSnapshot ds in snapshot.documents) {
         ds.reference.delete();
       }
     });
   }
 
-  Future deleteImagesList() async{
+  Future deleteFamilyEventList() async {
     return await familyCollection
         .document(famCode)
-        .collection("images").getDocuments().then((snapshot) {
-      for(DocumentSnapshot ds in snapshot.documents){
-        
-        if(ds.reference.documentID.compareTo("tagList") != 0){
-          try{
-            CloudStorageService(famCode: famCode).deleteImage(ds.reference.documentID).then((value) {
+        .collection("familyEvent")
+        .getDocuments()
+        .then((snapshot) {
+      for (DocumentSnapshot ds in snapshot.documents) {
+        ds.reference.delete();
+      }
+    });
+  }
+
+  Future deleteImagesList() async {
+    return await familyCollection
+        .document(famCode)
+        .collection("images")
+        .getDocuments()
+        .then((snapshot) {
+      for (DocumentSnapshot ds in snapshot.documents) {
+        if (ds.reference.documentID.compareTo("tagList") != 0) {
+          try {
+            CloudStorageService(famCode: famCode)
+                .deleteImage(ds.reference.documentID)
+                .then((value) {
               ds.reference.delete();
             });
-          }catch(e){
+          } catch (e) {
             print(e.toString());
           }
-        }else{
+        } else {
           ds.reference.delete();
         }
-
-
       }
     });
   }
 
-  Future deleteRecipesList() async{
+  Future deleteRecipesList() async {
     return await familyCollection
         .document(famCode)
-        .collection("recipes").getDocuments().then((snapshot) {
-      for(DocumentSnapshot ds in snapshot.documents){
-
-        if(ds.reference.documentID.compareTo("tagList") != 0){
-          try{
-            CloudStorageService(famCode: famCode).deleteImage(ds.reference.documentID).then((value) {
+        .collection("recipes")
+        .getDocuments()
+        .then((snapshot) {
+      for (DocumentSnapshot ds in snapshot.documents) {
+        if (ds.reference.documentID.compareTo("tagList") != 0) {
+          try {
+            CloudStorageService(famCode: famCode)
+                .deleteImage(ds.reference.documentID)
+                .then((value) {
               ds.reference.delete();
             });
-          }catch(e){
+          } catch (e) {
             print(e.toString());
           }
-        }else{
+        } else {
           ds.reference.delete();
         }
-
-
       }
     });
   }
-  Future initializeDocField() async{
+
+  Future initializeDocField() async {
     return await familyCollection.document(famCode).setData({
       'code': famCode,
     });
   }
-  Future initializeImageTagField() async{
+
+  Future initializeImageTagField() async {
     List<String> initialList = new List<String>();
     initialList.add("#Happy");
-    return await familyCollection.document(famCode).collection("images").
-    document("tagList").setData({
+    return await familyCollection
+        .document(famCode)
+        .collection("images")
+        .document("tagList")
+        .setData({
       'tagValues': FieldValue.arrayUnion(initialList),
     });
   }
 
   // Might need if recipe has tags
-//  Future initializeRecipeTagField() async{
-//    List<String> initialList = new List<String>();
-//    initialList.add("");
-//    return await familyCollection.document(famCode).collection("recipes").
-//    document("tagList").setData({
-//      'tagValues': FieldValue.arrayUnion(initialList),
-//    });
-//  }
+  Future initializeRecipeTagField() async {
+    List<String> initialList = new List<String>();
+    initialList.add("");
+    return await familyCollection
+        .document(famCode)
+        .collection("recipes")
+        .document("tagList")
+        .setData({
+      'tagValues': FieldValue.arrayUnion(initialList),
+    });
+  }
 
   Future updateContactsInfo(String emailId, String name, int phNo) async {
     String name_id = emailId;
@@ -297,11 +354,11 @@ class DataBaseService {
       'phNo': phNo,
       'joined': false,
       'uid': null,
-	  'photoURL': null,
+      'photoURL': null,
     });
   }
 
-  Future updateEvents(String title, String description, String date) async{
+  Future updateEvents(String title, String description, String date) async {
     var random = Random.secure();
 
     var value = random.nextInt(1000000000);
@@ -314,57 +371,82 @@ class DataBaseService {
       'title': capitalize(title),
       'description': description,
       'id': event_id,
-      'eventDate' : date,
-
+      'eventDate': date,
     });
   }
 
-  Future updateContactjoined(String id, bool joined, String photoURL) async{
+  Future updateContactjoined(String id, bool joined, String photoURL) async {
     String name_id = id;
     return await familyCollection
         .document(famCode)
         .collection("contacts")
-        .document(name_id).updateData({
+        .document(name_id)
+        .updateData({
       'joined': joined,
-	  'photoURL': photoURL,
+      'photoURL': photoURL,
     });
   }
 
-  Future updateContactUID(String id, String uid) async{
+  Future updateContactUID(String id, String uid) async {
     String name_id = id;
     return await familyCollection
         .document(famCode)
         .collection("contacts")
-        .document(name_id).updateData({
+        .document(name_id)
+        .updateData({
       'uid': uid,
-
     });
   }
 
-  Future addImageURL(String name, String id, String url, List<String> tags) async{
+  Future addImageURL(
+      String name, String id, String url, List<String> tags) async {
     return await familyCollection
         .document(famCode)
         .collection("images")
-        .document(id).setData({
-      'url' : url,
+        .document(id)
+        .setData({
+      'url': url,
       'name': capitalize(name),
       'id': id,
       'tag': tags,
-
     });
   }
 
-  Future addImageTag(String id, List tags) async{
+  Future addRecipeURL(
+      String name, String id, String url, List<String> tags) async {
+    return await familyCollection
+        .document(famCode)
+        .collection("recipes")
+        .document(id)
+        .setData({
+      'url': url,
+      'name': capitalize(name),
+      'id': id,
+      'tag': tags,
+    });
+  }
 
+  Future addImageTag(String id, List tags) async {
     return await familyCollection
         .document(famCode)
         .collection("images")
-        .document(id).updateData({
+        .document(id)
+        .updateData({
       'tags': tags,
     });
   }
 
-  Future updateTasks(String task, bool check) async{
+  Future addRecipeTag(String id, List tags) async {
+    return await familyCollection
+        .document(famCode)
+        .collection("recipes")
+        .document(id)
+        .updateData({
+      'tags': tags,
+    });
+  }
+
+  Future updateTasks(String task, bool check) async {
     var random = Random.secure();
 
     var value = random.nextInt(1000000000);
@@ -374,13 +456,11 @@ class DataBaseService {
         .collection("todos")
         .document(task_id)
         .setData({
-        'task': capitalize(task),
-        'check': check,
-        'id': task_id,
-
+      'task': capitalize(task),
+      'check': check,
+      'id': task_id,
     });
   }
-
 
   List<Contact> _contactListFromSnapShot(QuerySnapshot snapshot) {
     return snapshot.documents.map((doc) {
@@ -390,7 +470,7 @@ class DataBaseService {
         emaild: doc.data['emailID'] ?? '',
         joined: doc.data['joined'] ?? false,
         uid: doc.data['uid'] ?? '',
-		photoURL: doc.data['photoURL'] ?? '',
+        photoURL: doc.data['photoURL'] ?? '',
       );
     }).toList();
   }
@@ -405,9 +485,8 @@ class DataBaseService {
     }).toList();
   }
 
-
-  List<Task> _taskListFromSnapShot(QuerySnapshot snapshot){
-    return snapshot.documents.map((doc){
+  List<Task> _taskListFromSnapShot(QuerySnapshot snapshot) {
+    return snapshot.documents.map((doc) {
       return Task(
         task: doc.data['task'] ?? '',
         check: doc.data['check'] ?? false,
@@ -441,7 +520,7 @@ class DataBaseService {
     );
   }
 
-  ImageTags _imageTags(DocumentSnapshot snapshot){
+  ImageTags _imageTags(DocumentSnapshot snapshot) {
     List<String> emptyList = new List<String>();
     emptyList.add("");
     return ImageTags(
@@ -473,9 +552,21 @@ class DataBaseService {
     return userCollection.snapshots().map(_userLisFromSnapShot);
   }
 
-  Stream<ImageTags> get imgTagData{
-    return familyCollection.document(famCode).collection("images")
-        .document("tagList").snapshots()
+  Stream<ImageTags> get imgTagData {
+    return familyCollection
+        .document(famCode)
+        .collection("images")
+        .document("tagList")
+        .snapshots()
+        .map(_imageTags);
+  }
+
+  Stream<ImageTags> get recipeTagData {
+    return familyCollection
+        .document(famCode)
+        .collection("recipes")
+        .document("tagList")
+        .snapshots()
         .map(_imageTags);
   }
 
@@ -493,7 +584,7 @@ class DataBaseService {
   }
 
   //get tasks stream
-  Stream<List<Task>> get tasks{
+  Stream<List<Task>> get tasks {
     return familyCollection
         .document(famCode)
         .collection("todos")
@@ -502,7 +593,7 @@ class DataBaseService {
   }
 
   //get events stream
-  Stream<List<EventModel>> get events{
+  Stream<List<EventModel>> get events {
     return familyCollection
         .document(famCode)
         .collection("familyEvent")
@@ -511,7 +602,7 @@ class DataBaseService {
   }
 
   //get urls stream
-  Stream<List<ImageUrls>> get urls{
+  Stream<List<ImageUrls>> get urls {
     return familyCollection
         .document(famCode)
         .collection("images")
@@ -519,7 +610,7 @@ class DataBaseService {
         .map(_urlListFromSnapShot);
   }
 
-  Stream<FamilyCodeValue> get codeData{
+  Stream<FamilyCodeValue> get codeData {
     return userCollection.document(uid).snapshots().map(_familyCodeValue);
   }
 
