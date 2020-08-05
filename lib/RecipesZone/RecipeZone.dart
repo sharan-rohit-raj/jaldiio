@@ -77,7 +77,7 @@ class RecipeZone extends StatelessWidget {
         },
         child: Icon(
           Icons.fastfood,
-          size: 40,
+          size: 35,
           color: Colors.white,
         ),
         backgroundColor: Colors.deepPurple[600],
